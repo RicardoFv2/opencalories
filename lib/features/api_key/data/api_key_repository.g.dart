@@ -6,39 +6,84 @@ part of 'api_key_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$apiKeyRepositoryHash() => r'79c8d536389fa3cb78baefafbdb15021a77d2167';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [apiKeyRepository].
 @ProviderFor(apiKeyRepository)
-final apiKeyRepositoryProvider = AutoDisposeProvider<ApiKeyRepository>.internal(
-  apiKeyRepository,
-  name: r'apiKeyRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$apiKeyRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final apiKeyRepositoryProvider = ApiKeyRepositoryProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ApiKeyRepositoryRef = AutoDisposeProviderRef<ApiKeyRepository>;
-String _$apiKeyHash() => r'50f62de54f3e35a9df7af3991684c9f032ac1e39';
+final class ApiKeyRepositoryProvider
+    extends
+        $FunctionalProvider<
+          ApiKeyRepository,
+          ApiKeyRepository,
+          ApiKeyRepository
+        >
+    with $Provider<ApiKeyRepository> {
+  ApiKeyRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'apiKeyRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-/// See also [apiKey].
+  @override
+  String debugGetCreateSourceHash() => _$apiKeyRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<ApiKeyRepository> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ApiKeyRepository create(Ref ref) {
+    return apiKeyRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ApiKeyRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ApiKeyRepository>(value),
+    );
+  }
+}
+
+String _$apiKeyRepositoryHash() => r'251f9eae9ef4e138c1c3e45fb40935dea699536b';
+
 @ProviderFor(apiKey)
-final apiKeyProvider = AutoDisposeFutureProvider<String?>.internal(
-  apiKey,
-  name: r'apiKeyProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$apiKeyHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final apiKeyProvider = ApiKeyProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ApiKeyRef = AutoDisposeFutureProviderRef<String?>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class ApiKeyProvider
+    extends $FunctionalProvider<AsyncValue<String?>, String?, FutureOr<String?>>
+    with $FutureModifier<String?>, $FutureProvider<String?> {
+  ApiKeyProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'apiKeyProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$apiKeyHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<String?> create(Ref ref) {
+    return apiKey(ref);
+  }
+}
+
+String _$apiKeyHash() => r'0a83abe9a815e481637d3c01ed950e271147f0d7';

@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:opencalories/features/api_key/data/api_key_repository.dart';
@@ -19,7 +18,7 @@ GoRouter goRouter(Ref ref) {
       // You might want to show a splash screen here, but for now we default to settings
       // if we can't prove we have a key.
 
-      final apiKey = apiKeyAsync.valueOrNull;
+      final apiKey = apiKeyAsync.asData?.value;
       final isSettings = state.uri.path == '/settings';
 
       if (apiKey == null || apiKey.isEmpty) {
