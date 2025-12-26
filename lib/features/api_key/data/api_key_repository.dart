@@ -1,4 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'api_key_repository.g.dart';
@@ -24,12 +26,12 @@ class ApiKeyRepository {
 }
 
 @riverpod
-ApiKeyRepository apiKeyRepository(ApiKeyRepositoryRef ref) {
+ApiKeyRepository apiKeyRepository(Ref ref) {
   return ApiKeyRepository(const FlutterSecureStorage());
 }
 
 @riverpod
-Future<String?> apiKey(ApiKeyRef ref) async {
+Future<String?> apiKey(Ref ref) async {
   final repository = ref.watch(apiKeyRepositoryProvider);
   return await repository.getApiKey();
 }

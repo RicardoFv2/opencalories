@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:opencalories/features/api_key/data/api_key_repository.dart';
@@ -7,7 +8,7 @@ import 'package:opencalories/features/settings/presentation/settings_screen.dart
 part 'app_router.g.dart';
 
 @riverpod
-GoRouter goRouter(GoRouterRef ref) {
+GoRouter goRouter(Ref ref) {
   final apiKeyAsync = ref.watch(apiKeyProvider);
 
   return GoRouter(
