@@ -233,7 +233,6 @@ class WelcomeScreen extends StatelessWidget {
                               TextSpan(
                                 text: 'You Eat.',
                                 style: TextStyle(
-                                  color: Colors.transparent,
                                   shadows: [
                                     Shadow(
                                       color: AppTheme.primary.withValues(
