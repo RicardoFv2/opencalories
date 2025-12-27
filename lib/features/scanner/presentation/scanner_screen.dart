@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/services/image_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../settings/data/api_key_repository.dart';
 
 class ScannerScreen extends HookConsumerWidget {
   const ScannerScreen({super.key});
@@ -82,7 +83,14 @@ class ScannerScreen extends HookConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _CircleButton(icon: Icons.flash_off, onTap: () {}),
+                    _CircleButton(
+                      icon: Icons.logout,
+                      onTap: () async {
+                        // Clear API key to reset app state (Back to Welcome)
+                        await ref.read(apiKeyRepositoryProvider).deleteApiKey();
+                        ref.invalidate(apiKeyProvider);
+                      },
+                    ),
                     const Text(
                       'Scan Meal',
                       style: TextStyle(

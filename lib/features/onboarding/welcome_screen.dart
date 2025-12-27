@@ -243,7 +243,7 @@ class WelcomeScreen extends StatelessWidget {
                                     ),
                                   ],
                                   decoration: TextDecoration.none,
-                                  background: Paint()
+                                  foreground: Paint()
                                     ..shader =
                                         const LinearGradient(
                                           colors: [
