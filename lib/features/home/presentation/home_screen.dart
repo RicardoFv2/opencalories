@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import '../../settings/data/api_key_repository.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends HookConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('OpenCalories'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => context.push('/settings'),
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await ref.read(apiKeyRepositoryProvider).deleteApiKey();
+              ref.invalidate(apiKeyProvider);
+            },
           ),
         ],
       ),
-      body: const Center(child: Text('Home Screen (Placeholder)')),
+      body: const Center(child: Text('Home Screen')),
     );
   }
 }

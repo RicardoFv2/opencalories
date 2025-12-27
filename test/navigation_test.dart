@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:opencalories/features/api_key/data/api_key_repository.dart';
+import 'package:opencalories/features/settings/data/api_key_repository.dart';
 import 'package:opencalories/main.dart';
 
 // Generate mocks if we were using generated mocks, but for simple storage we can mock manually or use InMemory
@@ -48,7 +48,10 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify that we are on the Settings Screen
-    expect(find.text('Enter your Google AI Studio API Key'), findsOneWidget);
+    expect(
+      find.text('Enter your Google Generative AI API Key'),
+      findsOneWidget,
+    );
     expect(find.text('OpenCalories'), findsNothing); // Title of Home
   });
 
@@ -67,8 +70,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // Verify that we are on the Home Screen (or at least NOT on settings)
-    // Note: Our Home Screen placeholder has 'Home Screen (Placeholder)' text
-    expect(find.text('Home Screen (Placeholder)'), findsOneWidget);
+    // Verify that we are on the Home Screen
+    expect(find.text('Home Screen'), findsOneWidget);
   });
 }
