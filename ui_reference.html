@@ -1,0 +1,851 @@
+<!-- Welcome Screen -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome Screen - Nano Banana Pro</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216", // Deep forest green/black
+                        "surface-dark": "#1a2c20",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem", 
+                        "lg": "0.75rem", 
+                        "xl": "1rem", 
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white antialiased overflow-hidden selection:bg-primary selection:text-background-dark">
+<div class="relative flex h-screen w-full flex-col justify-between overflow-y-auto">
+<!-- Background Decor -->
+<div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+<div class="absolute top-[-10%] left-[-20%] w-[60%] h-[40%] bg-primary/10 rounded-full blur-[100px]"></div>
+<div class="absolute bottom-[10%] right-[-10%] w-[50%] h-[40%] bg-primary/5 rounded-full blur-[80px]"></div>
+</div>
+<!-- Top Section: Header & Image -->
+<div class="flex-1 flex flex-col items-center justify-start pt-8 px-6 z-10 w-full max-w-md mx-auto">
+<!-- Logo/Branding -->
+<div class="flex items-center gap-2 mb-8 opacity-80">
+<span class="material-symbols-outlined text-primary text-2xl">nutrition</span>
+<span class="text-sm font-semibold tracking-widest uppercase text-white/80">Nano Banana Pro</span>
+</div>
+<!-- Hero Image / Visualization -->
+<div class="relative w-full aspect-[4/5] max-h-[50vh] rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
+<!-- Image -->
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Close up of a fresh green apple being analyzed with digital scanning lines" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB90KLW_KTbgpqU3Sp_lJ7_7BxuT6-hgaErq-3qge2Uf9L-amejkYHY3q9Ajel5Hnj8l8oeqt6bGMQANZNzyee2t4uVSTeNAFRg7gs8u0dbOCJRifLelP_py1xKBxze_i-Yu7oudM-WjsQkBswPZD1sY__CYYvqfrcIRXXKxPzzrpnU9ufp8a81_dgfNPRjxV6yv1FgaqQ20_CR0hRHrP72mTwwHzbifezv-i5Wj1nxXyOK1VdbG-myCTBff1of9oT0-Oqd6CWbYNs");'>
+</div>
+<!-- Overlay Gradient -->
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/90 via-transparent to-transparent"></div>
+<!-- Scanning UI Overlay -->
+<div class="absolute inset-0 flex flex-col items-center justify-center p-6">
+<!-- Scan Frame -->
+<div class="w-full h-full border border-primary/30 rounded-lg relative flex flex-col justify-between p-4">
+<!-- Corner Markers -->
+<div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-lg"></div>
+<div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-lg"></div>
+<div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-lg"></div>
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-lg"></div>
+<!-- Floating Data Points -->
+<div class="bg-black/40 backdrop-blur-md self-end rounded px-2 py-1 border border-primary/20">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span class="text-[10px] font-mono text-primary">SCANNING...</span>
+</div>
+</div>
+<!-- Analysis Result Mockup -->
+<div class="bg-surface-dark/90 backdrop-blur-sm border border-white/10 rounded-lg p-3 w-full mt-auto translate-y-2">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-xs text-gray-400 mb-1">Detected</p>
+<h3 class="text-lg font-bold text-white leading-none">Green Apple</h3>
+</div>
+<div class="text-right">
+<p class="text-xs text-primary font-bold">52 kcal</p>
+<p class="text-[10px] text-gray-400">High Confidence</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Text & Actions -->
+<div class="w-full bg-background-dark z-20 pt-6 pb-8 px-6 rounded-t-3xl border-t border-white/5 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] max-w-md mx-auto">
+<div class="text-center mb-8">
+<h1 class="text-4xl font-black text-white leading-[1.1] mb-4 tracking-tight">
+                    See What <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-400">You Eat.</span>
+</h1>
+<p class="text-gray-400 text-base font-normal leading-relaxed max-w-[300px] mx-auto">
+                    Instant calorie analysis and macro breakdowns powered by <span class="text-white font-medium">Nano Banana Pro</span> technology.
+                </p>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Primary Action -->
+<button class="relative w-full group overflow-hidden rounded-xl bg-primary h-14 flex items-center justify-center transition-all hover:bg-[#0fd650] active:scale-[0.98]">
+<span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></span>
+<span class="flex items-center gap-2 text-background-dark font-bold text-lg tracking-wide">
+<span class="material-symbols-outlined text-[24px]">center_focus_weak</span>
+                        Start Scanning
+                    </span>
+</button>
+<!-- Secondary Action -->
+<button class="w-full rounded-xl bg-surface-dark border border-white/5 h-12 flex items-center justify-center text-white font-semibold text-sm transition-colors hover:bg-white/5 active:scale-[0.98]">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">bluetooth_connected</span>
+                        Connect Device
+                    </span>
+</button>
+<!-- Tertiary Link -->
+<button class="mt-2 text-gray-500 text-sm font-medium hover:text-primary transition-colors">
+                    Already have an account? <span class="underline decoration-gray-600 underline-offset-4">Log In</span>
+</button>
+</div>
+<!-- Safe Area Spacer -->
+<div class="h-4"></div>
+</div>
+</div>
+<style>
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</body></html>
+
+<!-- Food Scan/Camera Screen -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Food Scan Screen</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#13ec5b",
+              "background-light": "#f6f8f6",
+              "background-dark": "#102216",
+            },
+            fontFamily: {
+              "display": ["Space Grotesk", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>/* Custom styles for camera viewfinder simulation */
+.camera-viewfinder {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCLZcAWotxRFKP7Z_ZFX46EPQaBvqE5rfpCBTw2kwTAM5cXU3LBt7sILVh42-rw_FXbJlD4XcPpdNDfOgvUXLdFpTR9sWp2MAJ_kp4QXLrZW9C643vTj2NhoY3jCyAOilo-g7O5Ft1rbS0OwretHVk_zjKJW0i2uP-8En2_UFEADkZQ11VtNYuanIaNUGlD5dE4lKKNKrk6oTnCSuj5xGmS0f9k2N8vPdOPpSKA3JOzgzfsOgtQmiWZ7An3r6MScCX_QHrKV9qL0mk);
+    background-size: cover;
+    background-position: center
+    }
+/* Subtle pulse animation for the active badge */
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 0 0 rgba(19, 236, 91, 0.4);
+        } 70% {
+        box-shadow: 0 0 0 10px rgba(19, 236, 91, 0);
+        } 100% {
+        box-shadow: 0 0 0 0 rgba(19, 236, 91, 0);
+        }
+    }
+.pulse-active {
+    animation: pulse-green 2s infinite
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display h-screen w-full overflow-hidden flex flex-col relative text-white">
+<!-- Camera Viewfinder Background -->
+<div class="absolute inset-0 z-0 camera-viewfinder" data-alt="Overhead view of a healthy salad bowl on a wooden table">
+<!-- Overlay Gradient for better text visibility -->
+<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80"></div>
+</div>
+<!-- Top App Bar -->
+<div class="relative z-10 pt-safe-top">
+<div class="flex items-center p-4 pb-2 justify-between">
+<!-- Flash Toggle -->
+<button class="flex size-12 shrink-0 items-center justify-center rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 transition-colors">
+<span class="material-symbols-outlined text-white" style="font-size: 24px;">flash_off</span>
+</button>
+<!-- Title -->
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center drop-shadow-md">Scan Meal</h2>
+<!-- Close Button -->
+<button class="flex size-12 shrink-0 items-center justify-center rounded-full bg-black/20 backdrop-blur-md hover:bg-black/40 transition-colors">
+<span class="material-symbols-outlined text-white" style="font-size: 24px;">close</span>
+</button>
+</div>
+</div>
+<!-- Main Content Area (Framing) -->
+<div class="relative z-10 flex-1 flex flex-col items-center justify-center w-full px-6">
+<!-- Nano Banana Pro Chip -->
+<div class="mb-8">
+<div class="pulse-active flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-black/60 backdrop-blur-lg border border-primary/30 pl-4 pr-4 shadow-lg">
+<span class="material-symbols-outlined text-primary" style="font-size: 18px;">bolt</span>
+<p class="text-primary text-sm font-semibold leading-normal tracking-wide uppercase">Nano Banana Pro: Active</p>
+</div>
+</div>
+<!-- Framing Overlay -->
+<div class="relative aspect-square w-full max-w-sm rounded-3xl border-2 border-white/20 shadow-2xl overflow-hidden group">
+<!-- Corner Brackets -->
+<div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-xl translate-x-2 translate-y-2"></div>
+<div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-xl -translate-x-2 translate-y-2"></div>
+<div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-xl translate-x-2 -translate-y-2"></div>
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-xl -translate-x-2 -translate-y-2"></div>
+<!-- Center Focus Reticle -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="w-2 h-2 bg-primary rounded-full opacity-80 shadow-[0_0_10px_rgba(19,236,91,0.8)]"></div>
+</div>
+<!-- Scanning line animation simulation -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 blur-sm animate-[scan_3s_ease-in-out_infinite]" style="top: 20%;"></div>
+</div>
+<!-- Helper Text -->
+<div class="mt-6 text-center">
+<p class="text-white/90 text-sm font-medium leading-normal tracking-wide bg-black/30 backdrop-blur-sm py-1 px-4 rounded-full inline-block border border-white/10">
+                Align food within frame...
+            </p>
+</div>
+</div>
+<!-- Bottom Controls Area -->
+<div class="relative z-10 pb-8 pt-4 bg-gradient-to-t from-black via-black/80 to-transparent">
+<div class="flex items-center justify-around px-8">
+<!-- Gallery Button -->
+<button class="flex flex-col items-center justify-center gap-1 group">
+<div class="size-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center overflow-hidden transition-transform group-active:scale-95">
+<div class="w-full h-full bg-cover bg-center opacity-80 group-hover:opacity-100" data-alt="Thumbnail of last taken food photo" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDadVsHCwIZeNRPGXT5dJ_13EE-OiO0_ZLcRi_lsyi1frTuPwCvI01KpZ3cGCu3gHmEcSYqFRGDEhgr0_DKUoRmvZuQpSrVSrLnSlWQ8d7sjCRTCOIVxYZLkuYQtRePdKtbLSYKzGArz6DscZFB6Qfze_HVURv0tSXrCJbH4a_05xNDw7mLUzvD50BmYHyxG1KwifHimsTjGwU-ljUhqGJk1lJgRxAHzj00cIIz6h4l5y5_cYfEbJDvBoleZhgFQ6k6bnWKFOWPoRs');"></div>
+</div>
+</button>
+<!-- Shutter Button -->
+<button class="relative group cursor-pointer transition-transform active:scale-95">
+<!-- Outer Ring -->
+<div class="size-20 rounded-full border-4 border-white flex items-center justify-center bg-transparent shadow-[0_0_15px_rgba(0,0,0,0.3)]">
+<!-- Inner Circle -->
+<div class="size-16 rounded-full bg-primary shadow-[0_0_20px_rgba(19,236,91,0.6)] group-hover:bg-[#3bf478] transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-background-dark group-active:scale-110 transition-transform" style="font-size: 32px;">photo_camera</span>
+</div>
+</div>
+</button>
+<!-- History Button -->
+<button class="flex flex-col items-center justify-center gap-1 group">
+<div class="size-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors group-active:scale-95">
+<span class="material-symbols-outlined" style="font-size: 24px;">history</span>
+</div>
+</button>
+</div>
+<!-- Bottom Safe Area Spacer if needed on mobile web -->
+<div class="h-4"></div>
+</div>
+<!-- Scanning Animation Keyframe (Inline) -->
+<style>
+        @keyframes scan {
+            0% { transform: translateY(-100%); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(400px); opacity: 0; }
+        }
+    </style>
+</body></html>
+
+<!-- Meal Log/History Screen -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Meal Log Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "surface-dark": "#1b2d21", // Slightly lighter than bg-dark for cards
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "Noto Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", 
+                        "lg": "0.5rem", 
+                        "xl": "0.75rem", 
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #102216;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b5443;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #13ec5b;
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-slate-900 dark:text-white overflow-x-hidden selection:bg-primary selection:text-black">
+<div class="relative flex flex-col min-h-screen max-w-md mx-auto shadow-2xl overflow-hidden bg-background-light dark:bg-background-dark border-x border-gray-200 dark:border-gray-800">
+<!-- Header -->
+<header class="sticky top-0 z-50 glass-effect bg-background-light/80 dark:bg-background-dark/80 border-b border-gray-200 dark:border-gray-800 transition-all duration-300">
+<div class="flex items-center justify-between px-4 py-3">
+<button class="p-2 -ml-2 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">Meal History</h1>
+<button class="p-2 -mr-2 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors relative">
+<span class="material-symbols-outlined text-2xl">calendar_month</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+</button>
+</div>
+<!-- Connection Status Bar -->
+<div class="px-4 pb-3">
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-dark/5 dark:bg-surface-dark border border-gray-200 dark:border-white/5 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary">
+<span class="material-symbols-outlined text-[18px]">bluetooth_connected</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Device</span>
+<span class="text-sm font-semibold">Nano Banana Pro</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+</span>
+<span class="text-xs font-medium text-primary">Syncing</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Daily Stats Summary -->
+<div class="px-4 py-6">
+<div class="grid grid-cols-3 gap-3">
+<div class="flex flex-col p-4 rounded-2xl bg-white dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">local_fire_department</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Calories</span>
+<span class="text-2xl font-bold text-gray-900 dark:text-white">1,250</span>
+<div class="flex items-center mt-2 text-xs font-medium text-primary">
+<span class="material-symbols-outlined text-sm mr-0.5">trending_up</span>
+<span>+12%</span>
+</div>
+</div>
+<div class="flex flex-col p-4 rounded-2xl bg-white dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-blue-400">fitness_center</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Protein</span>
+<span class="text-2xl font-bold text-gray-900 dark:text-white">98g</span>
+<div class="flex items-center mt-2 text-xs font-medium text-red-500">
+<span class="material-symbols-outlined text-sm mr-0.5">trending_down</span>
+<span>-5%</span>
+</div>
+</div>
+<div class="flex flex-col p-4 rounded-2xl bg-white dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-yellow-400">bakery_dining</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">Carbs</span>
+<span class="text-2xl font-bold text-gray-900 dark:text-white">120g</span>
+<div class="flex items-center mt-2 text-xs font-medium text-primary">
+<span class="material-symbols-outlined text-sm mr-0.5">trending_up</span>
+<span>+2%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Timeline -->
+<div class="flex flex-col">
+<!-- Section: Today -->
+<div class="sticky top-[138px] z-30 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm px-4 py-2 border-b border-gray-200 dark:border-gray-800 flex justify-between items-end">
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Today</h2>
+<span class="text-sm font-medium text-gray-500 dark:text-gray-400">Oct 24</span>
+</div>
+<div class="px-4 py-4 space-y-4">
+<!-- List Item 1 -->
+<div class="group relative flex items-center p-3 gap-4 rounded-2xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/5 shadow-sm active:scale-[0.98] transition-transform duration-100 cursor-pointer overflow-hidden">
+<!-- Left indicator bar -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<!-- Thumbnail -->
+<div class="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Top down view of a healthy grilled chicken salad bowl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAG2cTyJOIZ-hl_AFt4KsEO_k0QMGF8WDEPXGG-fZa6ZOLpjg6ScsMYExcKBosRYtHLzmQo5zFbxSyUsmGo2_JcaluOyI4_MW_Dt6MAUgw14QsjbOXIlOar7EpCke6YYV7sAJmQgEtoTW7He6-0cGFJBe-mMFKMrA3LA2OFihYLXHaWiaevGpFYSQ7HuSiEsJdxyDqB6anktHXBc5vnkv4Y_urCiANS5WXeyCDkeuXYy2e-hKmNW3j4_lDIjNB5kYFdA2sFp8qbRvo');"></div>
+</div>
+<!-- Content -->
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-base font-bold text-gray-900 dark:text-white truncate pr-2">Grilled Chicken Salad</h3>
+<span class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primary-dark dark:text-primary">450 kcal</span>
+</div>
+<div class="flex items-center gap-2 mb-2">
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium">12:30 PM</span>
+<span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Lunch</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+<span class="text-xs font-semibold text-gray-600 dark:text-gray-300">98% Match</span>
+</div>
+</div>
+<!-- Chevron -->
+<div class="text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="group relative flex items-center p-3 gap-4 rounded-2xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/5 shadow-sm active:scale-[0.98] transition-transform duration-100 cursor-pointer overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-300 dark:bg-gray-700"></div>
+<div class="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="A bowl of fresh oatmeal with blueberries and bananas" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBfyUxMGIAEZ7Kf4FysYpbJwj1nPBB800UxSc6XkYBNSwP_wYZLdm-x_EzlFXf224yjaxD-bbuunHWKdzWCiyqGC2yTa1tVgS3fKE5egB6XUQLTFeTzREPuUKyXE4wIUda6Ov27fN2413pm0OlXit3lLKFamzRXwbk3fMr2OE4f8RcdEyyZOID_DjTgNrYf4v-ng138aUByl-0SrC3HKgxnmlhiimDjgbpeWT_Deb9jOxyxxYqIRHdng3xsG8BfwMnc5K_SeXOVRHo');"></div>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-base font-bold text-gray-900 dark:text-white truncate pr-2">Oatmeal &amp; Berries</h3>
+<span class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300">320 kcal</span>
+</div>
+<div class="flex items-center gap-2 mb-2">
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium">8:15 AM</span>
+<span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Breakfast</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+<span class="text-xs font-semibold text-gray-600 dark:text-gray-300">95% Match</span>
+</div>
+</div>
+<div class="text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Section: Yesterday -->
+<div class="sticky top-[138px] z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm px-4 py-2 border-b border-gray-200 dark:border-gray-800 flex justify-between items-end mt-4">
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Yesterday</h2>
+<span class="text-sm font-medium text-gray-500 dark:text-gray-400">Oct 23</span>
+</div>
+<div class="px-4 py-4 space-y-4">
+<!-- List Item 3 -->
+<div class="group relative flex items-center p-3 gap-4 rounded-2xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/5 shadow-sm active:scale-[0.98] transition-transform duration-100 cursor-pointer overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-300 dark:bg-gray-700"></div>
+<div class="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Fluffy pancakes stack with maple syrup drizzle" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAhtHKXpAwdbLm6xK7AQ8vA1NUc3AbMr_o9HDvNp5eOZfpkpLOFE0doUfFl94TeVu2jmnjtxLGiP8mRpgrY7tOHclVpUl6xo03I_2LvhTsGjCgR1upMrJK5Mk0OlJu76VqwZdBRjC9oj5mX8jERhHfOK9EqPgJGyeF7cxPATHsXw7oPKNyff99CnH9XqRlceHUCOalF_hNodAR0QMXwmXQ7EaPO9AUqFA8j8MrIkZfUBBp0vX1ExSPnw8vH5_LrVsFXPPZmb3CCmRA');"></div>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<div class="flex justify-between items-start mb-1">
+<h3 class="text-base font-bold text-gray-900 dark:text-white truncate pr-2">Protein Pancakes</h3>
+<span class="shrink-0 text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300">550 kcal</span>
+</div>
+<div class="flex items-center gap-2 mb-2">
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium">7:30 PM</span>
+<span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Dinner</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+<span class="text-xs font-semibold text-gray-600 dark:text-gray-300">92% Match</span>
+</div>
+</div>
+<div class="text-gray-400 dark:text-gray-500">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Load More / End of List -->
+<div class="px-4 py-8 text-center">
+<p class="text-sm text-gray-500 dark:text-gray-400 font-medium">You're all caught up!</p>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="absolute bottom-6 right-6 z-50">
+<button class="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-background-dark shadow-lg shadow-primary/30 active:scale-95 hover:scale-105 transition-all duration-200">
+<span class="material-symbols-outlined text-3xl">photo_camera</span>
+</button>
+</div>
+<!-- Bottom Navigation (Simulated) -->
+<nav class="sticky bottom-0 z-40 bg-white/90 dark:bg-[#0d1c12]/90 backdrop-blur-lg border-t border-gray-200 dark:border-white/5">
+<div class="flex justify-around items-center h-16">
+<a class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-primary" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">history</span>
+<span class="text-[10px] font-medium">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">analytics</span>
+<span class="text-[10px] font-medium">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>
+
+<!-- Analysis Results Screen -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analysis Results Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+            extend: {
+                colors: {
+                "primary": "#13ec5b",
+                "background-light": "#f6f8f6",
+                "background-dark": "#102216",
+                "surface-dark": "#1c2e22",
+                "surface-darker": "#16251b"
+                },
+                fontFamily: {
+                "display": ["Space Grotesk", "sans-serif"]
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+            },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Space Grotesk", sans-serif;
+        }
+        /* Hide scrollbar for clean mobile look */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200 min-h-screen">
+<div class="relative flex h-full min-h-screen w-full flex-col max-w-md mx-auto overflow-x-hidden shadow-2xl">
+<!-- Top App Bar -->
+<div class="flex items-center px-4 pt-6 pb-2 justify-between bg-background-light dark:bg-background-dark sticky top-0 z-10">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white">arrow_back</span>
+</button>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight uppercase">Analysis</h2>
+<div class="flex items-center justify-end">
+<button class="flex h-9 px-3 items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 text-primary gap-1.5 text-xs font-bold transition-colors border border-primary/20">
+<span class="material-symbols-outlined text-[18px]">usb</span>
+<span>Pro</span>
+</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto pb-24">
+<!-- Scanned Image Card -->
+<div class="px-4 mt-2">
+<div class="relative flex flex-col items-stretch justify-start rounded-2xl bg-white dark:bg-surface-dark shadow-sm border border-slate-100 dark:border-white/5 overflow-hidden">
+<div class="w-full h-56 bg-center bg-no-repeat bg-cover relative group" data-alt="Close up of a ripe yellow banana on a dark surface" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDQ29DUoX2vw4J3lSLQLePCSZI5dIFXes_8oKRGUEcUn8_hHfCJhH_XRqVr94EKuTJqL4k8Be90G4s9gAzC3ZTYu-xGHk5Oqv2oIzzzpw1rDNp3vh4PZFP4XfW6V1baZ8rQi7zycLGx_9obBqo_ELorfRntgme8J5eOl11KoadpQOC_jlQBOgcpqRSkv612WA_cYp_T_63txyNUzBIVpgcy7wTZJBM_q1k2a47W1ZHyL_sShtpv6k-Gl6lA8UFGfy9OlC4phC-B3G8");'>
+<!-- Overlay gradient for text readability -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<!-- AI Confidence Badge -->
+<div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-primary/30 flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[14px]">auto_awesome</span>
+<span class="text-primary text-xs font-bold tracking-wide">98% Match</span>
+</div>
+<div class="absolute bottom-4 left-4 right-4">
+<p class="text-primary text-xs font-bold uppercase tracking-wider mb-0.5">Detected</p>
+<h3 class="text-white text-2xl font-bold leading-tight">Banana (Medium)</h3>
+</div>
+</div>
+</div>
+</div>
+<!-- Calories Hero -->
+<div class="flex flex-col items-center justify-center pt-8 pb-6">
+<div class="relative">
+<h1 class="text-slate-900 dark:text-white tracking-tighter text-[56px] font-bold leading-none">105</h1>
+<span class="absolute -right-8 top-1 text-primary text-xl font-bold rotate-[-10deg]">kcal</span>
+</div>
+<p class="text-slate-500 dark:text-gray-400 text-sm font-medium mt-2">per 118g serving</p>
+</div>
+<!-- Macro Distribution Chart -->
+<div class="px-4 mb-6">
+<div class="bg-white dark:bg-surface-dark rounded-2xl p-5 border border-slate-100 dark:border-white/5 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-white font-bold text-base uppercase tracking-tight">Macro Distribution</h3>
+<span class="text-slate-400 dark:text-gray-500 text-xs">Target Met</span>
+</div>
+<!-- Visual Bar Representation -->
+<div class="w-full h-3 bg-slate-100 dark:bg-surface-darker rounded-full flex overflow-hidden mb-4">
+<div class="bg-primary h-full" style="width: 5%"></div> <!-- Protein -->
+<div class="bg-white h-full opacity-60 dark:opacity-40" style="width: 93%"></div> <!-- Carbs -->
+<div class="bg-slate-400 dark:bg-slate-600 h-full" style="width: 2%"></div> <!-- Fat -->
+</div>
+<!-- Macro Cards -->
+<div class="grid grid-cols-3 gap-3">
+<!-- Carbs -->
+<div class="flex flex-col items-center p-3 rounded-xl bg-slate-50 dark:bg-surface-darker border border-transparent dark:border-white/5">
+<span class="text-slate-400 dark:text-gray-400 text-xs font-medium mb-1">Carbs</span>
+<span class="text-slate-900 dark:text-white text-xl font-bold">27g</span>
+<div class="w-1 h-1 rounded-full bg-white mt-2"></div>
+</div>
+<!-- Protein -->
+<div class="flex flex-col items-center p-3 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/20">
+<span class="text-primary/80 text-xs font-bold mb-1">Protein</span>
+<span class="text-primary text-xl font-bold">1.3g</span>
+<div class="w-1 h-1 rounded-full bg-primary mt-2"></div>
+</div>
+<!-- Fat -->
+<div class="flex flex-col items-center p-3 rounded-xl bg-slate-50 dark:bg-surface-darker border border-transparent dark:border-white/5">
+<span class="text-slate-400 dark:text-gray-400 text-xs font-medium mb-1">Fat</span>
+<span class="text-slate-900 dark:text-white text-xl font-bold">0.4g</span>
+<div class="w-1 h-1 rounded-full bg-slate-500 mt-2"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Micronutrients Expandable List -->
+<div class="px-4 space-y-3">
+<div class="p-4 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-100 dark:bg-surface-darker flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+</div>
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-white font-bold text-sm">Potassium</span>
+<span class="text-slate-500 dark:text-gray-400 text-xs">Electrolyte Balance</span>
+</div>
+</div>
+<span class="text-slate-900 dark:text-white font-mono font-bold">422mg</span>
+</div>
+<div class="p-4 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-100 dark:bg-surface-darker flex items-center justify-center text-indigo-400">
+<span class="material-symbols-outlined text-[18px]">water_drop</span>
+</div>
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-white font-bold text-sm">Fiber</span>
+<span class="text-slate-500 dark:text-gray-400 text-xs">Digestive Health</span>
+</div>
+</div>
+<span class="text-slate-900 dark:text-white font-mono font-bold">3.1g</span>
+</div>
+<div class="p-4 rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-100 dark:bg-surface-darker flex items-center justify-center text-orange-400">
+<span class="material-symbols-outlined text-[18px]">eco</span>
+</div>
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-white font-bold text-sm">Vitamin C</span>
+<span class="text-slate-500 dark:text-gray-400 text-xs">Immunity</span>
+</div>
+</div>
+<span class="text-slate-900 dark:text-white font-mono font-bold">10mg</span>
+</div>
+</div>
+<!-- Disclaimer -->
+<p class="text-center text-slate-400 dark:text-gray-600 text-[10px] mt-6 px-8">
+                Values are estimates based on visual recognition by Nano Banana Pro. Accuracy may vary.
+            </p>
+</div>
+<!-- Sticky Action Buttons -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark dark:to-transparent z-20 max-w-md mx-auto">
+<div class="flex gap-3">
+<button class="flex-1 h-14 rounded-xl bg-slate-200 dark:bg-surface-dark text-slate-900 dark:text-white font-bold text-sm hover:bg-slate-300 dark:hover:bg-surface-darker transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">replay</span>
+                    Retake
+                </button>
+<button class="flex-[2] h-14 rounded-xl bg-primary text-background-dark font-bold text-base hover:bg-primary/90 transition-colors shadow-[0_0_20px_rgba(19,236,91,0.3)] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+                    Log Food
+                </button>
+</div>
+</div>
+</div>
+</body></html>
+
+<!-- Gemini API Key Setup -->
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gemini API Key Setup</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "surface-dark": "#1A2E22",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body>
+<div class="relative flex h-full min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden font-display text-[#111418] dark:text-white">
+<!-- TopAppBar -->
+<div class="flex items-center p-4 pb-2 justify-between">
+<div class="text-[#111418] dark:text-white flex size-12 shrink-0 items-center justify-center cursor-pointer rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</div>
+<h2 class="text-[#111418] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Connect Intelligence</h2>
+</div>
+<!-- HeaderImage (Hero Graphic) -->
+<div class="@container">
+<div class="@[480px]:px-4 @[480px]:py-3 pt-4 px-4">
+<div class="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden rounded-xl min-h-[180px] border border-primary/20 shadow-[0_0_15px_rgba(19,236,91,0.1)]" data-alt="Futuristic neon glowing banana merged with digital circuit brain connections" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCyQpXAOclKcePKfVsBD87ITisJezg4kpOcFKaLUM_H_vvnnE99DxDbPTEcK3MVzatJapxNntZ80lDpS7buLyig3_IG79Z83mgyxzWbpeXrApUCO5Gizpphnq76RNfjDBklQabqMe-xlyUO72jL0ulyJ5jvHCcsMOTBh1JEHhNxb6lGUGDsRPRvaf92xrwGgl5TS8Q3-5JJyqhKJOu1TiljSEyYvLFvXsEphXlomRVR9hum5hdHt0mITzByvPwiMCedmlj5YIcBuVM");'>
+<div class="bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent p-4">
+<!-- Gradient Overlay for text readability if needed -->
+</div>
+</div>
+</div>
+</div>
+<!-- HeadlineText -->
+<h2 class="text-[#111418] dark:text-white tracking-tight text-[28px] font-bold leading-tight px-4 text-center pb-2 pt-6">
+            Unlock Gemini AI
+        </h2>
+<!-- BodyText -->
+<p class="text-[#637588] dark:text-[#9db9a6] text-base font-normal leading-normal pb-6 pt-1 px-8 text-center">
+            To analyze your food with the Nano Banana Pro, we need to connect to Google's Gemini brain.
+        </p>
+<!-- TextField (API Key Input) -->
+<div class="flex flex-col px-4 w-full max-w-[480px] mx-auto">
+<label class="flex flex-col w-full">
+<p class="text-[#111418] dark:text-white text-base font-medium leading-normal pb-2 ml-1">API Key</p>
+<div class="flex w-full items-stretch rounded-xl overflow-hidden group focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background-dark transition-all">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none bg-[#f0f2f4] dark:bg-surface-dark text-[#111418] dark:text-white border-0 h-14 placeholder:text-[#9db9a6] p-[15px] pr-2 text-base font-mono leading-normal focus:ring-0" placeholder="AIzaSy..." type="text" value=""/>
+<div class="flex items-center justify-center pr-[15px] pl-2 bg-[#f0f2f4] dark:bg-surface-dark cursor-pointer hover:text-primary transition-colors text-[#637588] dark:text-[#9db9a6]">
+<span class="material-symbols-outlined">content_paste</span>
+</div>
+</div>
+</label>
+</div>
+<!-- Helper Link -->
+<div class="flex justify-center pt-4 px-4">
+<a class="text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1" href="#">
+                Don't have a key? Get one from Google AI Studio
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+<!-- Spacer to push button to bottom on tall screens, or gap on short screens -->
+<div class="flex-1 min-h-[32px]"></div>
+<!-- Primary Action Button -->
+<div class="px-4 pb-4 w-full max-w-[480px] mx-auto">
+<button class="flex w-full items-center justify-center rounded-xl bg-primary px-4 py-4 text-background-dark font-bold text-lg tracking-wide hover:bg-primary/90 transition-transform active:scale-[0.98] shadow-[0_0_20px_rgba(19,236,91,0.3)]">
+                Connect &amp; Continue
+            </button>
+<!-- Privacy Reassurance -->
+<p class="text-center text-xs text-[#637588] dark:text-[#9db9a6] mt-4 opacity-60 flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                Your key is stored locally on device and never shared.
+            </p>
+</div>
+<!-- Bottom Safe Area Spacer -->
+<div class="h-2"></div>
+</div>
+</body></html>

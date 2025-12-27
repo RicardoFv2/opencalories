@@ -1,0 +1,506 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../../core/theme/app_theme.dart';
+
+class AnalysisResultScreen extends StatelessWidget {
+  final File? imageFile;
+
+  const AnalysisResultScreen({super.key, this.imageFile});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          'ANALYSIS',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            letterSpacing: 2,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppTheme.primary.withValues(alpha: 0.3),
+              ),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.usb, size: 16, color: AppTheme.primary),
+                SizedBox(width: 4),
+                Text(
+                  'Pro',
+                  style: TextStyle(
+                    color: AppTheme.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // 1. Scanned Image Card
+            if (imageFile != null)
+              Container(
+                    height: 220,
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 20,
+                        ),
+                      ],
+                      image: DecorationImage(
+                        image: FileImage(imageFile!),
+                        fit: BoxFit.cover,
+                      ),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withValues(alpha: 0.8),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 16,
+                          left: 16,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: BackdropFilter(
+                              filter: ui.ImageFilter.blur(
+                                sigmaX: 10,
+                                sigmaY: 10,
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: AppTheme.primary.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                  ),
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(
+                                      Icons.auto_awesome,
+                                      color: AppTheme.primary,
+                                      size: 14,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      '98% Match',
+                                      style: TextStyle(
+                                        color: AppTheme.primary,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const Positioned(
+                          bottom: 16,
+                          left: 16,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'DETECTED',
+                                style: TextStyle(
+                                  color: AppTheme.primary,
+                                  fontSize: 10,
+                                  letterSpacing: 1.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'Banana (Medium)',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(duration: 600.ms)
+                  .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
+
+            // 2. Calories Hero
+            const SizedBox(height: 16),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Text(
+                  '105',
+                  style: TextStyle(
+                    fontSize: 64,
+                    fontWeight: FontWeight.w900,
+                    height: 1.0,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                const Positioned(
+                  top: 4,
+                  right: -32,
+                  child: RotatedBox(
+                    quarterTurns: 0,
+                    child: Text(
+                      'kcal',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: AppTheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ).animate().scale(
+              delay: 200.ms,
+              duration: 400.ms,
+              curve: Curves.easeOutBack,
+            ),
+            Text(
+              'per 118g serving',
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+            ),
+
+            const SizedBox(height: 32),
+
+            // 3. Macro Distribution Chart
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.05),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'MACRO DISTRIBUTION',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        Text(
+                          'Target Met',
+                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Bar
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: SizedBox(
+                        height: 12,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 5,
+                              child: Container(color: AppTheme.primary),
+                            ),
+                            Expanded(
+                              flex: 93,
+                              child: Container(color: Colors.white30),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Container(color: Colors.white10),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _MacroCard(
+                          label: 'Carbs',
+                          value: '27g',
+                          color: Colors.white,
+                          isPrimary: false,
+                        ),
+                        _MacroCard(
+                          label: 'Protein',
+                          value: '1.3g',
+                          color: AppTheme.primary,
+                          isPrimary: true,
+                        ),
+                        _MacroCard(
+                          label: 'Fat',
+                          value: '0.4g',
+                          color: Colors.white38,
+                          isPrimary: false,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 4. Micronutrients
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  _NutrientRow(
+                    icon: Icons.bolt,
+                    label: 'Potassium',
+                    sub: 'Electrolyte Balance',
+                    value: '422mg',
+                    color: AppTheme.primary,
+                  ),
+                  const SizedBox(height: 12),
+                  _NutrientRow(
+                    icon: Icons.water_drop,
+                    label: 'Fiber',
+                    sub: 'Digestive Health',
+                    value: '3.1g',
+                    color: Colors.indigoAccent,
+                  ),
+                  const SizedBox(height: 12),
+                  _NutrientRow(
+                    icon: Icons.eco,
+                    label: 'Vitamin C',
+                    sub: 'Immunity',
+                    value: '10mg',
+                    color: Colors.orangeAccent,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 100), // Spacing for fab
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: () => context.pop(),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.white10,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                icon: const Icon(Icons.replay),
+                label: const Text('Retake'),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 2,
+              child: FilledButton.icon(
+                onPressed: () {
+                  // Log food logic here
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                icon: const Icon(Icons.check_circle),
+                label: const Text('Log Food'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MacroCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+  final bool isPrimary;
+
+  const _MacroCard({
+    required this.label,
+    required this.value,
+    required this.color,
+    required this.isPrimary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 100,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isPrimary
+            ? AppTheme.primary.withValues(alpha: 0.1)
+            : Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: isPrimary
+            ? Border.all(color: AppTheme.primary.withValues(alpha: 0.3))
+            : null,
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: isPrimary ? AppTheme.primary : Colors.grey,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: isPrimary ? AppTheme.primary : Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            width: 4,
+            height: 4,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NutrientRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String sub;
+  final String value;
+  final Color color;
+
+  const _NutrientRow({
+    required this.icon,
+    required this.label,
+    required this.sub,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Icon(icon, size: 18, color: color),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Text(
+                    sub,
+                    style: const TextStyle(color: Colors.grey, fontSize: 10),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+}

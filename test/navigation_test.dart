@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:opencalories/features/settings/data/api_key_repository.dart';
@@ -29,7 +30,7 @@ class MockApiKeyRepository implements ApiKeyRepository {
 }
 
 void main() {
-  testWidgets('App redirects to SettingsScreen when no API key is found', (
+  testWidgets('App redirects to WelcomeScreen when no API key is found', (
     WidgetTester tester,
   ) async {
     // Build our app and trigger a frame.
@@ -45,21 +46,20 @@ void main() {
     );
 
     // Pump to allow the FutureBuilder/AsyncValue to resolve and router into action
-    await tester.pumpAndSettle();
+    // We use pump with duration to let animations tick but not wait for infinite ones
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 1));
 
-    // Verify that we are on the Settings Screen
-    expect(
-      find.text('Enter your Google Generative AI API Key'),
-      findsOneWidget,
-    );
-    expect(find.text('OpenCalories'), findsNothing); // Title of Home
+    // Verify that we are on the Welcome Screen
+    expect(find.text('Start Scanning'), findsOneWidget);
+    expect(find.text('Scan Meal'), findsNothing);
   });
 
   testWidgets('App allows Home when API key is present', (
     WidgetTester tester,
   ) async {
     final mockRepo = MockApiKeyRepository();
-    await mockRepo.setApiKey('dummy_key');
+    await mockRepo.setApiKey('test_key');
 
     await tester.pumpWidget(
       ProviderScope(
@@ -68,9 +68,14 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
+    // Allow time for async value and router
+    await tester.pump(const Duration(seconds: 5));
 
-    // Verify that we are on the Scanner Screen
-    expect(find.text('Food Scanner'), findsOneWidget);
+    // Verify we are on Scanner Screen (Home)
+    expect(find.text('Scan Meal'), findsOneWidget);
+
+    // Explicitly dispose to clean up infinite animations
+    await tester.pumpWidget(Container());
+    await tester.pumpAndSettle();
   });
 }
