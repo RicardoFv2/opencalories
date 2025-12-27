@@ -101,7 +101,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
               child: Text(
-                'To analyze your food with the Nano Banana Pro, we need to connect to Google\'s Gemini brain.',
+                'To analyze your food with Open Calories, we need to connect to Google\'s Gemini brain.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[400], height: 1.5),
               ),

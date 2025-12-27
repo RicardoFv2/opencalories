@@ -5,9 +5,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/services/image_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../settings/data/api_key_repository.dart';
+import '../../analysis/presentation/analysis_controller.dart';
 
 class ScannerScreen extends HookConsumerWidget {
   const ScannerScreen({super.key});
@@ -17,6 +19,24 @@ class ScannerScreen extends HookConsumerWidget {
     final imageService = ref.read(imageServiceProvider.notifier);
     final selectedImage = useState<File?>(null);
     final isProcessing = useState(false);
+
+    ref.listen(analysisControllerProvider, (previous, next) {
+      next.whenOrNull(
+        data: (analysis) {
+          if (analysis != null) {
+            context.push('/analysis', extra: analysis);
+          }
+        },
+        error: (error, stack) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Analysis failed: ${error.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        },
+      );
+    });
 
     Future<void> pickAndProcessImage(ImageSource source) async {
       isProcessing.value = true;
@@ -137,7 +157,7 @@ class ScannerScreen extends HookConsumerWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'NANO BANANA PRO: ACTIVE',
+                            'OPEN CALORIES PRO: ACTIVE',
                             style: Theme.of(context).textTheme.labelSmall
                                 ?.copyWith(
                                   color: AppTheme.primary,
@@ -249,9 +269,17 @@ class ScannerScreen extends HookConsumerWidget {
                     if (selectedImage.value == null) {
                       await pickAndProcessImage(ImageSource.camera);
                     } else {
-                      // Analyze
-                      if (selectedImage.value != null) {
-                        context.push('/analysis', extra: selectedImage.value);
+                      // Trigger AI Analysis
+                      if (selectedImage.value != null && !isProcessing.value) {
+                        isProcessing.value = true;
+                        // Logic handled via listen in build
+                        try {
+                          await ref
+                              .read(analysisControllerProvider.notifier)
+                              .analyze(selectedImage.value!);
+                        } finally {
+                          isProcessing.value = false;
+                        }
                       }
                     }
                   },

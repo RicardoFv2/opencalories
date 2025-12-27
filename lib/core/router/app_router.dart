@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../features/analysis/domain/food_analysis.dart';
 import '../../features/settings/data/api_key_repository.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/scanner/presentation/scanner_screen.dart';
@@ -62,8 +62,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/analysis',
         builder: (context, state) {
-          final imageFile = state.extra as File?;
-          return AnalysisResultScreen(imageFile: imageFile);
+          final analysis = state.extra as FoodAnalysis?;
+          return AnalysisResultScreen(analysis: analysis);
         },
       ),
     ],

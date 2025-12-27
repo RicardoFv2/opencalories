@@ -51,7 +51,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'NANO BANANA PRO',
+                        'OPEN CALORIES',
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           letterSpacing: 2,
                           fontWeight: FontWeight.bold,
@@ -261,7 +261,7 @@ class WelcomeScreen extends StatelessWidget {
                         const SizedBox(height: 16),
 
                         Text(
-                          'Instant calorie analysis and macro breakdowns powered by Nano Banana Pro technology.',
+                          'Instant calorie analysis and macro breakdowns powered by Open Calories AI.',
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: Colors.grey[400], height: 1.5),

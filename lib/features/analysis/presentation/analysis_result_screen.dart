@@ -5,14 +5,30 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../domain/food_analysis.dart';
 
 class AnalysisResultScreen extends StatelessWidget {
+  final FoodAnalysis? analysis;
   final File? imageFile;
 
-  const AnalysisResultScreen({super.key, this.imageFile});
+  const AnalysisResultScreen({super.key, this.analysis, this.imageFile});
 
   @override
   Widget build(BuildContext context) {
+    // Calculate totals
+    final items = analysis?.items ?? [];
+    final totalCalories = items.fold<int>(
+      0,
+      (sum, item) => sum + item.calories,
+    );
+    final totalCarbs = items.fold<int>(0, (sum, item) => sum + item.carbs);
+    final totalProtein = items.fold<int>(0, (sum, item) => sum + item.protein);
+    final totalFat = items.fold<int>(0, (sum, item) => sum + item.fat);
+
+    final detectedName = items.isNotEmpty
+        ? items.map((e) => e.name).join(', ')
+        : 'Unknown Food';
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -144,7 +160,7 @@ class AnalysisResultScreen extends StatelessWidget {
                           ),
                         ),
 
-                        const Positioned(
+                        Positioned(
                           bottom: 16,
                           left: 16,
                           child: Column(
@@ -160,8 +176,8 @@ class AnalysisResultScreen extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'Banana (Medium)',
-                                style: TextStyle(
+                                detectedName,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -184,7 +200,7 @@ class AnalysisResultScreen extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Text(
-                  '105',
+                  '$totalCalories',
                   style: TextStyle(
                     fontSize: 64,
                     fontWeight: FontWeight.w900,
@@ -214,7 +230,7 @@ class AnalysisResultScreen extends StatelessWidget {
               curve: Curves.easeOutBack,
             ),
             Text(
-              'per 118g serving',
+              items.isNotEmpty ? items.first.portionEstimate : '1 serving',
               style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
             ),
 
@@ -281,19 +297,19 @@ class AnalysisResultScreen extends StatelessWidget {
                       children: [
                         _MacroCard(
                           label: 'Carbs',
-                          value: '27g',
+                          value: '${totalCarbs}g',
                           color: Colors.white,
                           isPrimary: false,
                         ),
                         _MacroCard(
                           label: 'Protein',
-                          value: '1.3g',
+                          value: '${totalProtein}g',
                           color: AppTheme.primary,
                           isPrimary: true,
                         ),
                         _MacroCard(
                           label: 'Fat',
-                          value: '0.4g',
+                          value: '${totalFat}g',
                           color: Colors.white38,
                           isPrimary: false,
                         ),
