@@ -6,7 +6,7 @@ part of 'api_key_repository.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$apiKeyRepositoryHash() => r'01c310c1e66abe9d72dad658a5625d2e538c71f4';
+String _$apiKeyRepositoryHash() => r'24df31ca3402e9c87c1b947057265122c27df1bd';
 
 /// See also [apiKeyRepository].
 @ProviderFor(apiKeyRepository)
@@ -23,7 +23,7 @@ final apiKeyRepositoryProvider = AutoDisposeProvider<ApiKeyRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ApiKeyRepositoryRef = AutoDisposeProviderRef<ApiKeyRepository>;
-String _$apiKeyHash() => r'076059a771fe89adff831e716f91b07c48f5df74';
+String _$apiKeyHash() => r'1a856a300c8c592f29234ce1fedca34f0b78b5c2';
 
 /// See also [apiKey].
 @ProviderFor(apiKey)

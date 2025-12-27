@@ -70,7 +70,7 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // Verify that we are on the Home Screen
-    expect(find.text('Home Screen'), findsOneWidget);
+    // Verify that we are on the Scanner Screen
+    expect(find.text('Food Scanner'), findsOneWidget);
   });
 }

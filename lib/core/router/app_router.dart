@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/settings/data/api_key_repository.dart';
 import '../../features/settings/presentation/settings_screen.dart';
-import '../../features/home/presentation/home_screen.dart';
+import '../../features/scanner/presentation/scanner_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -33,7 +33,7 @@ GoRouter appRouter(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+      GoRoute(path: '/', builder: (context, state) => const ScannerScreen()),
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
