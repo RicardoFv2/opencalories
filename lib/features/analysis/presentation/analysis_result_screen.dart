@@ -323,37 +323,22 @@ class AnalysisResultScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // 4. Micronutrients
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  _NutrientRow(
-                    icon: Icons.bolt,
-                    label: 'Potassium',
-                    sub: 'Electrolyte Balance',
-                    value: '422mg',
-                    color: AppTheme.primary,
-                  ),
-                  const SizedBox(height: 12),
-                  _NutrientRow(
-                    icon: Icons.water_drop,
-                    label: 'Fiber',
-                    sub: 'Digestive Health',
-                    value: '3.1g',
-                    color: Colors.indigoAccent,
-                  ),
-                  const SizedBox(height: 12),
-                  _NutrientRow(
-                    icon: Icons.eco,
-                    label: 'Vitamin C',
-                    sub: 'Immunity',
-                    value: '10mg',
-                    color: Colors.orangeAccent,
-                  ),
-                ],
-              ),
-            ),
-
+            // 4. Micronutrients (Placeholder for future AI update)
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 16),
+            //   child: Column(
+            //     children: [
+            //       _NutrientRow(
+            //         icon: Icons.bolt,
+            //         label: 'Potassium',
+            //         sub: 'Electrolyte Balance',
+            //         value: '422mg',
+            //         color: AppTheme.primary,
+            //       ),
+            //       // ...
+            //     ],
+            //   ),
+            // ),
             const SizedBox(height: 100), // Spacing for fab
           ],
         ),
@@ -455,68 +440,68 @@ class _MacroCard extends StatelessWidget {
   }
 }
 
-class _NutrientRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String sub;
-  final String value;
-  final Color color;
+// class _NutrientRow extends StatelessWidget {
+//   final IconData icon;
+//   final String label;
+//   final String sub;
+//   final String value;
+//   final Color color;
 
-  const _NutrientRow({
-    required this.icon,
-    required this.label,
-    required this.sub,
-    required this.value,
-    required this.color,
-  });
+//   const _NutrientRow({
+//     required this.icon,
+//     required this.label,
+//     required this.sub,
+//     required this.value,
+//     required this.color,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Icon(icon, size: 18, color: color),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  Text(
-                    sub,
-                    style: const TextStyle(color: Colors.grey, fontSize: 10),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         color: Theme.of(context).colorScheme.surface,
+//         borderRadius: BorderRadius.circular(16),
+//         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+//       ),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Row(
+//             children: [
+//               Container(
+//                 padding: const EdgeInsets.all(8),
+//                 decoration: BoxDecoration(
+//                   color: Colors.white.withValues(alpha: 0.05),
+//                   borderRadius: BorderRadius.circular(30),
+//                 ),
+//                 child: Icon(icon, size: 18, color: color),
+//               ),
+//               const SizedBox(width: 12),
+//               Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(
+//                     label,
+//                     style: const TextStyle(
+//                       fontWeight: FontWeight.bold,
+//                       fontSize: 14,
+//                     ),
+//                   ),
+//                   Text(
+//                     sub,
+//                     style: const TextStyle(color: Colors.grey, fontSize: 10),
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//           Text(
+//             value,
+//             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

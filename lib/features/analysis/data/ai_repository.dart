@@ -50,11 +50,10 @@ Do not add any conversational text.
         throw Exception('Failed to generate analysis. No response from AI.');
       }
 
-      // Sanitization: Remove markdown code blocks
-      final cleanedJson = text
-          .replaceAll('```json', '')
-          .replaceAll('```', '')
-          .trim();
+      // Sanitization: Remove markdown code blocks using Regex
+      final pattern = RegExp(r'```(?:json)?\s*(.*?)\s*```', dotAll: true);
+      final match = pattern.firstMatch(text);
+      final cleanedJson = match != null ? match.group(1)!.trim() : text.trim();
 
       // Safe decoding
       final Map<String, dynamic> jsonMap = jsonDecode(cleanedJson);
