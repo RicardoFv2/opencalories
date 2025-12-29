@@ -7,14 +7,17 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../domain/food_analysis.dart';
 
-class AnalysisResultScreen extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../history/data/meal_repository.dart';
+
+class AnalysisResultScreen extends ConsumerWidget {
   final FoodAnalysis? analysis;
   final File? imageFile;
 
   const AnalysisResultScreen({super.key, this.analysis, this.imageFile});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Calculate totals
     final items = analysis?.items ?? [];
     final totalCalories = items.fold<int>(
@@ -364,8 +367,27 @@ class AnalysisResultScreen extends StatelessWidget {
             Expanded(
               flex: 2,
               child: FilledButton.icon(
-                onPressed: () {
-                  // Log food logic here
+                onPressed: () async {
+                  if (imageFile == null || analysis == null) return;
+
+                  // Show loading or just await
+                  try {
+                    await ref
+                        .read(mealRepositoryProvider)
+                        .saveMeal(analysis!, imageFile!);
+                    if (context.mounted) {
+                      context.go('/'); // Go home/history
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Meal saved to history!')),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error saving meal: $e')),
+                      );
+                    }
+                  }
                 },
                 style: FilledButton.styleFrom(
                   backgroundColor: AppTheme.primary,

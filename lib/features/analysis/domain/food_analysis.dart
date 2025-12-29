@@ -19,7 +19,6 @@ class FoodItem with _$FoodItem {
     required int protein,
     required int carbs,
     required int fat,
-    // ignore: invalid_annotation_target
     @JsonKey(name: 'portion_estimate') required String portionEstimate,
   }) = _FoodItem;
 

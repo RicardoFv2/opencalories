@@ -120,8 +120,16 @@ class ScannerScreen extends HookConsumerWidget {
                       ),
                     ),
                     _CircleButton(
-                      icon: Icons.close,
-                      onTap: () => selectedImage.value = null,
+                      icon: selectedImage.value != null
+                          ? Icons.close
+                          : Icons.arrow_back,
+                      onTap: () {
+                        if (selectedImage.value != null) {
+                          selectedImage.value = null;
+                        } else {
+                          if (context.canPop()) context.pop();
+                        }
+                      },
                     ),
                   ],
                 ),

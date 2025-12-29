@@ -8,6 +8,8 @@ import '../../features/scanner/presentation/scanner_screen.dart';
 import '../../features/analysis/presentation/analysis_result_screen.dart';
 import '../../features/onboarding/welcome_screen.dart';
 
+import '../../features/history/presentation/history_screen.dart';
+
 part 'app_router.g.dart';
 
 @riverpod
@@ -28,13 +30,10 @@ GoRouter appRouter(Ref ref) {
       if (isLoading) return null;
 
       // If user has key, they shouldn't be on welcome or settings (unless explicitly navigated)
-      // But for initial load, if hasKey is true, we want to go to / (Scanner)
+      // But for initial load, if hasKey is true, we want to go to / (History)
       if (hasKey) {
-        if (isWelcome || isSettings) {
-          // If we are just launching and have key, go home.
-          // Note: User might manually navigate to settings later, handle that case?
-          // For now, let's just say if you have a key, you can't go to welcome.
-          return isWelcome ? '/' : null;
+        if (isWelcome) {
+          return '/';
         }
         return null;
       }
@@ -50,7 +49,11 @@ GoRouter appRouter(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const ScannerScreen()),
+      GoRoute(path: '/', builder: (context, state) => const HistoryScreen()),
+      GoRoute(
+        path: '/scan',
+        builder: (context, state) => const ScannerScreen(),
+      ),
       GoRoute(
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
