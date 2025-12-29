@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,8 +66,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/analysis',
         builder: (context, state) {
-          final analysis = state.extra as FoodAnalysis?;
-          return AnalysisResultScreen(analysis: analysis);
+          final extra = state.extra as Map<String, dynamic>?;
+          final analysis = extra?['analysis'] as FoodAnalysis?;
+          final imageFile = extra?['image'] as File?;
+          return AnalysisResultScreen(analysis: analysis, imageFile: imageFile);
         },
       ),
     ],

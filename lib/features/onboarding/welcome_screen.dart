@@ -313,7 +313,15 @@ class WelcomeScreen extends StatelessWidget {
                           height: 52,
                           child: OutlinedButton(
                             onPressed: () {
-                              // TODO: Connect device flow
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Device integration coming soon! ⌚',
+                                  ),
+                                  backgroundColor: Colors.grey,
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
                             },
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.white,

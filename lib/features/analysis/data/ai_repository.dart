@@ -15,7 +15,7 @@ AiRepository aiRepository(Ref ref) {
 
 class AiRepository {
   final Ref _ref;
-  static const _modelName = 'gemini-3-pro-preview';
+  static const _modelName = 'gemini-3-flash-preview';
 
   static const _systemPrompt = '''
 You are a nutritionist. Analyze the image. Return a JSON object with a 'items' list. 

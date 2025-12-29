@@ -23,8 +23,11 @@ class ScannerScreen extends HookConsumerWidget {
     ref.listen(analysisControllerProvider, (previous, next) {
       next.whenOrNull(
         data: (analysis) {
-          if (analysis != null) {
-            context.push('/analysis', extra: analysis);
+          if (analysis != null && selectedImage.value != null) {
+            context.push(
+              '/analysis',
+              extra: {'analysis': analysis, 'image': selectedImage.value},
+            );
           }
         },
         error: (error, stack) {
@@ -323,7 +326,7 @@ class ScannerScreen extends HookConsumerWidget {
                   ),
                 ),
 
-                _GlassButton(icon: Icons.history, onTap: () {}),
+                _GlassButton(icon: Icons.history, onTap: () => context.go('/')),
               ],
             ),
           ),

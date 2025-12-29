@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../data/api_key_repository.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -151,11 +152,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
 
-            // 4. Helper Link
             Padding(
               padding: const EdgeInsets.all(16),
               child: TextButton.icon(
-                onPressed: () {}, // TODO: Launch URL
+                onPressed: () async {
+                  final url = Uri.parse(
+                    'https://aistudio.google.com/app/apikey',
+                  );
+                  if (!await launchUrl(
+                    url,
+                    mode: LaunchMode.externalApplication,
+                  )) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Could not launch URL')),
+                      );
+                    }
+                  }
+                },
                 icon: const Icon(
                   Icons.open_in_new,
                   size: 16,
@@ -179,12 +193,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 child: FilledButton(
                   onPressed: () async {
                     final key = _apiKeyController.text.trim();
-                    if (key.isNotEmpty) {
+                    // Validate basic Gemini format: starts with AIza, 39 chars, alphanumeric+dashes
+                    final isValidFormat = RegExp(
+                      r'^AIza[0-9A-Za-z\-_]{35}$',
+                    ).hasMatch(key);
+
+                    if (isValidFormat) {
                       await ref.read(apiKeyRepositoryProvider).setApiKey(key);
                       ref.invalidate(apiKeyProvider);
                       if (context.mounted) {
                         context.go('/'); // Go to scanner
                       }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            key.isEmpty
+                                ? 'Please enter an API Key'
+                                : 'Invalid Key format. It must start with "AIza" and be 39 characters long.',
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     }
                   },
                   style: FilledButton.styleFrom(
