@@ -1,0 +1,6 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "web/web-app-manifest-512x512.png"
+  adaptive_icon_background: "#102216"
+  adaptive_icon_foreground: "web/web-app-manifest-512x512.png"
