@@ -7,6 +7,7 @@ import '../../features/settings/data/api_key_repository.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/scanner/presentation/scanner_screen.dart';
 import '../../features/analysis/presentation/analysis_result_screen.dart';
+import '../../features/analysis/presentation/full_screen_image_view.dart';
 import '../../features/onboarding/welcome_screen.dart';
 
 import '../../features/history/presentation/history_screen.dart';
@@ -75,6 +76,13 @@ GoRouter appRouter(Ref ref) {
             imageFile: imageFile,
             isViewOnly: isViewOnly,
           );
+        },
+      ),
+      GoRoute(
+        path: '/image-view',
+        builder: (context, state) {
+          final imageFile = state.extra as File?;
+          return FullScreenImageView(imageFile: imageFile!);
         },
       ),
     ],

@@ -126,11 +126,64 @@ class HistoryScreen extends HookConsumerWidget {
               // List
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 80,
+                  ),
                   itemCount: meals.length,
                   itemBuilder: (context, index) {
                     final meal = meals[index];
-                    return _MealCard(meal: meal);
+                    return Dismissible(
+                      key: ValueKey(meal.meal.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      confirmDismiss: (direction) async {
+                        return await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: Colors.grey[900],
+                            title: const Text('Delete Meal?'),
+                            content: const Text(
+                              'This action cannot be undone.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                ),
+                                child: const Text('Delete'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      onDismissed: (direction) async {
+                        await ref
+                            .read(mealsDaoProvider)
+                            .deleteMeal(meal.meal.id);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Meal deleted')),
+                          );
+                        }
+                      },
+                      child: _MealCard(meal: meal),
+                    );
                   },
                 ),
               ),
@@ -214,7 +267,7 @@ class _MealCard extends StatelessWidget {
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
-          maxLines: 2,
+          maxLines: 3,
           overflow: TextOverflow.ellipsis,
         ),
         trailing: Container(

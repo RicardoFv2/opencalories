@@ -90,6 +90,13 @@ class MealsDao extends DatabaseAccessor<AppDatabase> with _$MealsDaoMixin {
 
     return result.fold<int>(0, (sum, meal) => sum + meal.totalCalories);
   }
+
+  Future<void> deleteMeal(int mealId) {
+    return transaction(() async {
+      await (delete(foodItems)..where((t) => t.mealId.equals(mealId))).go();
+      await (delete(meals)..where((t) => t.id.equals(mealId))).go();
+    });
+  }
 }
 
 class MealWithItems {

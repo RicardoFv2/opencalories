@@ -91,121 +91,126 @@ class AnalysisResultScreen extends ConsumerWidget {
           children: [
             // 1. Scanned Image Card
             if (imageFile != null)
-              Container(
-                    height: 220,
-                    width: double.infinity,
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 20,
-                        ),
-                      ],
-                      image: DecorationImage(
-                        image: FileImage(imageFile!),
-                        fit: BoxFit.cover,
-                      ),
-                      border: Border.all(color: Colors.white10),
-                    ),
-                    child: Stack(
-                      children: [
-                        Container(
+              GestureDetector(
+                onTap: () => context.push('/image-view', extra: imageFile),
+                child:
+                    Container(
+                          height: 220,
+                          width: double.infinity,
+                          margin: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(24),
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                Colors.black.withValues(alpha: 0.8),
-                                Colors.transparent,
-                              ],
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 16,
-                          left: 16,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: BackdropFilter(
-                              filter: ui.ImageFilter.blur(
-                                sigmaX: 10,
-                                sigmaY: 10,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 20,
                               ),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
+                            ],
+                            image: DecorationImage(
+                              image: FileImage(imageFile!),
+                              fit: BoxFit.cover,
+                            ),
+                            border: Border.all(color: Colors.white10),
+                          ),
+                          child: Stack(
+                            children: [
+                              Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(24),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.8),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 16,
+                                left: 16,
+                                child: ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: AppTheme.primary.withValues(
-                                      alpha: 0.3,
+                                  child: BackdropFilter(
+                                    filter: ui.ImageFilter.blur(
+                                      sigmaX: 10,
+                                      sigmaY: 10,
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black54,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: AppTheme.primary.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        children: [
+                                          Icon(
+                                            Icons.auto_awesome,
+                                            color: AppTheme.primary,
+                                            size: 14,
+                                          ),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            '98% Match',
+                                            style: TextStyle(
+                                              color: AppTheme.primary,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                                child: const Row(
+                              ),
+
+                              Positioned(
+                                bottom: 16,
+                                left: 16,
+                                right: 16,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
-                                      Icons.auto_awesome,
-                                      color: AppTheme.primary,
-                                      size: 14,
-                                    ),
-                                    SizedBox(width: 6),
                                     Text(
-                                      '98% Match',
+                                      'DETECTED',
                                       style: TextStyle(
                                         color: AppTheme.primary,
                                         fontSize: 10,
+                                        letterSpacing: 1.5,
                                         fontWeight: FontWeight.bold,
                                       ),
+                                    ),
+                                    Text(
+                                      detectedName,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1.1,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-
-                        Positioned(
-                          bottom: 16,
-                          left: 16,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'DETECTED',
-                                style: TextStyle(
-                                  color: AppTheme.primary,
-                                  fontSize: 10,
-                                  letterSpacing: 1.5,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                detectedName,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.1,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                  .animate()
-                  .fadeIn(duration: 600.ms)
-                  .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
+                        )
+                        .animate()
+                        .fadeIn(duration: 600.ms)
+                        .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
+              ),
 
             // 2. Calories Hero
             const SizedBox(height: 16),
