@@ -13,8 +13,14 @@ import '../../history/data/meal_repository.dart';
 class AnalysisResultScreen extends ConsumerWidget {
   final FoodAnalysis? analysis;
   final File? imageFile;
+  final bool isViewOnly;
 
-  const AnalysisResultScreen({super.key, this.analysis, this.imageFile});
+  const AnalysisResultScreen({
+    super.key,
+    this.analysis,
+    this.imageFile,
+    this.isViewOnly = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,7 +35,9 @@ class AnalysisResultScreen extends ConsumerWidget {
     final totalFat = items.fold<int>(0, (sum, item) => sum + item.fat);
 
     final detectedName = items.isNotEmpty
-        ? items.map((e) => e.name).join(', ')
+        ? (items.length > 3
+              ? '${items.take(3).map((e) => e.name).join(', ')} +${items.length - 3} more'
+              : items.map((e) => e.name).join(', '))
         : 'Unknown Food';
 
     return Scaffold(
@@ -44,7 +52,7 @@ class AnalysisResultScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'ANALYSIS',
+          isViewOnly ? 'MEAL DETAILS' : 'ANALYSIS',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             letterSpacing: 2,
             fontWeight: FontWeight.bold,
@@ -186,6 +194,8 @@ class AnalysisResultScreen extends ConsumerWidget {
                                   fontWeight: FontWeight.bold,
                                   height: 1.1,
                                 ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -347,60 +357,64 @@ class AnalysisResultScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: FilledButton.icon(
-                onPressed: () => context.pop(),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white10,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                icon: const Icon(Icons.replay),
-                label: const Text('Retake'),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              flex: 2,
-              child: FilledButton.icon(
-                onPressed: () async {
-                  if (imageFile == null || analysis == null) return;
+      floatingActionButton: isViewOnly
+          ? null
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: () => context.pop(),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.white10,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      icon: const Icon(Icons.replay),
+                      label: const Text('Retake'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 2,
+                    child: FilledButton.icon(
+                      onPressed: () async {
+                        if (imageFile == null || analysis == null) return;
 
-                  // Show loading or just await
-                  try {
-                    await ref
-                        .read(mealRepositoryProvider)
-                        .saveMeal(analysis!, imageFile!);
-                    if (context.mounted) {
-                      context.go('/'); // Go home/history
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Meal saved to history!')),
-                      );
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error saving meal: $e')),
-                      );
-                    }
-                  }
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                icon: const Icon(Icons.check_circle),
-                label: const Text('Log Food'),
+                        // Show loading or just await
+                        try {
+                          await ref
+                              .read(mealRepositoryProvider)
+                              .saveMeal(analysis!, imageFile!);
+                          if (context.mounted) {
+                            context.go('/'); // Go home/history
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Meal saved to history!'),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error saving meal: $e')),
+                            );
+                          }
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      icon: const Icon(Icons.check_circle),
+                      label: const Text('Log Food'),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

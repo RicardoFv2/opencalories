@@ -69,7 +69,12 @@ GoRouter appRouter(Ref ref) {
           final extra = state.extra as Map<String, dynamic>?;
           final analysis = extra?['analysis'] as FoodAnalysis?;
           final imageFile = extra?['image'] as File?;
-          return AnalysisResultScreen(analysis: analysis, imageFile: imageFile);
+          final isViewOnly = extra?['isViewOnly'] as bool? ?? false;
+          return AnalysisResultScreen(
+            analysis: analysis,
+            imageFile: imageFile,
+            isViewOnly: isViewOnly,
+          );
         },
       ),
     ],

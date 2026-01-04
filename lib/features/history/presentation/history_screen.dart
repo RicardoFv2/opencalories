@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../history/data/app_database.dart';
-// Imports removed
+import '../../analysis/domain/food_analysis.dart';
 
 class HistoryScreen extends HookConsumerWidget {
   const HistoryScreen({super.key});
@@ -163,6 +163,30 @@ class _MealCard extends StatelessWidget {
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: ListTile(
+        onTap: () {
+          final analysis = FoodAnalysis(
+            items: meal.items
+                .map(
+                  (i) => FoodItem(
+                    name: i.name,
+                    calories: i.calories,
+                    protein: i.protein,
+                    carbs: i.carbs,
+                    fat: i.fat,
+                    portionEstimate: '1 serving',
+                  ),
+                )
+                .toList(),
+          );
+          context.push(
+            '/analysis',
+            extra: {
+              'analysis': analysis,
+              'image': File(meal.meal.imagePath),
+              'isViewOnly': true,
+            },
+          );
+        },
         contentPadding: const EdgeInsets.all(12),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(12),
@@ -190,7 +214,7 @@ class _MealCard extends StatelessWidget {
             fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
-          maxLines: 1,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
         trailing: Container(
