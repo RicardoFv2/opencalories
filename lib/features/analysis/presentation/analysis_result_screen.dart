@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../domain/food_analysis.dart';
 
@@ -232,9 +233,9 @@ class AnalysisResultScreen extends ConsumerWidget {
                                               size: 24,
                                             ),
                                             const SizedBox(width: 12),
-                                            const Text(
+                                            Text(
                                               'DETECTED FOODS',
-                                              style: TextStyle(
+                                              style: GoogleFonts.spaceGrotesk(
                                                 color: Colors.white,
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -277,29 +278,31 @@ class AnalysisResultScreen extends ConsumerWidget {
                                                   children: [
                                                     Text(
                                                       item.name,
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                                      style:
+                                                          GoogleFonts.spaceGrotesk(
+                                                            color: Colors.white,
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
                                                     ),
                                                     const SizedBox(height: 4),
                                                     Text(
                                                       '${item.portionEstimate} • ${item.calories} kcal',
-                                                      style: TextStyle(
-                                                        color: Colors.white
-                                                            .withValues(
-                                                              alpha: 0.6,
-                                                            ),
-                                                        fontSize: 14,
-                                                      ),
+                                                      style:
+                                                          GoogleFonts.spaceGrotesk(
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                  0.6,
+                                                                ),
+                                                            fontSize: 14,
+                                                          ),
                                                     ),
                                                     const SizedBox(height: 8),
                                                     Row(
                                                       children: [
                                                         _MacroMiniTag(
-                                                          label: 'P',
+                                                          label: 'Protein',
                                                           value:
                                                               '${item.protein}g',
                                                           color: Colors.blue,
@@ -308,7 +311,7 @@ class AnalysisResultScreen extends ConsumerWidget {
                                                           width: 8,
                                                         ),
                                                         _MacroMiniTag(
-                                                          label: 'C',
+                                                          label: 'Carbs',
                                                           value:
                                                               '${item.carbs}g',
                                                           color: Colors.orange,
@@ -317,7 +320,7 @@ class AnalysisResultScreen extends ConsumerWidget {
                                                           width: 8,
                                                         ),
                                                         _MacroMiniTag(
-                                                          label: 'F',
+                                                          label: 'Fat',
                                                           value: '${item.fat}g',
                                                           color: Colors.red,
                                                         ),
@@ -703,29 +706,31 @@ class _MacroMiniTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            label,
-            style: TextStyle(
+            label.toUpperCase(),
+            style: GoogleFonts.spaceGrotesk(
               color: color,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
+              fontSize: 8,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.0,
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(height: 2),
           Text(
             value,
-            style: const TextStyle(
+            style: GoogleFonts.spaceGrotesk(
               color: Colors.white,
-              fontSize: 10,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
           ),
