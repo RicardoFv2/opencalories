@@ -195,14 +195,14 @@ class AnalysisResultScreen extends ConsumerWidget {
                                   isScrollControlled: true,
                                   builder: (context) => Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[950],
+                                      color: const Color(
+                                        0xFF1A1A1A,
+                                      ), // Solid dark background
                                       borderRadius: const BorderRadius.vertical(
                                         top: Radius.circular(32),
                                       ),
                                       border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.1,
-                                        ),
+                                        color: Colors.white.withOpacity(0.1),
                                       ),
                                     ),
                                     padding: const EdgeInsets.fromLTRB(
