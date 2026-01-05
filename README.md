@@ -1,6 +1,6 @@
 # 🥑 OpenCalories
 
-**OpenCalories** is an AI-powered nutrition tracker built with Flutter. It leverages **Google's gemini-1.5-flash** model to analyze food images in real-time, estimating calories and macronutrients (Protein, Carbs, Fat) with remarkable accuracy.
+**OpenCalories** is an AI-powered nutrition tracker built with Flutter. It leverages **Google's gemini-3-flash-preview** model to analyze food images in real-time, estimating calories and macronutrients (Protein, Carbs, Fat) with remarkable accuracy.
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.x-blue?logo=dart)
