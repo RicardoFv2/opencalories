@@ -148,19 +148,19 @@ class AnalysisResultScreen extends ConsumerWidget {
                                   ),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.auto_awesome,
                                     color: AppTheme.primary,
                                     size: 14,
                                   ),
-                                  SizedBox(width: 6),
+                                  const SizedBox(width: 6),
                                   Text(
                                     '98% Match',
-                                    style: TextStyle(
+                                    style: GoogleFonts.spaceGrotesk(
                                       color: AppTheme.primary,
-                                      fontSize: 10,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -180,11 +180,11 @@ class AnalysisResultScreen extends ConsumerWidget {
                           children: [
                             Text(
                               'DETECTED',
-                              style: TextStyle(
+                              style: GoogleFonts.spaceGrotesk(
                                 color: AppTheme.primary,
-                                fontSize: 10,
-                                letterSpacing: 1.5,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                letterSpacing: 2.0,
+                                fontWeight: FontWeight.w900,
                               ),
                             ),
                             GestureDetector(
@@ -305,7 +305,8 @@ class AnalysisResultScreen extends ConsumerWidget {
                                                           label: 'Protein',
                                                           value:
                                                               '${item.protein}g',
-                                                          color: Colors.blue,
+                                                          color:
+                                                              Colors.cyanAccent,
                                                         ),
                                                         const SizedBox(
                                                           width: 8,
@@ -314,7 +315,8 @@ class AnalysisResultScreen extends ConsumerWidget {
                                                           label: 'Carbs',
                                                           value:
                                                               '${item.carbs}g',
-                                                          color: Colors.orange,
+                                                          color: Colors
+                                                              .amberAccent,
                                                         ),
                                                         const SizedBox(
                                                           width: 8,
@@ -322,7 +324,8 @@ class AnalysisResultScreen extends ConsumerWidget {
                                                         _MacroMiniTag(
                                                           label: 'Fat',
                                                           value: '${item.fat}g',
-                                                          color: Colors.red,
+                                                          color:
+                                                              Colors.pinkAccent,
                                                         ),
                                                       ],
                                                     ),
@@ -339,9 +342,9 @@ class AnalysisResultScreen extends ConsumerWidget {
                               },
                               child: Text(
                                 detectedName,
-                                style: const TextStyle(
+                                style: GoogleFonts.spaceGrotesk(
                                   color: Colors.white,
-                                  fontSize: 24,
+                                  fontSize: 26,
                                   fontWeight: FontWeight.bold,
                                   height: 1.1,
                                 ),
@@ -706,11 +709,11 @@ class _MacroMiniTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -720,17 +723,17 @@ class _MacroMiniTag extends StatelessWidget {
             label.toUpperCase(),
             style: GoogleFonts.spaceGrotesk(
               color: color,
-              fontSize: 8,
+              fontSize: 10,
               fontWeight: FontWeight.w900,
-              letterSpacing: 1.0,
+              letterSpacing: 1.2,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             value,
             style: GoogleFonts.spaceGrotesk(
               color: Colors.white,
-              fontSize: 13,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
