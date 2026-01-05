@@ -11,6 +11,7 @@ import '../../features/analysis/presentation/full_screen_image_view.dart';
 import '../../features/onboarding/welcome_screen.dart';
 
 import '../../features/history/presentation/history_screen.dart';
+import '../../features/manual_entry/presentation/manual_food_entry_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -77,6 +78,10 @@ GoRouter appRouter(Ref ref) {
             isViewOnly: isViewOnly,
           );
         },
+      ),
+      GoRoute(
+        path: '/manual-entry',
+        builder: (context, state) => const ManualFoodEntryScreen(),
       ),
       GoRoute(
         path: '/image-view',

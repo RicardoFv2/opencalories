@@ -26,14 +26,6 @@ Do not add any conversational text.
   AiRepository(this._ref);
 
   Future<FoodAnalysis> analyzeFood(File image) async {
-    final apiKey = await _ref.read(apiKeyProvider.future);
-
-    if (apiKey == null || apiKey.isEmpty) {
-      throw Exception('No API Key found. Please add one in Settings.');
-    }
-
-    final model = GenerativeModel(model: _modelName, apiKey: apiKey);
-
     final imageBytes = await image.readAsBytes();
     final content = [
       Content.multi([
@@ -41,6 +33,39 @@ Do not add any conversational text.
         DataPart('image/jpeg', imageBytes),
       ]),
     ];
+
+    final jsonMap = await _generateAndParse(content);
+    return FoodAnalysis.fromJson(jsonMap);
+  }
+
+  Future<FoodAnalysis> analyzeTextDescription(
+    String foodName,
+    String portion,
+  ) async {
+    final prompt =
+        '''
+You are a nutritionist. Estimate the nutritional content for the following food:
+Food: $foodName
+Portion: $portion
+
+Return a JSON object with a 'items' list containing a single object.
+Include: name, calories (integer), protein (integer), carbs (integer), fat (integer), portion_estimate (string).
+Do not add any conversational text.
+''';
+
+    final content = [Content.text(prompt)];
+    final jsonMap = await _generateAndParse(content);
+    return FoodAnalysis.fromJson(jsonMap);
+  }
+
+  Future<Map<String, dynamic>> _generateAndParse(List<Content> content) async {
+    final apiKey = await _ref.read(apiKeyProvider.future);
+
+    if (apiKey == null || apiKey.isEmpty) {
+      throw Exception('No API Key found. Please add one in Settings.');
+    }
+
+    final model = GenerativeModel(model: _modelName, apiKey: apiKey);
 
     try {
       final response = await model.generateContent(content);
@@ -56,11 +81,9 @@ Do not add any conversational text.
       final cleanedJson = match != null ? match.group(1)!.trim() : text.trim();
 
       // Safe decoding
-      final Map<String, dynamic> jsonMap = jsonDecode(cleanedJson);
-
-      return FoodAnalysis.fromJson(jsonMap);
+      return jsonDecode(cleanedJson) as Map<String, dynamic>;
     } catch (e) {
-      throw Exception('Error analyzing food: $e');
+      throw Exception('AI analysis error: $e');
     }
   }
 }

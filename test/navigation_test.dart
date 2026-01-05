@@ -71,8 +71,8 @@ void main() {
     // Allow time for async value and router
     await tester.pump(const Duration(seconds: 5));
 
-    // Verify we are on Scanner Screen (Home)
-    expect(find.text('Scan Meal'), findsOneWidget);
+    // Verify we are on History Screen (Home)
+    expect(find.text('HISTORY'), findsOneWidget);
 
     // Explicitly dispose to clean up infinite animations
     await tester.pumpWidget(Container());

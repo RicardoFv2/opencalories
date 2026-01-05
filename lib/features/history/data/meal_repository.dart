@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_database.dart';
 import '../../analysis/domain/food_analysis.dart';
+import '../../manual_entry/domain/manual_food_entry.dart';
 
 part 'meal_repository.g.dart';
 
@@ -36,8 +37,9 @@ class MealRepository {
 
     final meal = MealsCompanion.insert(
       createdAt: DateTime.now(),
-      imagePath: savedPath,
+      imagePath: Value(savedPath),
       totalCalories: totalCalories,
+      isManualEntry: const Value(false),
     );
 
     final items = analysis.items
@@ -54,6 +56,27 @@ class MealRepository {
         .toList();
 
     // 3. Save to DB
+    await _dao.insertMeal(meal, items);
+  }
+
+  Future<void> saveManualMeal(ManualFoodEntry entry) async {
+    final meal = MealsCompanion.insert(
+      createdAt: DateTime.now(),
+      imagePath: const Value(null),
+      totalCalories: entry.calories ?? 0,
+      isManualEntry: const Value(true),
+    );
+
+    final items = [
+      FoodItemsCompanion(
+        name: Value(entry.name),
+        calories: Value(entry.calories ?? 0),
+        protein: Value(entry.protein ?? 0),
+        carbs: Value(entry.carbs ?? 0),
+        fat: Value(entry.fat ?? 0),
+      ),
+    ];
+
     await _dao.insertMeal(meal, items);
   }
 }

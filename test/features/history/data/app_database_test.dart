@@ -20,7 +20,7 @@ void main() {
   test('insertMeal adds a meal and items to the database', () async {
     final meal = MealsCompanion.insert(
       createdAt: DateTime.now(),
-      imagePath: '/tmp/test.jpg',
+      imagePath: const Value('/tmp/test.jpg'),
       totalCalories: 500,
     );
 
@@ -50,13 +50,21 @@ void main() {
 
     // Meal 1: 500 kcal
     await dao.insertMeal(
-      MealsCompanion.insert(createdAt: now, imagePath: 'a', totalCalories: 500),
+      MealsCompanion.insert(
+        createdAt: now,
+        imagePath: const Value('a'),
+        totalCalories: 500,
+      ),
       [],
     );
 
     // Meal 2: 300 kcal
     await dao.insertMeal(
-      MealsCompanion.insert(createdAt: now, imagePath: 'b', totalCalories: 300),
+      MealsCompanion.insert(
+        createdAt: now,
+        imagePath: const Value('b'),
+        totalCalories: 300,
+      ),
       [],
     );
 
@@ -64,7 +72,7 @@ void main() {
     await dao.insertMeal(
       MealsCompanion.insert(
         createdAt: now.subtract(const Duration(days: 1)),
-        imagePath: 'c',
+        imagePath: const Value('c'),
         totalCalories: 1000,
       ),
       [],

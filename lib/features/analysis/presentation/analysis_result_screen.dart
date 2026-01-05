@@ -202,7 +202,9 @@ class AnalysisResultScreen extends ConsumerWidget {
                                         top: Radius.circular(32),
                                       ),
                                       border: Border.all(
-                                        color: Colors.white.withOpacity(0.1),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.1,
+                                        ),
                                       ),
                                     ),
                                     padding: const EdgeInsets.fromLTRB(
@@ -399,8 +401,18 @@ class AnalysisResultScreen extends ConsumerWidget {
               items.isNotEmpty ? items.first.portionEstimate : '1 serving',
               style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
             ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: () => context.push('/manual-entry'),
+              icon: const Icon(Icons.edit, size: 16),
+              label: const Text('Not what you ate? Enter manually'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey,
+                textStyle: const TextStyle(fontSize: 12),
+              ),
+            ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
 
             // 3. Macro Distribution Chart
             Padding(
@@ -711,9 +723,9 @@ class _MacroMiniTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

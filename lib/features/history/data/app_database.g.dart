@@ -44,9 +44,9 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
   late final GeneratedColumn<String> imagePath = GeneratedColumn<String>(
     'image_path',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _totalCaloriesMeta = const VerificationMeta(
     'totalCalories',
@@ -59,12 +59,28 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _isManualEntryMeta = const VerificationMeta(
+    'isManualEntry',
+  );
+  @override
+  late final GeneratedColumn<bool> isManualEntry = GeneratedColumn<bool>(
+    'is_manual_entry',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_manual_entry" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     createdAt,
     imagePath,
     totalCalories,
+    isManualEntry,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -94,8 +110,6 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
         _imagePathMeta,
         imagePath.isAcceptableOrUnknown(data['image_path']!, _imagePathMeta),
       );
-    } else if (isInserting) {
-      context.missing(_imagePathMeta);
     }
     if (data.containsKey('total_calories')) {
       context.handle(
@@ -107,6 +121,15 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
       );
     } else if (isInserting) {
       context.missing(_totalCaloriesMeta);
+    }
+    if (data.containsKey('is_manual_entry')) {
+      context.handle(
+        _isManualEntryMeta,
+        isManualEntry.isAcceptableOrUnknown(
+          data['is_manual_entry']!,
+          _isManualEntryMeta,
+        ),
+      );
     }
     return context;
   }
@@ -128,10 +151,14 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
       imagePath: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}image_path'],
-      )!,
+      ),
       totalCalories: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}total_calories'],
+      )!,
+      isManualEntry: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_manual_entry'],
       )!,
     );
   }
@@ -145,21 +172,26 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
 class MealEntity extends DataClass implements Insertable<MealEntity> {
   final int id;
   final DateTime createdAt;
-  final String imagePath;
+  final String? imagePath;
   final int totalCalories;
+  final bool isManualEntry;
   const MealEntity({
     required this.id,
     required this.createdAt,
-    required this.imagePath,
+    this.imagePath,
     required this.totalCalories,
+    required this.isManualEntry,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['created_at'] = Variable<DateTime>(createdAt);
-    map['image_path'] = Variable<String>(imagePath);
+    if (!nullToAbsent || imagePath != null) {
+      map['image_path'] = Variable<String>(imagePath);
+    }
     map['total_calories'] = Variable<int>(totalCalories);
+    map['is_manual_entry'] = Variable<bool>(isManualEntry);
     return map;
   }
 
@@ -167,8 +199,11 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
     return MealsCompanion(
       id: Value(id),
       createdAt: Value(createdAt),
-      imagePath: Value(imagePath),
+      imagePath: imagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imagePath),
       totalCalories: Value(totalCalories),
+      isManualEntry: Value(isManualEntry),
     );
   }
 
@@ -180,8 +215,9 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
     return MealEntity(
       id: serializer.fromJson<int>(json['id']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      imagePath: serializer.fromJson<String>(json['imagePath']),
+      imagePath: serializer.fromJson<String?>(json['imagePath']),
       totalCalories: serializer.fromJson<int>(json['totalCalories']),
+      isManualEntry: serializer.fromJson<bool>(json['isManualEntry']),
     );
   }
   @override
@@ -190,21 +226,24 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'createdAt': serializer.toJson<DateTime>(createdAt),
-      'imagePath': serializer.toJson<String>(imagePath),
+      'imagePath': serializer.toJson<String?>(imagePath),
       'totalCalories': serializer.toJson<int>(totalCalories),
+      'isManualEntry': serializer.toJson<bool>(isManualEntry),
     };
   }
 
   MealEntity copyWith({
     int? id,
     DateTime? createdAt,
-    String? imagePath,
+    Value<String?> imagePath = const Value.absent(),
     int? totalCalories,
+    bool? isManualEntry,
   }) => MealEntity(
     id: id ?? this.id,
     createdAt: createdAt ?? this.createdAt,
-    imagePath: imagePath ?? this.imagePath,
+    imagePath: imagePath.present ? imagePath.value : this.imagePath,
     totalCalories: totalCalories ?? this.totalCalories,
+    isManualEntry: isManualEntry ?? this.isManualEntry,
   );
   MealEntity copyWithCompanion(MealsCompanion data) {
     return MealEntity(
@@ -214,6 +253,9 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
       totalCalories: data.totalCalories.present
           ? data.totalCalories.value
           : this.totalCalories,
+      isManualEntry: data.isManualEntry.present
+          ? data.isManualEntry.value
+          : this.isManualEntry,
     );
   }
 
@@ -223,13 +265,15 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
           ..write('imagePath: $imagePath, ')
-          ..write('totalCalories: $totalCalories')
+          ..write('totalCalories: $totalCalories, ')
+          ..write('isManualEntry: $isManualEntry')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, createdAt, imagePath, totalCalories);
+  int get hashCode =>
+      Object.hash(id, createdAt, imagePath, totalCalories, isManualEntry);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -237,53 +281,60 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
           other.id == this.id &&
           other.createdAt == this.createdAt &&
           other.imagePath == this.imagePath &&
-          other.totalCalories == this.totalCalories);
+          other.totalCalories == this.totalCalories &&
+          other.isManualEntry == this.isManualEntry);
 }
 
 class MealsCompanion extends UpdateCompanion<MealEntity> {
   final Value<int> id;
   final Value<DateTime> createdAt;
-  final Value<String> imagePath;
+  final Value<String?> imagePath;
   final Value<int> totalCalories;
+  final Value<bool> isManualEntry;
   const MealsCompanion({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.imagePath = const Value.absent(),
     this.totalCalories = const Value.absent(),
+    this.isManualEntry = const Value.absent(),
   });
   MealsCompanion.insert({
     this.id = const Value.absent(),
     required DateTime createdAt,
-    required String imagePath,
+    this.imagePath = const Value.absent(),
     required int totalCalories,
+    this.isManualEntry = const Value.absent(),
   }) : createdAt = Value(createdAt),
-       imagePath = Value(imagePath),
        totalCalories = Value(totalCalories);
   static Insertable<MealEntity> custom({
     Expression<int>? id,
     Expression<DateTime>? createdAt,
     Expression<String>? imagePath,
     Expression<int>? totalCalories,
+    Expression<bool>? isManualEntry,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (createdAt != null) 'created_at': createdAt,
       if (imagePath != null) 'image_path': imagePath,
       if (totalCalories != null) 'total_calories': totalCalories,
+      if (isManualEntry != null) 'is_manual_entry': isManualEntry,
     });
   }
 
   MealsCompanion copyWith({
     Value<int>? id,
     Value<DateTime>? createdAt,
-    Value<String>? imagePath,
+    Value<String?>? imagePath,
     Value<int>? totalCalories,
+    Value<bool>? isManualEntry,
   }) {
     return MealsCompanion(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       imagePath: imagePath ?? this.imagePath,
       totalCalories: totalCalories ?? this.totalCalories,
+      isManualEntry: isManualEntry ?? this.isManualEntry,
     );
   }
 
@@ -302,6 +353,9 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
     if (totalCalories.present) {
       map['total_calories'] = Variable<int>(totalCalories.value);
     }
+    if (isManualEntry.present) {
+      map['is_manual_entry'] = Variable<bool>(isManualEntry.value);
+    }
     return map;
   }
 
@@ -311,7 +365,8 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
           ..write('imagePath: $imagePath, ')
-          ..write('totalCalories: $totalCalories')
+          ..write('totalCalories: $totalCalories, ')
+          ..write('isManualEntry: $isManualEntry')
           ..write(')'))
         .toString();
   }
@@ -776,15 +831,17 @@ typedef $$MealsTableCreateCompanionBuilder =
     MealsCompanion Function({
       Value<int> id,
       required DateTime createdAt,
-      required String imagePath,
+      Value<String?> imagePath,
       required int totalCalories,
+      Value<bool> isManualEntry,
     });
 typedef $$MealsTableUpdateCompanionBuilder =
     MealsCompanion Function({
       Value<int> id,
       Value<DateTime> createdAt,
-      Value<String> imagePath,
+      Value<String?> imagePath,
       Value<int> totalCalories,
+      Value<bool> isManualEntry,
     });
 
 final class $$MealsTableReferences
@@ -835,6 +892,11 @@ class $$MealsTableFilterComposer extends Composer<_$AppDatabase, $MealsTable> {
 
   ColumnFilters<int> get totalCalories => $composableBuilder(
     column: $table.totalCalories,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isManualEntry => $composableBuilder(
+    column: $table.isManualEntry,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -892,6 +954,11 @@ class $$MealsTableOrderingComposer
     column: $table.totalCalories,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isManualEntry => $composableBuilder(
+    column: $table.isManualEntry,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$MealsTableAnnotationComposer
@@ -914,6 +981,11 @@ class $$MealsTableAnnotationComposer
 
   GeneratedColumn<int> get totalCalories => $composableBuilder(
     column: $table.totalCalories,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isManualEntry => $composableBuilder(
+    column: $table.isManualEntry,
     builder: (column) => column,
   );
 
@@ -973,25 +1045,29 @@ class $$MealsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
-                Value<String> imagePath = const Value.absent(),
+                Value<String?> imagePath = const Value.absent(),
                 Value<int> totalCalories = const Value.absent(),
+                Value<bool> isManualEntry = const Value.absent(),
               }) => MealsCompanion(
                 id: id,
                 createdAt: createdAt,
                 imagePath: imagePath,
                 totalCalories: totalCalories,
+                isManualEntry: isManualEntry,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required DateTime createdAt,
-                required String imagePath,
+                Value<String?> imagePath = const Value.absent(),
                 required int totalCalories,
+                Value<bool> isManualEntry = const Value.absent(),
               }) => MealsCompanion.insert(
                 id: id,
                 createdAt: createdAt,
                 imagePath: imagePath,
                 totalCalories: totalCalories,
+                isManualEntry: isManualEntry,
               ),
           withReferenceMapper: (p0) => p0
               .map(

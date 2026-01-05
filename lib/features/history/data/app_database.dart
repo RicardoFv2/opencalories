@@ -14,8 +14,10 @@ part 'app_database.g.dart';
 class Meals extends Table {
   IntColumn get id => integer().autoIncrement()();
   DateTimeColumn get createdAt => dateTime()();
-  TextColumn get imagePath => text()();
+  TextColumn get imagePath => text().nullable()();
   IntColumn get totalCalories => integer()();
+  BoolColumn get isManualEntry =>
+      boolean().withDefault(const Constant(false))();
 }
 
 @DataClassName('FoodItemEntity')
@@ -117,7 +119,21 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(meals, meals.isManualEntry);
+        // In SQLite, making a column nullable is tricky,
+        // but Drift handles it if we use alterTable or just allow it in Dart.
+        // For simply adding a new column and making an old one nullable,
+        // we can use alterTable for the nullability if needed.
+        await m.alterTable(TableMigration(meals));
+      }
+    },
+  );
 
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'opencalories_db');

@@ -19,6 +19,12 @@ class HistoryScreen extends HookConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.black,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddMealOptions(context),
+        backgroundColor: AppTheme.primary,
+        foregroundColor: Colors.black,
+        child: const Icon(Icons.add),
+      ),
       appBar: AppBar(
         title: const Text(
           'HISTORY',
@@ -191,12 +197,76 @@ class HistoryScreen extends HookConsumerWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/scan'),
-        backgroundColor: AppTheme.primary,
-        foregroundColor: Colors.black,
-        icon: const Icon(Icons.camera_alt),
-        label: const Text('Scan Meal'),
+    );
+  }
+
+  void _showAddMealOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.camera_alt, color: AppTheme.primary),
+                ),
+                title: const Text(
+                  'Scan Meal',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Use AI to analyze your food photo',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/scan');
+                },
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.edit_note, color: Colors.blue),
+                ),
+                title: const Text(
+                  'Manual Entry',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Type in food name and portion',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/manual-entry');
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -235,27 +305,39 @@ class _MealCard extends StatelessWidget {
             '/analysis',
             extra: {
               'analysis': analysis,
-              'image': File(meal.meal.imagePath),
+              'image': meal.meal.imagePath != null
+                  ? File(meal.meal.imagePath!)
+                  : null,
               'isViewOnly': true,
             },
           );
         },
         contentPadding: const EdgeInsets.all(12),
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.file(
-            File(meal.meal.imagePath),
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
-              color: Colors.grey,
-              width: 60,
-              height: 60,
-              child: const Icon(Icons.error),
-            ),
-          ),
-        ),
+        leading: meal.meal.imagePath != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(
+                  File(meal.meal.imagePath!),
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.grey,
+                    width: 60,
+                    height: 60,
+                    child: const Icon(Icons.error),
+                  ),
+                ),
+              )
+            : Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.edit_note, color: AppTheme.primary),
+              ),
         title: Text(
           DateFormat('h:mm a').format(meal.meal.createdAt),
           style: const TextStyle(color: Colors.grey, fontSize: 12),
