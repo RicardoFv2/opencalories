@@ -294,8 +294,8 @@ class AnalysisResultScreen extends ConsumerWidget {
                                                       style:
                                                           GoogleFonts.spaceGrotesk(
                                                             color: Colors.white
-                                                                .withOpacity(
-                                                                  0.6,
+                                                                .withValues(
+                                                                  alpha: 0.6,
                                                                 ),
                                                             fontSize: 14,
                                                           ),
