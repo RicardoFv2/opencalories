@@ -8,14 +8,61 @@ import '../../../../core/theme/app_theme.dart';
 import '../../history/data/app_database.dart';
 import '../../analysis/domain/food_analysis.dart';
 
-class HistoryScreen extends HookConsumerWidget {
+class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends ConsumerState<HistoryScreen>
+    with WidgetsBindingObserver {
+  late DateTime _currentDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentDate = _getDateOnly(DateTime.now());
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      final now = _getDateOnly(DateTime.now());
+      if (now != _currentDate) {
+        setState(() {
+          _currentDate = now;
+        });
+      }
+    }
+  }
+
+  DateTime _getDateOnly(DateTime dt) {
+    return DateTime(dt.year, dt.month, dt.day);
+  }
+
+  String _formatDateLabel(DateTime date) {
+    final now = _getDateOnly(DateTime.now());
+    if (date == now) {
+      return 'Today, ${DateFormat('MMM d').format(date)}';
+    } else if (date == now.subtract(const Duration(days: 1))) {
+      return 'Yesterday, ${DateFormat('MMM d').format(date)}';
+    }
+    return DateFormat('EEE, MMM d').format(date);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final mealsStream = ref
         .watch(mealsDaoProvider)
-        .watchMealsForDate(DateTime.now());
+        .watchMealsForDate(_currentDate);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -103,6 +150,15 @@ class HistoryScreen extends HookConsumerWidget {
                 ),
                 child: Column(
                   children: [
+                    Text(
+                      _formatDateLabel(_currentDate),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
                     const Text(
                       'DAILY TOTAL',
                       style: TextStyle(
