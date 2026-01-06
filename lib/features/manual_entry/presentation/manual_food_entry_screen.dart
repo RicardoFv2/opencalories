@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../analysis/data/ai_repository.dart';
 import '../../history/data/meal_repository.dart';
 import '../domain/manual_food_entry.dart';
@@ -29,11 +30,13 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
       final portion = portionController.text.trim();
 
       if (name.isEmpty || portion.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enter name and portion first'),
-            backgroundColor: Colors.orange,
-          ),
+        context.showAppSnackBar(
+          'Please enter name and portion first',
+          isError:
+              true, // Using error style (red) or custom logical if needed, but Utils default isError=false.
+          // Since original was orange, Utils mainly supports red/normal. Let's strictly follow Utils API.
+          // IsError=true makes it red. If we want orange, Utils needs update or we accept red/default.
+          // Given simplicity, let's treat validation error as error -> Red.
         );
         return;
       }
@@ -52,16 +55,12 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
           fatController.text = item.fat.toString();
 
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('AI estimation completed!')),
-            );
+            context.showAppSnackBar('AI estimation completed!');
           }
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('AI Estimation failed: $e')));
+          context.showAppSnackBar('AI Estimation failed: $e', isError: true);
         }
       } finally {
         isEstimating.value = false;
@@ -94,19 +93,13 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
 
         if (context.mounted) {
           context.go('/');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Logged ${entry.name} with ${entry.calories ?? 0} kcal',
-              ),
-            ),
+          context.showAppSnackBar(
+            'Logged ${entry.name} with ${entry.calories ?? 0} kcal',
           );
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error: $e')));
+          context.showAppSnackBar('Error: $e', isError: true);
         }
       } finally {
         isSaving.value = false;

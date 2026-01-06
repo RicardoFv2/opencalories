@@ -10,6 +10,7 @@ import '../../../../core/services/image_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../settings/data/api_key_repository.dart';
 import '../../analysis/presentation/analysis_controller.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 class ScannerScreen extends HookConsumerWidget {
   const ScannerScreen({super.key});
@@ -31,11 +32,9 @@ class ScannerScreen extends HookConsumerWidget {
           }
         },
         error: (error, stack) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Analysis failed: ${error.toString()}'),
-              backgroundColor: Colors.red,
-            ),
+          context.showAppSnackBar(
+            'Analysis failed: ${error.toString()}',
+            isError: true,
           );
         },
       );
@@ -263,7 +262,7 @@ class ScannerScreen extends HookConsumerWidget {
 
           // 5. Bottom Controls
           Positioned(
-            bottom: 40,
+            bottom: MediaQuery.of(context).padding.bottom + 40,
             left: 0,
             right: 0,
             child: Row(

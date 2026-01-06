@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/snackbar_utils.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -313,14 +314,8 @@ class WelcomeScreen extends StatelessWidget {
                           height: 52,
                           child: OutlinedButton(
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Device integration coming soon! ⌚',
-                                  ),
-                                  backgroundColor: Colors.grey,
-                                  duration: Duration(seconds: 2),
-                                ),
+                              context.showAppSnackBar(
+                                'Device integration coming soon! ⌚',
                               );
                             },
                             style: OutlinedButton.styleFrom(

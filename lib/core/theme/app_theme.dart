@@ -16,6 +16,9 @@ class AppTheme {
         surface: Colors.white,
       ),
       textTheme: GoogleFonts.spaceGroteskTextTheme(),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -49,6 +52,11 @@ class AppTheme {
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: primary,
         foregroundColor: backgroundDark,
+      ),
+      snackBarTheme: const SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Color(0xFF333333),
+        contentTextStyle: TextStyle(color: Colors.white),
       ),
       textTheme: GoogleFonts.spaceGroteskTextTheme(ThemeData.dark().textTheme),
     );

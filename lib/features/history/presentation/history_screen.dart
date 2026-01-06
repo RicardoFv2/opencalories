@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../history/data/app_database.dart';
 import '../../analysis/domain/food_analysis.dart';
 
@@ -239,9 +240,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                             .read(mealsDaoProvider)
                             .deleteMeal(meal.meal.id);
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Meal deleted')),
-                          );
+                          context.showAppSnackBar('Meal deleted');
                         }
                       },
                       child: _MealCard(meal: meal),

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../domain/food_analysis.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -554,16 +555,13 @@ class AnalysisResultScreen extends ConsumerWidget {
                               .saveMeal(analysis!, imageFile!);
                           if (context.mounted) {
                             context.go('/'); // Go home/history
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Meal saved to history!'),
-                              ),
-                            );
+                            context.showAppSnackBar('Meal saved to history!');
                           }
                         } catch (e) {
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error saving meal: $e')),
+                            context.showAppSnackBar(
+                              'Error saving meal: $e',
+                              isError: true,
                             );
                           }
                         }

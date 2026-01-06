@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/api_key_repository.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -164,8 +165,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     mode: LaunchMode.externalApplication,
                   )) {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Could not launch URL')),
+                      context.showAppSnackBar(
+                        'Could not launch URL',
+                        isError: true,
                       );
                     }
                   }
