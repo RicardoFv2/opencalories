@@ -50,9 +50,20 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
   }
 
   void _previousDay() {
+    final minDate = _getMinDate();
+    final prev = _currentDate.subtract(const Duration(days: 1));
+    if (prev.isBefore(minDate)) return;
+
     setState(() {
-      _currentDate = _currentDate.subtract(const Duration(days: 1));
+      _currentDate = prev;
     });
+  }
+
+  DateTime _getMinDate() {
+    final now = _getDateOnly(DateTime.now());
+    // Start of week (Monday) covering the current week
+    // If today is Monday (1), subtract 0 days.
+    return now.subtract(Duration(days: now.weekday - 1));
   }
 
   void _nextDay() {
@@ -138,7 +149,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.chevron_left, color: Colors.white),
+                      icon: Icon(
+                        Icons.chevron_left,
+                        color: _currentDate.isAtSameMomentAs(_getMinDate())
+                            ? Colors.grey.withValues(alpha: 0.3)
+                            : Colors.white,
+                      ),
                       onPressed: _previousDay,
                     ),
                     Text(

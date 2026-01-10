@@ -173,9 +173,12 @@ class MealsDao extends DatabaseAccessor<AppDatabase> with _$MealsDaoMixin {
 
     // Group by day
     final Map<DateTime, int> dailyTotals = {};
+    final Map<DateTime, String?> dailyImages = {};
+
     for (int i = 0; i < 7; i++) {
       final day = start.add(Duration(days: i));
       dailyTotals[day] = 0;
+      dailyImages[day] = null;
     }
 
     for (final meal in result) {
@@ -186,11 +189,23 @@ class MealsDao extends DatabaseAccessor<AppDatabase> with _$MealsDaoMixin {
       );
       if (dailyTotals.containsKey(date)) {
         dailyTotals[date] = dailyTotals[date]! + meal.totalCalories;
+        // Pick the first non-null image we encounter for the day
+        if (dailyImages[date] == null &&
+            meal.imagePath != null &&
+            meal.imagePath!.isNotEmpty) {
+          dailyImages[date] = meal.imagePath;
+        }
       }
     }
 
     return dailyTotals.entries
-        .map((e) => {'date': e.key, 'totalCalories': e.value})
+        .map(
+          (e) => {
+            'date': e.key,
+            'totalCalories': e.value,
+            'imagePath': dailyImages[e.key],
+          },
+        )
         .toList();
   }
 

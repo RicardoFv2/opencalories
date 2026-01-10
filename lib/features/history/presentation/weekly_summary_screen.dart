@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../data/app_database.dart';
@@ -20,19 +22,13 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
   @override
   void initState() {
     super.initState();
-    // Default to current week's Monday (or Sunday depending on preference, let's say Monday)
-    // Or simpler: Show the last 7 days including today?
-    // The plan said "7-day calendar strip showing each day's calorie total".
-    // Let's go with "previous 7 days" ending today for "Trends", or a fixed week views.
-    // "Weekly Summary" usually implies a fixed week (Mon-Sun).
-    // Let's do Monday start of current week.
     final now = DateTime.now();
     _startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     _startOfWeek = DateTime(
       _startOfWeek.year,
       _startOfWeek.month,
       _startOfWeek.day,
-    ); // Strip time
+    );
   }
 
   void _previousWeek() {
@@ -44,7 +40,7 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
   void _nextWeek() {
     final now = DateTime.now();
     final nextWeekStart = _startOfWeek.add(const Duration(days: 7));
-    if (nextWeekStart.isAfter(now)) return; // Don't go to future weeks
+    if (nextWeekStart.isAfter(now)) return;
 
     setState(() {
       _startOfWeek = nextWeekStart;
@@ -74,217 +70,186 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: weeklyDataFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-
-          final data = snapshot.data ?? [];
-          // Calculate totals
-          final totalWeeklyCalories = data.fold<int>(
-            0,
-            (sum, item) => sum + (item['totalCalories'] as int),
-          );
-          final avgDailyCalories = (totalWeeklyCalories / 7).round();
-
-          // Find max for bar scaling
-          final maxCalories = data.fold<int>(
-            1, // Avoid div by zero
-            (max, item) => (item['totalCalories'] as int) > max
-                ? (item['totalCalories'] as int)
-                : max,
-          );
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+      body: Column(
+        children: [
+          // Week Selector
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Week Selector
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.chevron_left, color: Colors.white),
-                      onPressed: _previousWeek,
-                    ),
-                    Text(
-                      dateRangeStr,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.chevron_right,
-                        color:
-                            _startOfWeek
-                                .add(const Duration(days: 7))
-                                .isAfter(DateTime.now())
-                            ? Colors.grey.withValues(alpha: 0.3)
-                            : Colors.white,
-                      ),
-                      onPressed: _nextWeek,
-                    ),
-                  ],
+                IconButton(
+                  icon: const Icon(Icons.chevron_left, color: Colors.white),
+                  onPressed: _previousWeek,
                 ),
-                const SizedBox(height: 24),
-
-                // Aggregated Stats
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.05),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _StatItem(
-                        value: '$avgDailyCalories',
-                        label: 'Avg Calories',
-                        unit: 'kcal/day',
-                      ),
-                      Container(width: 1, height: 40, color: Colors.white24),
-                      _StatItem(
-                        value: '$totalWeeklyCalories',
-                        label: 'Total Calories',
-                        unit: 'kcal/week',
-                      ),
-                    ],
+                Text(
+                  dateRangeStr,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 32),
-
-                // Chart Title
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'CALORIE TREND',
-                    style: TextStyle(
-                      color: AppTheme.primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
-                    ),
+                IconButton(
+                  icon: Icon(
+                    Icons.chevron_right,
+                    color:
+                        _startOfWeek
+                            .add(const Duration(days: 7))
+                            .isAfter(DateTime.now())
+                        ? Colors.grey.withValues(alpha: 0.3)
+                        : Colors.white,
                   ),
-                ),
-                const SizedBox(height: 16),
-
-                // Bar Chart
-                SizedBox(
-                  height: 220,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: data.map((dayData) {
-                      final date = dayData['date'] as DateTime;
-                      final calories = dayData['totalCalories'] as int;
-                      final heightFactor = calories / maxCalories;
-                      final isToday =
-                          DateTime.now().difference(date).inDays == 0 &&
-                          DateTime.now().day == date.day;
-
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (calories > 0)
-                            Text(
-                              '$calories',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 10,
-                              ),
-                            ),
-                          const SizedBox(height: 8),
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeOut,
-                            width: 32, // Fixed width bars
-                            height: 150 * heightFactor, // Max height 150
-                            decoration: BoxDecoration(
-                              color: isToday
-                                  ? AppTheme.primary
-                                  : AppTheme.primary.withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            DateFormat(
-                              'EEE',
-                            ).format(date).toUpperCase(), // Mon, Tue...
-                            style: TextStyle(
-                              color: isToday ? Colors.white : Colors.grey,
-                              fontSize: 12,
-                              fontWeight: isToday
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                          ),
-                          Text(
-                            DateFormat('d').format(date),
-                            style: TextStyle(
-                              color: isToday ? Colors.white : Colors.grey[700],
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  ),
+                  onPressed: _nextWeek,
                 ),
               ],
             ),
-          );
-        },
+          ),
+
+          Expanded(
+            child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: weeklyDataFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+
+                final data = snapshot.data ?? [];
+
+                return MasonryGridView.count(
+                  padding: const EdgeInsets.all(16),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    final dayData = data[index];
+                    return _DayGridItem(dayData: dayData);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _StatItem extends StatelessWidget {
-  final String value;
-  final String label;
-  final String unit;
+class _DayGridItem extends StatelessWidget {
+  final Map<String, dynamic> dayData;
 
-  const _StatItem({
-    required this.value,
-    required this.label,
-    required this.unit,
-  });
+  const _DayGridItem({required this.dayData});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+    final date = dayData['date'] as DateTime;
+    final totalCalories = dayData['totalCalories'] as int;
+    final imagePath = dayData['imagePath'] as String?;
+
+    final isToday =
+        DateTime.now().difference(date).inDays == 0 &&
+        DateTime.now().day == date.day;
+
+    return GestureDetector(
+      onTap: () {
+        // Since we don't have parameterized routing yet, we can't easily jump to HistoryScreen state.
+        // For this iteration, we'll just show a snackbar or no-op.
+        // Ideally we would push(context, '/history', extra: date);
+        // But let's stick to visual summary for now or add a TODO.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Details for ${DateFormat('EEEE').format(date)}'),
           ),
+        );
+      },
+      child: Container(
+        height: (date.day % 2 == 0) ? 200 : 240, // Simple staggering effect
+        decoration: BoxDecoration(
+          color: Colors.grey[900],
+          borderRadius: BorderRadius.circular(24),
+          image: imagePath != null
+              ? DecorationImage(
+                  image: FileImage(File(imagePath)),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.black.withValues(alpha: 0.4),
+                    BlendMode.darken,
+                  ),
+                )
+              : null,
+          border: isToday
+              ? Border.all(color: AppTheme.primary, width: 2)
+              : Border.all(color: Colors.white10),
         ),
-        const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-        Text(unit, style: const TextStyle(color: Colors.grey, fontSize: 10)),
-      ],
+        child: Stack(
+          children: [
+            if (imagePath == null)
+              Center(
+                child: Icon(
+                  Icons.restaurant,
+                  size: 48,
+                  color: Colors.white.withValues(alpha: 0.1),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    DateFormat('EEEE').format(date).toUpperCase(),
+                    style: const TextStyle(
+                      color: AppTheme.primary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat('MMM d').format(date),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '$totalCalories kcal',
+                      style: const TextStyle(
+                        color: AppTheme.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
