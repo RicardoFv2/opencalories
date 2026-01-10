@@ -71,7 +71,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
       // Unfocus to ensure text fields commit their values
       FocusManager.instance.primaryFocus?.unfocus();
 
-      if (!formKey.currentState!.validate()) return;
+      if (formKey.currentState?.validate() != true) return;
 
       isSaving.value = true;
       try {

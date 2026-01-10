@@ -3,11 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/services/tutorial_service.dart';
 import '../../history/data/app_database.dart';
 import '../../analysis/domain/food_analysis.dart';
+
+/// Tutorial colors (Cyberpunk Theme)
+const _tutorialBg = Color(0xFF102216); // Deep Forest
+const _tutorialText = Color(0xFF13EC5B); // Neon Green
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -19,6 +25,8 @@ class HistoryScreen extends ConsumerStatefulWidget {
 class _HistoryScreenState extends ConsumerState<HistoryScreen>
     with WidgetsBindingObserver {
   late DateTime _currentDate;
+  final _deleteShowcaseKey = GlobalKey();
+  bool _tutorialStarted = false;
 
   @override
   void initState() {
@@ -65,6 +73,20 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
         .watch(mealsDaoProvider)
         .watchMealsForDate(_currentDate);
 
+    return ShowCaseWidget(
+      builder: (context) => _buildScaffold(context, mealsStream),
+      onComplete: (index, key) {
+        if (key == _deleteShowcaseKey) {
+          ref.read(tutorialServiceProvider.notifier).markHistoryTutorialShown();
+        }
+      },
+    );
+  }
+
+  Widget _buildScaffold(
+    BuildContext context,
+    Stream<List<MealWithItems>> mealsStream,
+  ) {
     return Scaffold(
       backgroundColor: Colors.black,
       floatingActionButton: FloatingActionButton(
@@ -293,7 +315,27 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                         itemCount: meals.length,
                         itemBuilder: (context, index) {
                           final meal = meals[index];
-                          return Dismissible(
+
+                          // Start tutorial if this is the first meal and tutorial hasn't been shown
+                          if (index == 0 && !_tutorialStarted) {
+                            _tutorialStarted = true;
+                            WidgetsBinding.instance.addPostFrameCallback((
+                              _,
+                            ) async {
+                              await ref.read(tutorialServiceProvider.future);
+                              final tutorialService = ref.read(
+                                tutorialServiceProvider.notifier,
+                              );
+                              if (!tutorialService.hasShownHistoryTutorial) {
+                                // ignore: use_build_context_synchronously
+                                ShowCaseWidget.of(
+                                  context,
+                                ).startShowCase([_deleteShowcaseKey]);
+                              }
+                            });
+                          }
+
+                          final dismissibleWidget = Dismissible(
                             key: ValueKey(meal.meal.id),
                             direction: DismissDirection.endToStart,
                             background: Container(
@@ -346,6 +388,28 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                             },
                             child: _MealCard(meal: meal),
                           );
+
+                          // Wrap first item with Showcase
+                          if (index == 0) {
+                            return Showcase(
+                              key: _deleteShowcaseKey,
+                              title: 'Erase History',
+                              description:
+                                  'Swipe left on any meal card to delete it from your log.',
+                              tooltipBackgroundColor: _tutorialBg,
+                              titleTextStyle: const TextStyle(
+                                color: _tutorialText,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              descTextStyle: TextStyle(
+                                color: _tutorialText.withValues(alpha: 0.8),
+                                fontSize: 14,
+                              ),
+                              child: dismissibleWidget,
+                            );
+                          }
+                          return dismissibleWidget;
                         },
                       ),
               ),

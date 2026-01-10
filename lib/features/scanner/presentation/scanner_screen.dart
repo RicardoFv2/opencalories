@@ -5,21 +5,83 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../../../core/services/image_service.dart';
+import '../../../../core/services/tutorial_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../settings/data/api_key_repository.dart';
 import '../../analysis/presentation/analysis_controller.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 
-class ScannerScreen extends HookConsumerWidget {
+/// Tutorial colors (Cyberpunk Theme)
+const _tutorialBg = Color(0xFF102216); // Deep Forest
+const _tutorialText = Color(0xFF13EC5B); // Neon Green
+
+class ScannerScreen extends StatefulHookConsumerWidget {
   const ScannerScreen({super.key});
+
+  @override
+  ConsumerState<ScannerScreen> createState() => _ScannerScreenState();
+}
+
+class _ScannerScreenState extends ConsumerState<ScannerScreen> {
+  // Showcase keys
+  final _cameraKey = GlobalKey();
+  final _galleryKey = GlobalKey();
+  final _historyKey = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    return ShowCaseWidget(
+      builder: (context) => _ScannerContent(
+        cameraKey: _cameraKey,
+        galleryKey: _galleryKey,
+        historyKey: _historyKey,
+      ),
+      onComplete: (index, key) {
+        // Mark tutorial as shown when completed
+        if (key == _historyKey) {
+          ref.read(tutorialServiceProvider.notifier).markHomeTutorialShown();
+        }
+      },
+    );
+  }
+}
+
+class _ScannerContent extends HookConsumerWidget {
+  final GlobalKey cameraKey;
+  final GlobalKey galleryKey;
+  final GlobalKey historyKey;
+
+  const _ScannerContent({
+    required this.cameraKey,
+    required this.galleryKey,
+    required this.historyKey,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final imageService = ref.read(imageServiceProvider.notifier);
     final selectedImage = useState<File?>(null);
     final isProcessing = useState(false);
+
+    // Check and start tutorial on first build
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // Wait for TutorialService to initialize
+        await ref.read(tutorialServiceProvider.future);
+        final tutorialService = ref.read(tutorialServiceProvider.notifier);
+
+        if (!tutorialService.hasShownHomeTutorial) {
+          // ignore: use_build_context_synchronously
+          ShowCaseWidget.of(
+            context,
+          ).startShowCase([cameraKey, galleryKey, historyKey]);
+        }
+      });
+      return null;
+    }, const []);
 
     ref.listen(analysisControllerProvider, (previous, next) {
       next.whenOrNull(
@@ -268,64 +330,118 @@ class ScannerScreen extends HookConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _GlassButton(
-                  icon: Icons.photo_library,
-                  onTap: () => pickAndProcessImage(ImageSource.gallery),
+                // Gallery Button - Showcase Target 2
+                Showcase(
+                  key: galleryKey,
+                  title: 'Load Data',
+                  description:
+                      'Pick an existing photo from your device\'s library.',
+                  tooltipBackgroundColor: _tutorialBg,
+                  titleTextStyle: const TextStyle(
+                    color: _tutorialText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  descTextStyle: TextStyle(
+                    color: _tutorialText.withValues(alpha: 0.8),
+                    fontSize: 14,
+                  ),
+                  child: _GlassButton(
+                    icon: Icons.photo_library,
+                    onTap: () => pickAndProcessImage(ImageSource.gallery),
+                  ),
                 ),
 
-                // Shutter Button
-                GestureDetector(
-                  onTap: () async {
-                    if (selectedImage.value == null) {
-                      await pickAndProcessImage(ImageSource.camera);
-                    } else {
-                      // Trigger AI Analysis
-                      if (selectedImage.value != null && !isProcessing.value) {
-                        isProcessing.value = true;
-                        // Logic handled via listen in build
-                        try {
-                          await ref
-                              .read(analysisControllerProvider.notifier)
-                              .analyze(selectedImage.value!);
-                        } finally {
-                          isProcessing.value = false;
+                // Shutter Button - Showcase Target 1 (Camera)
+                Showcase(
+                  key: cameraKey,
+                  title: 'Capture Reality',
+                  description:
+                      'Take a photo of your meal directly to start the analysis.',
+                  tooltipBackgroundColor: _tutorialBg,
+                  titleTextStyle: const TextStyle(
+                    color: _tutorialText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  descTextStyle: TextStyle(
+                    color: _tutorialText.withValues(alpha: 0.8),
+                    fontSize: 14,
+                  ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      if (selectedImage.value == null) {
+                        await pickAndProcessImage(ImageSource.camera);
+                      } else {
+                        // Trigger AI Analysis
+                        if (selectedImage.value != null &&
+                            !isProcessing.value) {
+                          isProcessing.value = true;
+                          // Logic handled via listen in build
+                          try {
+                            await ref
+                                .read(analysisControllerProvider.notifier)
+                                .analyze(selectedImage.value!);
+                          } finally {
+                            isProcessing.value = false;
+                          }
                         }
                       }
-                    }
-                  },
-                  child: Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4),
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primary,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppTheme.primary.withValues(alpha: 0.5),
-                              blurRadius: 20,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          selectedImage.value == null
-                              ? Icons.camera_alt
-                              : Icons.check,
-                          color: Colors.black,
+                    },
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 4),
+                      ),
+                      child: Center(
+                        child: Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.primary.withValues(alpha: 0.5),
+                                blurRadius: 20,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            selectedImage.value == null
+                                ? Icons.camera_alt
+                                : Icons.check,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
 
-                _GlassButton(icon: Icons.history, onTap: () => context.go('/')),
+                // History Button - Showcase Target 3
+                Showcase(
+                  key: historyKey,
+                  title: 'Time Capsule',
+                  description:
+                      'Access your full log of past meals and daily stats.',
+                  tooltipBackgroundColor: _tutorialBg,
+                  titleTextStyle: const TextStyle(
+                    color: _tutorialText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  descTextStyle: TextStyle(
+                    color: _tutorialText.withValues(alpha: 0.8),
+                    fontSize: 14,
+                  ),
+                  child: _GlassButton(
+                    icon: Icons.history,
+                    onTap: () => context.go('/'),
+                  ),
+                ),
               ],
             ),
           ),

@@ -5,14 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/services/tutorial_service.dart';
 import '../domain/food_analysis.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../history/data/meal_repository.dart';
 
-class AnalysisResultScreen extends ConsumerWidget {
+/// Tutorial colors (Cyberpunk Theme)
+const _tutorialBg = Color(0xFF102216); // Deep Forest
+const _tutorialText = Color(0xFF13EC5B); // Neon Green
+
+class AnalysisResultScreen extends ConsumerStatefulWidget {
   final FoodAnalysis? analysis;
   final File? imageFile;
   final bool isViewOnly;
@@ -25,9 +31,43 @@ class AnalysisResultScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AnalysisResultScreen> createState() =>
+      _AnalysisResultScreenState();
+}
+
+class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
+  // Showcase key for the detected items section
+  final _detectedItemsKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    _maybeStartTutorial();
+  }
+
+  Future<void> _maybeStartTutorial() async {
+    // Wait for the widget tree to be built
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Only show tutorial if there are items and this is not view-only mode
+      final items = widget.analysis?.items ?? [];
+      if (items.isEmpty || widget.isViewOnly) return;
+
+      // Wait for TutorialService to initialize
+      await ref.read(tutorialServiceProvider.future);
+      final tutorialService = ref.read(tutorialServiceProvider.notifier);
+
+      if (!tutorialService.hasShownResultsTutorial) {
+        // ignore: use_build_context_synchronously
+        ShowCaseWidget.of(context).startShowCase([_detectedItemsKey]);
+        await tutorialService.markResultsTutorialShown();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Calculate totals
-    final items = analysis?.items ?? [];
+    final items = widget.analysis?.items ?? [];
     final totalCalories = items.fold<int>(
       0,
       (sum, item) => sum + item.calories,
@@ -42,6 +82,28 @@ class AnalysisResultScreen extends ConsumerWidget {
               : items.map((e) => e.name).join(', '))
         : 'Unknown Food';
 
+    return ShowCaseWidget(
+      builder: (context) => _buildContent(
+        context,
+        items,
+        totalCalories,
+        totalCarbs,
+        totalProtein,
+        totalFat,
+        detectedName,
+      ),
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context,
+    List<FoodItem> items,
+    int totalCalories,
+    int totalCarbs,
+    int totalProtein,
+    int totalFat,
+    String detectedName,
+  ) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -54,7 +116,7 @@ class AnalysisResultScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          isViewOnly ? 'MEAL DETAILS' : 'ANALYSIS',
+          widget.isViewOnly ? 'MEAL DETAILS' : 'ANALYSIS',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             letterSpacing: 2,
             fontWeight: FontWeight.bold,
@@ -92,9 +154,10 @@ class AnalysisResultScreen extends ConsumerWidget {
         child: Column(
           children: [
             // 1. Scanned Image Card
-            if (imageFile != null)
+            if (widget.imageFile != null)
               GestureDetector(
-                onTap: () => context.push('/image-view', extra: imageFile),
+                onTap: () =>
+                    context.push('/image-view', extra: widget.imageFile),
                 child: Container(
                   height: 220,
                   width: double.infinity,
@@ -108,7 +171,7 @@ class AnalysisResultScreen extends ConsumerWidget {
                       ),
                     ],
                     image: DecorationImage(
-                      image: FileImage(imageFile!),
+                      image: FileImage(widget.imageFile!),
                       fit: BoxFit.cover,
                     ),
                     border: Border.all(color: Colors.white10),
@@ -188,173 +251,196 @@ class AnalysisResultScreen extends ConsumerWidget {
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  backgroundColor: Colors.transparent,
-                                  isScrollControlled: true,
-                                  builder: (context) => Container(
-                                    decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF1A1A1A,
-                                      ), // Solid dark background
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(32),
-                                      ),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                      ),
-                                    ),
-                                    padding: const EdgeInsets.fromLTRB(
-                                      24,
-                                      12,
-                                      24,
-                                      24,
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 40,
-                                          height: 4,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white24,
-                                            borderRadius: BorderRadius.circular(
-                                              2,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 24),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.auto_awesome,
-                                              color: AppTheme.primary,
-                                              size: 24,
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Text(
-                                              'DETECTED FOODS',
-                                              style: GoogleFonts.spaceGrotesk(
-                                                color: Colors.white,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 1.2,
-                                              ),
-                                            ),
-                                            const Spacer(),
-                                            IconButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                              icon: const Icon(
-                                                Icons.close,
-                                                color: Colors.white54,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Flexible(
-                                          child: ListView.separated(
-                                            shrinkWrap: true,
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            itemCount: items.length,
-                                            separatorBuilder:
-                                                (context, index) => Divider(
-                                                  color: Colors.white
-                                                      .withValues(alpha: 0.05),
-                                                ),
-                                            itemBuilder: (context, index) {
-                                              final item = items[index];
-                                              return Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      vertical: 12,
-                                                    ),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      item.name,
-                                                      style:
-                                                          GoogleFonts.spaceGrotesk(
-                                                            color: Colors.white,
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    Text(
-                                                      '${item.portionEstimate} • ${item.calories} kcal',
-                                                      style:
-                                                          GoogleFonts.spaceGrotesk(
-                                                            color: Colors.white
-                                                                .withValues(
-                                                                  alpha: 0.6,
-                                                                ),
-                                                            fontSize: 14,
-                                                          ),
-                                                    ),
-                                                    const SizedBox(height: 8),
-                                                    Row(
-                                                      children: [
-                                                        _MacroMiniTag(
-                                                          label: 'Protein',
-                                                          value:
-                                                              '${item.protein}g',
-                                                          color:
-                                                              Colors.cyanAccent,
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 8,
-                                                        ),
-                                                        _MacroMiniTag(
-                                                          label: 'Carbs',
-                                                          value:
-                                                              '${item.carbs}g',
-                                                          color: Colors
-                                                              .amberAccent,
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 8,
-                                                        ),
-                                                        _MacroMiniTag(
-                                                          label: 'Fat',
-                                                          value: '${item.fat}g',
-                                                          color:
-                                                              Colors.pinkAccent,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                detectedName,
-                                style: GoogleFonts.spaceGrotesk(
-                                  color: Colors.white,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.1,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                            Showcase(
+                              key: _detectedItemsKey,
+                              title: 'Inspect Components',
+                              description:
+                                  'When multiple items are detected (e.g., Burger + Fries), tap on an item to see its specific portion size and individual macros.',
+                              tooltipBackgroundColor: _tutorialBg,
+                              titleTextStyle: const TextStyle(
+                                color: _tutorialText,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ),
+                              descTextStyle: TextStyle(
+                                color: _tutorialText.withValues(alpha: 0.8),
+                                fontSize: 14,
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    isScrollControlled: true,
+                                    builder: (context) => Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(
+                                          0xFF1A1A1A,
+                                        ), // Solid dark background
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                              top: Radius.circular(32),
+                                            ),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.fromLTRB(
+                                        24,
+                                        12,
+                                        24,
+                                        24,
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            width: 40,
+                                            height: 4,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white24,
+                                              borderRadius:
+                                                  BorderRadius.circular(2),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 24),
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.auto_awesome,
+                                                color: AppTheme.primary,
+                                                size: 24,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Text(
+                                                'DETECTED FOODS',
+                                                style: GoogleFonts.spaceGrotesk(
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 1.2,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              IconButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                icon: const Icon(
+                                                  Icons.close,
+                                                  color: Colors.white54,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 16),
+                                          Flexible(
+                                            child: ListView.separated(
+                                              shrinkWrap: true,
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              itemCount: items.length,
+                                              separatorBuilder:
+                                                  (context, index) => Divider(
+                                                    color: Colors.white
+                                                        .withValues(
+                                                          alpha: 0.05,
+                                                        ),
+                                                  ),
+                                              itemBuilder: (context, index) {
+                                                final item = items[index];
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                      ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        item.name,
+                                                        style:
+                                                            GoogleFonts.spaceGrotesk(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        '${item.portionEstimate} • ${item.calories} kcal',
+                                                        style:
+                                                            GoogleFonts.spaceGrotesk(
+                                                              color: Colors
+                                                                  .white
+                                                                  .withValues(
+                                                                    alpha: 0.6,
+                                                                  ),
+                                                              fontSize: 14,
+                                                            ),
+                                                      ),
+                                                      const SizedBox(height: 8),
+                                                      Row(
+                                                        children: [
+                                                          _MacroMiniTag(
+                                                            label: 'Protein',
+                                                            value:
+                                                                '${item.protein}g',
+                                                            color: Colors
+                                                                .cyanAccent,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 8,
+                                                          ),
+                                                          _MacroMiniTag(
+                                                            label: 'Carbs',
+                                                            value:
+                                                                '${item.carbs}g',
+                                                            color: Colors
+                                                                .amberAccent,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 8,
+                                                          ),
+                                                          _MacroMiniTag(
+                                                            label: 'Fat',
+                                                            value:
+                                                                '${item.fat}g',
+                                                            color: Colors
+                                                                .pinkAccent,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  detectedName,
+                                  style: GoogleFonts.spaceGrotesk(
+                                    color: Colors.white,
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1.1,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ), // Close GestureDetector
+                            ), // Close Showcase
                           ],
                         ),
                       ),
@@ -523,7 +609,7 @@ class AnalysisResultScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: isViewOnly
+      floatingActionButton: widget.isViewOnly
           ? null
           : Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -546,13 +632,14 @@ class AnalysisResultScreen extends ConsumerWidget {
                     flex: 2,
                     child: FilledButton.icon(
                       onPressed: () async {
-                        if (imageFile == null || analysis == null) return;
+                        if (widget.imageFile == null || widget.analysis == null)
+                          return;
 
                         // Show loading or just await
                         try {
                           await ref
                               .read(mealRepositoryProvider)
-                              .saveMeal(analysis!, imageFile!);
+                              .saveMeal(widget.analysis!, widget.imageFile!);
                           if (context.mounted) {
                             context.go('/'); // Go home/history
                             context.showAppSnackBar('Meal saved to history!');

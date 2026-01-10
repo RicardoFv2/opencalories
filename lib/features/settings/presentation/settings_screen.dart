@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../data/api_key_repository.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/services/tutorial_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -261,6 +262,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // 6. Reset Hints Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await ref.read(tutorialServiceProvider.future);
+                  await ref
+                      .read(tutorialServiceProvider.notifier)
+                      .resetTutorials();
+                  if (context.mounted) {
+                    context.showAppSnackBar(
+                      'Hints reset! Tutorials will show again.',
+                    );
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.grey[400],
+                  side: BorderSide(color: Colors.grey[700]!),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                icon: const Icon(Icons.help_outline, size: 18),
+                label: const Text('Reset Hints'),
               ),
             ),
           ],
