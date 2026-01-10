@@ -126,14 +126,25 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
                 final data = snapshot.data ?? [];
 
                 return MasonryGridView.count(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 16,
+                    bottom:
+                        100, // Extra padding to ensure the last item is not cut off
+                  ),
                   crossAxisCount: 2,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
                   itemCount: data.length,
                   itemBuilder: (context, index) {
                     final dayData = data[index];
-                    return _DayGridItem(dayData: dayData);
+                    // Add top padding to the second item (Tuesday) to create the "stepped" look
+                    // where the right column is shifted down relative to the left.
+                    return Padding(
+                      padding: EdgeInsets.only(top: index == 1 ? 40.0 : 0.0),
+                      child: _DayGridItem(dayData: dayData),
+                    );
                   },
                 );
               },
@@ -165,7 +176,7 @@ class _DayGridItem extends StatelessWidget {
         context.pop(date);
       },
       child: Container(
-        height: (date.day % 2 == 0) ? 200 : 240, // Simple staggering effect
+        height: 220, // Fixed height for consistent stepped look
         decoration: BoxDecoration(
           color: Colors.grey[900],
           borderRadius: BorderRadius.circular(24),

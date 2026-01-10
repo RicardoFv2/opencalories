@@ -81,10 +81,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
         backgroundColor: Colors.transparent,
         actions: [
           IconButton(
-            icon: const Icon(Icons.bar_chart),
-            onPressed: () => context.push('/weekly'),
-          ),
-          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => context.push('/settings'),
           ),
