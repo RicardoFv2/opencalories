@@ -121,25 +121,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
           }
 
           final meals = snapshot.data!;
-          if (meals.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.restaurant_menu,
-                    size: 64,
-                    color: Colors.grey.withValues(alpha: 0.3),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No meals logged today',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-            );
-          }
 
           // Calculate daily total
           final dailyCalories = meals.fold<int>(
@@ -275,65 +256,93 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
 
               // List
               Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 80,
-                  ),
-                  itemCount: meals.length,
-                  itemBuilder: (context, index) {
-                    final meal = meals[index];
-                    return Dismissible(
-                      key: ValueKey(meal.meal.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20),
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Icon(Icons.delete, color: Colors.white),
-                      ),
-                      confirmDismiss: (direction) async {
-                        return await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            backgroundColor: Colors.grey[900],
-                            title: const Text('Delete Meal?'),
-                            content: const Text(
-                              'This action cannot be undone.',
+                child: meals.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.restaurant_menu,
+                              size: 64,
+                              color: Colors.grey.withValues(alpha: 0.3),
                             ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Cancel'),
+                            const SizedBox(height: 16),
+                            Text(
+                              _currentDate.day == DateTime.now().day &&
+                                      _currentDate.month ==
+                                          DateTime.now().month &&
+                                      _currentDate.year == DateTime.now().year
+                                  ? 'No meals logged today'
+                                  : 'No meals logged for this day',
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          bottom: 80,
+                        ),
+                        itemCount: meals.length,
+                        itemBuilder: (context, index) {
+                          final meal = meals[index];
+                          return Dismissible(
+                            key: ValueKey(meal.meal.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.8),
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.red,
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                            ),
+                            confirmDismiss: (direction) async {
+                              return await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  backgroundColor: Colors.grey[900],
+                                  title: const Text('Delete Meal?'),
+                                  content: const Text(
+                                    'This action cannot be undone.',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: Colors.red,
+                                      ),
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
                                 ),
-                                child: const Text('Delete'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      onDismissed: (direction) async {
-                        await ref
-                            .read(mealsDaoProvider)
-                            .deleteMeal(meal.meal.id);
-                        if (context.mounted) {
-                          context.showAppSnackBar('Meal deleted');
-                        }
-                      },
-                      child: _MealCard(meal: meal),
-                    );
-                  },
-                ),
+                              );
+                            },
+                            onDismissed: (direction) async {
+                              await ref
+                                  .read(mealsDaoProvider)
+                                  .deleteMeal(meal.meal.id);
+                              if (context.mounted) {
+                                context.showAppSnackBar('Meal deleted');
+                              }
+                            },
+                            child: _MealCard(meal: meal),
+                          );
+                        },
+                      ),
               ),
             ],
           );
