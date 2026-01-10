@@ -15,6 +15,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _apiKeyController = TextEditingController();
+  bool _obscureApiKey = true;
 
   @override
   void initState() {
@@ -126,6 +127,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   TextField(
                     controller: _apiKeyController,
+                    obscureText: _obscureApiKey,
                     style: const TextStyle(fontFamily: 'monospace'),
                     decoration: InputDecoration(
                       filled: true,
@@ -143,9 +145,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           width: 2,
                         ),
                       ),
-                      suffixIcon: const Icon(
-                        Icons.content_paste,
-                        color: Colors.grey,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureApiKey
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureApiKey = !_obscureApiKey;
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -235,16 +246,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
 
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.lock, size: 14, color: Colors.grey[600]),
-                const SizedBox(width: 4),
-                Text(
-                  'Your key is stored locally on device and never shared.',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.lock, size: 14, color: Colors.grey[600]),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      'Your key is stored locally on device and never shared.',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
