@@ -49,6 +49,21 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
     return DateTime(dt.year, dt.month, dt.day);
   }
 
+  void _previousDay() {
+    setState(() {
+      _currentDate = _currentDate.subtract(const Duration(days: 1));
+    });
+  }
+
+  void _nextDay() {
+    final now = _getDateOnly(DateTime.now());
+    final next = _currentDate.add(const Duration(days: 1));
+    if (next.isAfter(now)) return; // No future logs
+    setState(() {
+      _currentDate = next;
+    });
+  }
+
   String _formatDateLabel(DateTime date) {
     final now = _getDateOnly(DateTime.now());
     if (date == now) {
@@ -80,6 +95,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
         ),
         backgroundColor: Colors.transparent,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () => context.push('/weekly'),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => context.push('/settings'),
@@ -131,6 +150,41 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
           return Column(
             children: [
               // Summary Header
+              // Date Navigation
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.chevron_left, color: Colors.white),
+                      onPressed: _previousDay,
+                    ),
+                    Text(
+                      _formatDateLabel(_currentDate),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.chevron_right,
+                        color:
+                            _currentDate.year == DateTime.now().year &&
+                                _currentDate.month == DateTime.now().month &&
+                                _currentDate.day == DateTime.now().day
+                            ? Colors.grey.withValues(alpha: 0.3)
+                            : Colors.white,
+                      ),
+                      onPressed: _nextDay,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Summary Header with Macros
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.all(16),
@@ -151,15 +205,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                 ),
                 child: Column(
                   children: [
-                    Text(
-                      _formatDateLabel(_currentDate),
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
                     const Text(
                       'DAILY TOTAL',
                       style: TextStyle(
@@ -181,6 +226,48 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                     const Text(
                       'kcal',
                       style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                    const SizedBox(height: 24),
+                    // Macros
+                    FutureBuilder<Map<String, int>>(
+                      future: ref
+                          .watch(mealsDaoProvider)
+                          .getDailyMacros(_currentDate),
+                      builder: (context, snapshot) {
+                        final macros =
+                            snapshot.data ??
+                            {'protein': 0, 'carbs': 0, 'fat': 0};
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _MacroItem(
+                              label: 'Protein',
+                              value: '${macros['protein']}g',
+                              color: Colors.greenAccent,
+                            ),
+                            Container(
+                              width: 1,
+                              height: 30,
+                              color: Colors.white24,
+                            ),
+                            _MacroItem(
+                              label: 'Carbs',
+                              value: '${macros['carbs']}g',
+                              color: Colors.blueAccent,
+                            ),
+                            Container(
+                              width: 1,
+                              height: 30,
+                              color: Colors.white24,
+                            ),
+                            _MacroItem(
+                              label: 'Fat',
+                              value: '${macros['fat']}g',
+                              color: Colors.orangeAccent,
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -327,6 +414,36 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
   }
 }
 
+class _MacroItem extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _MacroItem({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: TextStyle(color: color, fontSize: 12)),
+      ],
+    );
+  }
+}
+
 class _MealCard extends StatelessWidget {
   final MealWithItems meal;
   const _MealCard({required this.meal});
@@ -412,6 +529,9 @@ class _MealCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppTheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppTheme.primary.withValues(alpha: 0.3),
+            ), // Matched bracket here
           ),
           child: Text(
             '${meal.meal.totalCalories} kcal',

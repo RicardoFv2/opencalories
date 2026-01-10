@@ -93,6 +93,107 @@ class MealsDao extends DatabaseAccessor<AppDatabase> with _$MealsDaoMixin {
     return result.fold<int>(0, (sum, meal) => sum + meal.totalCalories);
   }
 
+  Stream<List<MealWithItems>> watchMealsForDateRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    // Ensure we cover the full range
+    final start = DateTime(startDate.year, startDate.month, startDate.day);
+    final end = DateTime(
+      endDate.year,
+      endDate.month,
+      endDate.day,
+    ).add(const Duration(days: 1));
+
+    final query =
+        select(meals).join([
+            leftOuterJoin(foodItems, foodItems.mealId.equalsExp(meals.id)),
+          ])
+          ..where(meals.createdAt.isBetweenValues(start, end))
+          ..orderBy([OrderingTerm.desc(meals.createdAt)]);
+
+    return query.watch().map((rows) {
+      final groupedData = <MealEntity, List<FoodItemEntity>>{};
+
+      for (final row in rows) {
+        final meal = row.readTable(meals);
+        final item = row.readTableOrNull(foodItems);
+
+        if (!groupedData.containsKey(meal)) {
+          groupedData[meal] = [];
+        }
+        if (item != null) {
+          groupedData[meal]!.add(item);
+        }
+      }
+
+      return groupedData.entries.map((entry) {
+        return MealWithItems(meal: entry.key, items: entry.value);
+      }).toList();
+    });
+  }
+
+  Future<Map<String, int>> getDailyMacros(DateTime date) async {
+    final startOfDay = DateTime(date.year, date.month, date.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
+    final query = select(foodItems).join([
+      innerJoin(meals, meals.id.equalsExp(foodItems.mealId)),
+    ])..where(meals.createdAt.isBetweenValues(startOfDay, endOfDay));
+
+    final result = await query.get();
+
+    int totalProtein = 0;
+    int totalCarbs = 0;
+    int totalFat = 0;
+
+    for (final row in result) {
+      final item = row.readTable(foodItems);
+      totalProtein += item.protein;
+      totalCarbs += item.carbs;
+      totalFat += item.fat;
+    }
+
+    return {'protein': totalProtein, 'carbs': totalCarbs, 'fat': totalFat};
+  }
+
+  Future<List<Map<String, dynamic>>> getWeeklySummary(
+    DateTime weekStart,
+  ) async {
+    // Return last 7 days data starting from weekStart
+    // Or actually, let's make it flexible: range from weekStart to weekStart + 7 days
+    final start = DateTime(weekStart.year, weekStart.month, weekStart.day);
+    final end = start.add(const Duration(days: 7));
+
+    final query = select(meals)
+      ..where((t) => t.createdAt.isBetweenValues(start, end))
+      ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]);
+
+    final result = await query.get();
+
+    // Group by day
+    final Map<DateTime, int> dailyTotals = {};
+    for (int i = 0; i < 7; i++) {
+      final day = start.add(Duration(days: i));
+      dailyTotals[day] = 0;
+    }
+
+    for (final meal in result) {
+      final date = DateTime(
+        meal.createdAt.year,
+        meal.createdAt.month,
+        meal.createdAt.day,
+      );
+      if (dailyTotals.containsKey(date)) {
+        dailyTotals[date] = dailyTotals[date]! + meal.totalCalories;
+      }
+    }
+
+    return dailyTotals.entries
+        .map((e) => {'date': e.key, 'totalCalories': e.value})
+        .toList();
+  }
+
   Future<void> deleteMeal(int mealId) {
     return transaction(() async {
       await (delete(foodItems)..where((t) => t.mealId.equals(mealId))).go();

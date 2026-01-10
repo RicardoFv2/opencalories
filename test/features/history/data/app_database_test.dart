@@ -81,4 +81,148 @@ void main() {
     final daily = await dao.getDailyCalories(now);
     expect(daily, 800);
   });
+
+  test('watchMealsForDateRange filters correctly', () async {
+    final now = DateTime.now();
+    final yesterday = now.subtract(const Duration(days: 1));
+    final tomorrow = now.add(const Duration(days: 1));
+
+    await dao.insertMeal(
+      MealsCompanion.insert(
+        createdAt: yesterday,
+        imagePath: const Value('y'),
+        totalCalories: 100,
+      ),
+      [],
+    );
+    await dao.insertMeal(
+      MealsCompanion.insert(
+        createdAt: now,
+        imagePath: const Value('t'),
+        totalCalories: 200,
+      ),
+      [],
+    );
+    await dao.insertMeal(
+      MealsCompanion.insert(
+        createdAt: tomorrow,
+        imagePath: const Value('tm'),
+        totalCalories: 300,
+      ),
+      [],
+    );
+
+    // Query range: Yesterday to Today (Inclusive start/end handling in UI might differ,
+    // but DAO should handle range as start <= t < end+1day if we implemented it that way.
+    // Let's check implementation: isBetweenValues(start, end) where end is date+1day.
+    // So if update used endDate + 1day, it covers the whole endDate day.
+
+    final result = await dao.watchMealsForDateRange(yesterday, now).first;
+    expect(result.length, 2); // Yesterday + Today
+    expect(result.any((m) => m.meal.totalCalories == 100), isTrue);
+    expect(result.any((m) => m.meal.totalCalories == 200), isTrue);
+    expect(result.any((m) => m.meal.totalCalories == 300), isFalse);
+  });
+
+  test('getDailyMacros aggregates correctly', () async {
+    final now = DateTime.now();
+    final items = [
+      const FoodItemsCompanion(
+        name: Value('Chicken'),
+        calories: Value(200),
+        protein: Value(30),
+        carbs: Value(0),
+        fat: Value(10),
+      ),
+      const FoodItemsCompanion(
+        name: Value('Rice'),
+        calories: Value(200),
+        protein: Value(4),
+        carbs: Value(45),
+        fat: Value(1),
+      ),
+    ];
+
+    await dao.insertMeal(
+      MealsCompanion.insert(
+        createdAt: now,
+        imagePath: const Value('m'),
+        totalCalories: 400,
+      ),
+      items,
+    );
+
+    final macros = await dao.getDailyMacros(now);
+    expect(macros['protein'], 34);
+    expect(macros['carbs'], 45);
+    expect(macros['fat'], 11);
+  });
+
+  test('getWeeklySummary aggregates 7 days', () async {
+    final today = DateTime.now();
+    final weekStart = today.subtract(
+      const Duration(days: 3),
+    ); // Start 3 days ago
+
+    // Insert meal 3 days ago (Start day)
+    await dao.insertMeal(
+      MealsCompanion.insert(
+        createdAt: weekStart,
+        imagePath: const Value('1'),
+        totalCalories: 500,
+      ),
+      [],
+    );
+
+    // Insert meal today (Start + 3)
+    await dao.insertMeal(
+      MealsCompanion.insert(
+        createdAt: today,
+        imagePath: const Value('2'),
+        totalCalories: 300,
+      ),
+      [],
+    );
+
+    // Insert meal tomorrow (Start + 4) - Should also be included in 7 day window
+    await dao.insertMeal(
+      MealsCompanion.insert(
+        createdAt: today.add(const Duration(days: 1)),
+        imagePath: const Value('3'),
+        totalCalories: 200,
+      ),
+      [],
+    );
+
+    // Insert meal 8 days after start (Should be excluded)
+    await dao.insertMeal(
+      MealsCompanion.insert(
+        createdAt: weekStart.add(const Duration(days: 8)),
+        imagePath: const Value('4'),
+        totalCalories: 100,
+      ),
+      [],
+    );
+
+    final summary = await dao.getWeeklySummary(weekStart);
+
+    expect(summary.length, 7);
+
+    // Check specific days
+    final startDaySummary = summary.firstWhere(
+      (d) =>
+          (d['date'] as DateTime).year == weekStart.year &&
+          (d['date'] as DateTime).month == weekStart.month &&
+          (d['date'] as DateTime).day == weekStart.day,
+    );
+    expect(startDaySummary['totalCalories'], 500);
+
+    final todaySummary = summary.firstWhere(
+      (d) =>
+          (d['date'] as DateTime).year == today.year &&
+          (d['date'] as DateTime).month == today.month &&
+          (d['date'] as DateTime).day == today.day,
+    );
+    expect(todaySummary['totalCalories'], 300);
+  });
 }
