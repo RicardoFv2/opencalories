@@ -162,15 +162,7 @@ class _DayGridItem extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Since we don't have parameterized routing yet, we can't easily jump to HistoryScreen state.
-        // For this iteration, we'll just show a snackbar or no-op.
-        // Ideally we would push(context, '/history', extra: date);
-        // But let's stick to visual summary for now or add a TODO.
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Details for ${DateFormat('EEEE').format(date)}'),
-          ),
-        );
+        context.pop(date);
       },
       child: Container(
         height: (date.day % 2 == 0) ? 200 : 240, // Simple staggering effect

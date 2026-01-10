@@ -49,32 +49,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
     return DateTime(dt.year, dt.month, dt.day);
   }
 
-  void _previousDay() {
-    final minDate = _getMinDate();
-    final prev = _currentDate.subtract(const Duration(days: 1));
-    if (prev.isBefore(minDate)) return;
-
-    setState(() {
-      _currentDate = prev;
-    });
-  }
-
-  DateTime _getMinDate() {
-    final now = _getDateOnly(DateTime.now());
-    // Start of week (Monday) covering the current week
-    // If today is Monday (1), subtract 0 days.
-    return now.subtract(Duration(days: now.weekday - 1));
-  }
-
-  void _nextDay() {
-    final now = _getDateOnly(DateTime.now());
-    final next = _currentDate.add(const Duration(days: 1));
-    if (next.isAfter(now)) return; // No future logs
-    setState(() {
-      _currentDate = next;
-    });
-  }
-
   String _formatDateLabel(DateTime date) {
     final now = _getDateOnly(DateTime.now());
     if (date == now) {
@@ -143,41 +117,60 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
             children: [
               // Summary Header
               // Date Navigation
+              // Summary Header
+              // Date Navigation
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.chevron_left,
-                        color: _currentDate.isAtSameMomentAs(_getMinDate())
-                            ? Colors.grey.withValues(alpha: 0.3)
-                            : Colors.white,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () async {
+                      final selectedDate = await context.push<DateTime>(
+                        '/weekly',
+                      );
+                      if (selectedDate != null) {
+                        setState(() {
+                          _currentDate = _getDateOnly(selectedDate);
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
-                      onPressed: _previousDay,
-                    ),
-                    Text(
-                      _formatDateLabel(_currentDate),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.1),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.calendar_today,
+                            size: 16,
+                            color: AppTheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _formatDateLabel(_currentDate),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.white54,
+                          ),
+                        ],
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.chevron_right,
-                        color:
-                            _currentDate.year == DateTime.now().year &&
-                                _currentDate.month == DateTime.now().month &&
-                                _currentDate.day == DateTime.now().day
-                            ? Colors.grey.withValues(alpha: 0.3)
-                            : Colors.white,
-                      ),
-                      onPressed: _nextDay,
-                    ),
-                  ],
+                  ),
                 ),
               ),
 
