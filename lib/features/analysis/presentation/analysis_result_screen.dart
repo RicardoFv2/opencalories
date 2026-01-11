@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,6 +39,7 @@ class AnalysisResultScreen extends ConsumerStatefulWidget {
 class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
   // Showcase key for the detected items section
   final _detectedItemsKey = GlobalKey();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -630,30 +632,52 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                   const SizedBox(width: 16),
                   Expanded(
                     flex: 2,
-                    child: FilledButton.icon(
-                      onPressed: () async {
-                        if (widget.imageFile == null || widget.analysis == null)
-                          return;
+                    child: ElevatedButton.icon(
+                      onPressed: _isSaving
+                          ? null
+                          : () async {
+                              if (widget.analysis == null ||
+                                  widget.analysis!.items.isEmpty) {
+                                if (context.mounted) {
+                                  context.showAppSnackBar(
+                                    'No items to save',
+                                    isError: true,
+                                  );
+                                }
+                                return;
+                              }
 
-                        // Show loading or just await
-                        try {
-                          await ref
-                              .read(mealRepositoryProvider)
-                              .saveMeal(widget.analysis!, widget.imageFile!);
-                          if (context.mounted) {
-                            context.go('/'); // Go home/history
-                            context.showAppSnackBar('Meal saved to history!');
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
-                            context.showAppSnackBar(
-                              'Error saving meal: $e',
-                              isError: true,
-                            );
-                          }
-                        }
-                      },
-                      style: FilledButton.styleFrom(
+                              await HapticFeedback.heavyImpact();
+                              setState(() => _isSaving = true);
+                              try {
+                                if (widget.imageFile == null) return;
+
+                                await ref
+                                    .read(mealRepositoryProvider)
+                                    .saveMeal(
+                                      widget.analysis!,
+                                      widget.imageFile!,
+                                    );
+                                if (context.mounted) {
+                                  context.go('/'); // Go home/history
+                                  context.showAppSnackBar(
+                                    'Meal saved to history!',
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  context.showAppSnackBar(
+                                    'Error saving meal: $e',
+                                    isError: true,
+                                  );
+                                }
+                              } finally {
+                                if (mounted) {
+                                  setState(() => _isSaving = false);
+                                }
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primary,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(vertical: 16),

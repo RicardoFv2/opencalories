@@ -7,6 +7,12 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../data/app_database.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../../../../core/services/tutorial_service.dart';
+
+/// Tutorial colors (Cyberpunk Theme)
+const _tutorialBg = Color(0xFF102216); // Deep Forest
+const _tutorialText = Color(0xFF13EC5B); // Neon Green
 
 class WeeklySummaryScreen extends ConsumerStatefulWidget {
   const WeeklySummaryScreen({super.key});
@@ -18,6 +24,8 @@ class WeeklySummaryScreen extends ConsumerStatefulWidget {
 
 class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
   late DateTime _startOfWeek;
+  final GlobalKey _navKey = GlobalKey();
+  final GlobalKey _gridKey = GlobalKey();
 
   @override
   void initState() {
@@ -70,87 +78,149 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: Column(
-        children: [
-          // Week Selector
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left, color: Colors.white),
-                  onPressed: _previousWeek,
+      body: ShowCaseWidget(
+        onComplete: (index, key) {
+          if (index == 1) {
+            ref
+                .read(tutorialServiceProvider.notifier)
+                .markWeeklyTutorialShown();
+          }
+        },
+        builder: (context) {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            await ref.read(tutorialServiceProvider.future);
+            final tutorialService = ref.read(tutorialServiceProvider.notifier);
+
+            if (!tutorialService.hasShownWeeklyTutorial && context.mounted) {
+              ShowCaseWidget.of(context).startShowCase([_navKey, _gridKey]);
+            }
+          });
+
+          return Column(
+            children: [
+              // Week Selector
+              Showcase(
+                key: _navKey,
+                title: 'Time Travel',
+                description: 'Use arrows to browse previous weeks history.',
+                tooltipBackgroundColor: _tutorialBg,
+                titleTextStyle: const TextStyle(
+                  color: _tutorialText,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                Text(
-                  dateRangeStr,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                descTextStyle: TextStyle(
+                  color: _tutorialText.withValues(alpha: 0.8),
+                  fontSize: 14,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          color: Colors.white,
+                        ),
+                        onPressed: _previousWeek,
+                      ),
+                      Text(
+                        dateRangeStr,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.chevron_right,
+                          color:
+                              _startOfWeek
+                                  .add(const Duration(days: 7))
+                                  .isAfter(DateTime.now())
+                              ? Colors.grey.withValues(alpha: 0.3)
+                              : Colors.white,
+                        ),
+                        onPressed: _nextWeek,
+                      ),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.chevron_right,
-                    color:
-                        _startOfWeek
-                            .add(const Duration(days: 7))
-                            .isAfter(DateTime.now())
-                        ? Colors.grey.withValues(alpha: 0.3)
-                        : Colors.white,
-                  ),
-                  onPressed: _nextWeek,
-                ),
-              ],
-            ),
-          ),
+              ),
 
-          Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: weeklyDataFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+              Expanded(
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+                  future: weeklyDataFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Error: ${snapshot.error}',
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  );
-                }
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text(
+                          'Error: ${snapshot.error}',
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      );
+                    }
 
-                final data = snapshot.data ?? [];
+                    final data = snapshot.data ?? [];
 
-                return MasonryGridView.count(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    top: 16,
-                    bottom:
-                        100, // Extra padding to ensure the last item is not cut off
-                  ),
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    final dayData = data[index];
-                    // Add top padding to the second item (Tuesday) to create the "stepped" look
-                    // where the right column is shifted down relative to the left.
-                    return Padding(
-                      padding: EdgeInsets.only(top: index == 1 ? 40.0 : 0.0),
-                      child: _DayGridItem(dayData: dayData),
+                    return MasonryGridView.count(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 16,
+                        bottom:
+                            100, // Extra padding to ensure the last item is not cut off
+                      ),
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      itemCount: data.length,
+                      itemBuilder: (context, index) {
+                        final dayData = data[index];
+                        final widget = Padding(
+                          padding: EdgeInsets.only(
+                            top: index == 1 ? 40.0 : 0.0,
+                          ),
+                          child: _DayGridItem(dayData: dayData),
+                        );
+
+                        if (index == 0) {
+                          return Showcase(
+                            key: _gridKey,
+                            title: 'Select a Day',
+                            description:
+                                'Tap any day to view its meal history.',
+                            tooltipBackgroundColor: _tutorialBg,
+                            titleTextStyle: const TextStyle(
+                              color: _tutorialText,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            descTextStyle: TextStyle(
+                              color: _tutorialText.withValues(alpha: 0.8),
+                              fontSize: 14,
+                            ),
+                            child: widget,
+                          );
+                        }
+                        return widget;
+                      },
                     );
                   },
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

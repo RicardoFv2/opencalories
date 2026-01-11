@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -8,6 +9,8 @@ import 'package:showcaseview/showcaseview.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/services/tutorial_service.dart';
+import '../../../../core/services/calorie_goal_service.dart';
+import '../../../../core/widgets/skeleton_card.dart';
 import '../../history/data/app_database.dart';
 import '../../analysis/domain/food_analysis.dart';
 
@@ -120,7 +123,29 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
             );
           }
           if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+            return Column(
+              children: [
+                const SizedBox(height: 16),
+                // Date Nav Skeleton
+                const Center(child: SkeletonCard(width: 180, height: 40)),
+                // Summary Card Skeleton
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: SkeletonCard(width: double.infinity, height: 220),
+                ),
+                // List Skeletons
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: 3,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemBuilder: (_, __) => const Padding(
+                      padding: EdgeInsets.only(bottom: 16),
+                      child: SkeletonCard(width: double.infinity, height: 100),
+                    ),
+                  ),
+                ),
+              ],
+            );
           }
 
           final meals = snapshot.data!;
@@ -234,6 +259,37 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                     const Text(
                       'kcal',
                       style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                    const SizedBox(height: 16),
+                    // Goal Progress
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final goal =
+                            ref.watch(calorieGoalServiceProvider).valueOrNull ??
+                            2500;
+                        final progress = (dailyCalories / goal).clamp(0.0, 1.0);
+                        return Column(
+                          children: [
+                            LinearProgressIndicator(
+                              value: progress,
+                              backgroundColor: Colors.white10,
+                              color: progress >= 1.0
+                                  ? Colors.redAccent
+                                  : AppTheme.primary,
+                              minHeight: 6,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${(progress * 100).toInt()}% of daily goal ($goal)',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const SizedBox(height: 24),
                     // Macros
@@ -352,6 +408,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                               ),
                             ),
                             confirmDismiss: (direction) async {
+                              await HapticFeedback.selectionClick();
                               return await showDialog<bool>(
                                 context: context,
                                 builder: (context) => AlertDialog(
@@ -379,6 +436,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                               );
                             },
                             onDismissed: (direction) async {
+                              await HapticFeedback.mediumImpact();
                               await ref
                                   .read(mealsDaoProvider)
                                   .deleteMeal(meal.meal.id);

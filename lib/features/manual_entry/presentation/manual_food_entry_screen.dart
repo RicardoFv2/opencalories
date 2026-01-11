@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -8,12 +9,35 @@ import '../../../../core/utils/snackbar_utils.dart';
 import '../../analysis/data/ai_repository.dart';
 import '../../history/data/meal_repository.dart';
 import '../domain/manual_food_entry.dart';
+import 'package:showcaseview/showcaseview.dart';
+import '../../../../core/services/tutorial_service.dart';
+
+/// Tutorial colors (Cyberpunk Theme)
+const _tutorialBg = Color(0xFF102216); // Deep Forest
+const _tutorialText = Color(0xFF13EC5B); // Neon Green
 
 class ManualFoodEntryScreen extends HookConsumerWidget {
   const ManualFoodEntryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final nameKey = useMemoized(() => GlobalKey());
+    final aiKey = useMemoized(() => GlobalKey());
+    final macrosKey = useMemoized(() => GlobalKey());
+
+    // Auto-start tutorial
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await ref.read(tutorialServiceProvider.future);
+        final tutorialService = ref.read(tutorialServiceProvider.notifier);
+
+        if (!tutorialService.hasShownManualTutorial && context.mounted) {
+          ShowCaseWidget.of(context).startShowCase([nameKey, aiKey, macrosKey]);
+        }
+      });
+      return null;
+    }, []);
+
     final nameController = useTextEditingController();
     final portionController = useTextEditingController();
     final caloriesController = useTextEditingController();
@@ -115,135 +139,207 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
         ),
         backgroundColor: Colors.transparent,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSectionTitle('REQUIRED'),
-              const SizedBox(height: 16),
-              _buildTextField(
-                controller: nameController,
-                label: 'Food Name',
-                hint: 'e.g. Tortillas',
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Please enter a name' : null,
-              ),
-              const SizedBox(height: 20),
-              _buildTextField(
-                controller: portionController,
-                label: 'Portion',
-                hint: 'e.g. 2 pieces',
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Please enter a portion' : null,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: isEstimating.value ? null : estimateWithAi,
-                  icon: isEstimating.value
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppTheme.primary,
-                          ),
-                        )
-                      : const Icon(Icons.auto_awesome, size: 20),
-                  label: Text(
-                    isEstimating.value ? 'ESTIMATING...' : 'ESTIMATE WITH AI',
+      body: ShowCaseWidget(
+        onComplete: (index, key) {
+          if (index == 2) {
+            ref
+                .read(tutorialServiceProvider.notifier)
+                .markManualTutorialShown();
+          }
+        },
+        builder: (context) => SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('REQUIRED'),
+                const SizedBox(height: 16),
+                Showcase(
+                  key: nameKey,
+                  title: 'Name Your Fuel',
+                  description: 'Enter the name of your food item.',
+                  tooltipBackgroundColor: _tutorialBg,
+                  titleTextStyle: const TextStyle(
+                    color: _tutorialText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.primary,
-                    side: const BorderSide(color: AppTheme.primary),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  descTextStyle: TextStyle(
+                    color: _tutorialText.withValues(alpha: 0.8),
+                    fontSize: 14,
+                  ),
+                  child: _buildTextField(
+                    controller: nameController,
+                    label: 'Food Name',
+                    hint: 'e.g. Tortillas',
+                    validator: (v) =>
+                        v == null || v.isEmpty ? 'Please enter a name' : null,
                   ),
                 ),
-              ),
-              const SizedBox(height: 48),
-              _buildSectionTitle('NUTRITION (OPTIONAL)'),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextField(
-                      controller: caloriesController,
-                      label: 'Calories',
-                      hint: '0',
-                      keyboardType: TextInputType.number,
-                      suffix: 'kcal',
+                const SizedBox(height: 20),
+                _buildTextField(
+                  controller: portionController,
+                  label: 'Portion',
+                  hint: 'e.g. 2 pieces',
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Please enter a portion' : null,
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: Showcase(
+                    key: aiKey,
+                    title: 'AI Assist',
+                    description:
+                        'Let Gemini estimate calories from the food name.',
+                    tooltipBackgroundColor: _tutorialBg,
+                    titleTextStyle: const TextStyle(
+                      color: _tutorialText,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildTextField(
-                      controller: proteinController,
-                      label: 'Protein',
-                      hint: '0',
-                      keyboardType: TextInputType.number,
-                      suffix: 'g',
+                    descTextStyle: TextStyle(
+                      color: _tutorialText.withValues(alpha: 0.8),
+                      fontSize: 14,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextField(
-                      controller: carbsController,
-                      label: 'Carbs',
-                      hint: '0',
-                      keyboardType: TextInputType.number,
-                      suffix: 'g',
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildTextField(
-                      controller: fatController,
-                      label: 'Fat',
-                      hint: '0',
-                      keyboardType: TextInputType.number,
-                      suffix: 'g',
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 48),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: isSaving.value ? null : saveEntry,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: isSaving.value
-                      ? const CircularProgressIndicator(color: Colors.black)
-                      : const Text(
-                          'LOG MEAL',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            letterSpacing: 1.2,
-                          ),
+                    child: OutlinedButton.icon(
+                      onPressed: isEstimating.value
+                          ? null
+                          : () async {
+                              await HapticFeedback.lightImpact();
+                              estimateWithAi();
+                            },
+                      icon: isEstimating.value
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppTheme.primary,
+                              ),
+                            )
+                          : const Icon(Icons.auto_awesome, size: 20),
+                      label: Text(
+                        isEstimating.value
+                            ? 'ESTIMATING...'
+                            : 'ESTIMATE WITH AI',
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppTheme.primary,
+                        side: const BorderSide(color: AppTheme.primary),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 48),
+                _buildSectionTitle('NUTRITION (OPTIONAL)'),
+                const SizedBox(height: 16),
+                Showcase(
+                  key: macrosKey,
+                  title: 'Fine-Tune Data',
+                  description:
+                      'Manually adjust the nutritional info if needed.',
+                  tooltipBackgroundColor: _tutorialBg,
+                  titleTextStyle: const TextStyle(
+                    color: _tutorialText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  descTextStyle: TextStyle(
+                    color: _tutorialText.withValues(alpha: 0.8),
+                    fontSize: 14,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildTextField(
+                              controller: caloriesController,
+                              label: 'Calories',
+                              hint: '0',
+                              keyboardType: TextInputType.number,
+                              suffix: 'kcal',
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildTextField(
+                              controller: proteinController,
+                              label: 'Protein',
+                              hint: '0',
+                              keyboardType: TextInputType.number,
+                              suffix: 'g',
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildTextField(
+                              controller: carbsController,
+                              label: 'Carbs',
+                              hint: '0',
+                              keyboardType: TextInputType.number,
+                              suffix: 'g',
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildTextField(
+                              controller: fatController,
+                              label: 'Fat',
+                              hint: '0',
+                              keyboardType: TextInputType.number,
+                              suffix: 'g',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 48),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: isSaving.value
+                        ? null
+                        : () async {
+                            await HapticFeedback.heavyImpact();
+                            saveEntry();
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: isSaving.value
+                        ? const CircularProgressIndicator(color: Colors.black)
+                        : const Text(
+                            'LOG MEAL',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

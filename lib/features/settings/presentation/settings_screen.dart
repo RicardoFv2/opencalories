@@ -6,6 +6,7 @@ import '../data/api_key_repository.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/services/tutorial_service.dart';
+import '../../../../core/services/calorie_goal_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -193,6 +194,76 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   'Don\'t have a key? Get one from Google AI Studio',
                   style: TextStyle(color: AppTheme.primary, fontSize: 12),
                 ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // 4. Daily Calorie Goal
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 4, bottom: 8),
+                    child: Text(
+                      'Daily Calorie Goal',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceDark,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Consumer(
+                      builder: (context, ref, child) {
+                        final calorieGoal = ref.watch(
+                          calorieGoalServiceProvider,
+                        );
+                        final goalValue = calorieGoal.valueOrNull ?? 2500;
+
+                        return Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Target',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                                Text(
+                                  '$goalValue kcal',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Slider(
+                              value: goalValue.toDouble(),
+                              min: 1200,
+                              max: 5000,
+                              divisions: 38,
+                              activeColor: AppTheme.primary,
+                              inactiveColor: Colors.white10,
+                              onChanged: (value) {
+                                ref
+                                    .read(calorieGoalServiceProvider.notifier)
+                                    .setGoal(value.toInt());
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
 

@@ -82,8 +82,15 @@ Do not add any conversational text.
 
       // Safe decoding
       return jsonDecode(cleanedJson) as Map<String, dynamic>;
+    } on SocketException {
+      throw Exception('No internet connection. Please check your network.');
+    } on GenerativeAIException catch (e) {
+      if (e.message.contains('429')) {
+        throw Exception('Rate limit exceeded. Please try again later.');
+      }
+      throw Exception('AI Service Error: ${e.message}');
     } catch (e) {
-      throw Exception('AI analysis error: $e');
+      throw Exception('An unexpected error occurred: $e');
     }
   }
 }

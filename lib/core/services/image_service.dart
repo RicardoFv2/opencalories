@@ -39,9 +39,9 @@ class ImageService extends _$ImageService {
       final result = await FlutterImageCompress.compressAndGetFile(
         file.absolute.path,
         targetPath,
-        quality: 85,
-        minWidth: 1024,
-        minHeight: 1024,
+        quality: 70,
+        minWidth: 768,
+        minHeight: 768,
       );
 
       if (result == null) {

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -64,7 +65,7 @@ class _ScannerContent extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final imageService = ref.read(imageServiceProvider.notifier);
     final selectedImage = useState<File?>(null);
-    final isProcessing = useState(false);
+    final processingStatus = useState<String?>(null);
 
     // Check and start tutorial on first build
     useEffect(() {
@@ -103,7 +104,7 @@ class _ScannerContent extends HookConsumerWidget {
     });
 
     Future<void> pickAndProcessImage(ImageSource source) async {
-      isProcessing.value = true;
+      processingStatus.value = 'Compressing image...';
       try {
         final picked = await imageService.pickImage(source);
         if (picked != null) {
@@ -111,7 +112,7 @@ class _ScannerContent extends HookConsumerWidget {
           selectedImage.value = compressed;
         }
       } finally {
-        isProcessing.value = false;
+        processingStatus.value = null;
       }
     }
 
@@ -371,19 +372,20 @@ class _ScannerContent extends HookConsumerWidget {
                   child: GestureDetector(
                     onTap: () async {
                       if (selectedImage.value == null) {
+                        await HapticFeedback.heavyImpact();
                         await pickAndProcessImage(ImageSource.camera);
                       } else {
-                        // Trigger AI Analysis
-                        if (selectedImage.value != null &&
-                            !isProcessing.value) {
-                          isProcessing.value = true;
-                          // Logic handled via listen in build
+                        // Allow analysis if not currently processing
+                        if (processingStatus.value == null) {
+                          await HapticFeedback.lightImpact();
+                          // Process existing image
+                          processingStatus.value = 'Analyzing food...';
                           try {
                             await ref
                                 .read(analysisControllerProvider.notifier)
                                 .analyze(selectedImage.value!);
                           } finally {
-                            isProcessing.value = false;
+                            processingStatus.value = null;
                           }
                         }
                       }
@@ -446,11 +448,25 @@ class _ScannerContent extends HookConsumerWidget {
             ),
           ),
 
-          if (isProcessing.value)
+          if (processingStatus.value != null)
             Container(
               color: Colors.black54,
-              child: const Center(
-                child: CircularProgressIndicator(color: AppTheme.primary),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(color: AppTheme.primary),
+                    const SizedBox(height: 16),
+                    Text(
+                      processingStatus.value!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
         ],

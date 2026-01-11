@@ -7,6 +7,8 @@ part 'tutorial_service.g.dart';
 const String _kHomeShowcase = 'hasShownHomeTutorial';
 const String _kResultsShowcase = 'hasShownResultsTutorial';
 const String _kHistoryShowcase = 'hasShownHistoryTutorial';
+const String _kManualShowcase = 'hasShownManualTutorial';
+const String _kWeeklyShowcase = 'hasShownWeeklyTutorial';
 
 @Riverpod(keepAlive: true)
 class TutorialService extends _$TutorialService {
@@ -28,6 +30,12 @@ class TutorialService extends _$TutorialService {
   bool get hasShownHistoryTutorial =>
       _prefs.getBool(_kHistoryShowcase) ?? false;
 
+  /// Check if the manual entry tutorial has been shown
+  bool get hasShownManualTutorial => _prefs.getBool(_kManualShowcase) ?? false;
+
+  /// Check if the weekly summary tutorial has been shown
+  bool get hasShownWeeklyTutorial => _prefs.getBool(_kWeeklyShowcase) ?? false;
+
   /// Mark the home tutorial as shown
   Future<void> markHomeTutorialShown() async {
     await _prefs.setBool(_kHomeShowcase, true);
@@ -43,10 +51,22 @@ class TutorialService extends _$TutorialService {
     await _prefs.setBool(_kHistoryShowcase, true);
   }
 
+  /// Mark the manual entry tutorial as shown
+  Future<void> markManualTutorialShown() async {
+    await _prefs.setBool(_kManualShowcase, true);
+  }
+
+  /// Mark the weekly summary tutorial as shown
+  Future<void> markWeeklyTutorialShown() async {
+    await _prefs.setBool(_kWeeklyShowcase, true);
+  }
+
   /// Reset all tutorials (for testing/debugging)
   Future<void> resetTutorials() async {
     await _prefs.remove(_kHomeShowcase);
     await _prefs.remove(_kResultsShowcase);
     await _prefs.remove(_kHistoryShowcase);
+    await _prefs.remove(_kManualShowcase);
+    await _prefs.remove(_kWeeklyShowcase);
   }
 }
