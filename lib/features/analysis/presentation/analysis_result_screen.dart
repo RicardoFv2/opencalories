@@ -7,13 +7,13 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:showcaseview/showcaseview.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/snackbar_utils.dart';
-import '../../../../core/services/tutorial_service.dart';
-import '../domain/food_analysis.dart';
+import 'package:opencalories/core/theme/app_theme.dart';
+import 'package:opencalories/core/utils/snackbar_utils.dart';
+import 'package:opencalories/core/services/tutorial_service.dart';
+import 'package:opencalories/features/analysis/domain/food_analysis.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../history/data/meal_repository.dart';
+import 'package:opencalories/features/history/data/meal_repository.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -504,87 +504,109 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
             const SizedBox(height: 16),
 
             // 3. Macro Distribution Chart
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.05),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Builder(
+              builder: (context) {
+                final totalGrams = totalCarbs + totalProtein + totalFat;
+                final carbsPercent = totalGrams > 0
+                    ? (totalCarbs / totalGrams * 100).round()
+                    : 0;
+                final proteinPercent = totalGrams > 0
+                    ? (totalProtein / totalGrams * 100).round()
+                    : 0;
+                final fatPercent = totalGrams > 0
+                    ? (totalFat / totalGrams * 100).round()
+                    : 0;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.05),
+                      ),
+                    ),
+                    child: Column(
                       children: [
-                        Text(
-                          'MACRO DISTRIBUTION',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'MACRO DISTRIBUTION',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            // Removed "Target Met" as it was non-functional
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        // Bar
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: SizedBox(
+                            height: 12,
+                            child: Row(
+                              children: [
+                                if (proteinPercent > 0)
+                                  Expanded(
+                                    flex: proteinPercent,
+                                    child: Container(color: AppTheme.primary),
+                                  ),
+                                if (carbsPercent > 0)
+                                  Expanded(
+                                    flex: carbsPercent,
+                                    child: Container(color: Colors.blueAccent),
+                                  ),
+                                if (fatPercent > 0)
+                                  Expanded(
+                                    flex: fatPercent,
+                                    child: Container(
+                                      color: Colors.orangeAccent,
+                                    ),
+                                  ),
+                                if (totalGrams == 0)
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(color: Colors.white10),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
-                        Text(
-                          'Target Met',
-                          style: TextStyle(fontSize: 10, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Bar
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: SizedBox(
-                        height: 12,
-                        child: Row(
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
-                              flex: 5,
-                              child: Container(color: AppTheme.primary),
+                            _MacroCard(
+                              label: 'Carbs',
+                              value: '${totalCarbs}g',
+                              color: Colors.blueAccent,
+                              isPrimary: false,
                             ),
-                            Expanded(
-                              flex: 93,
-                              child: Container(color: Colors.white30),
+                            _MacroCard(
+                              label: 'Protein',
+                              value: '${totalProtein}g',
+                              color: AppTheme.primary,
+                              isPrimary: true,
                             ),
-                            Expanded(
-                              flex: 2,
-                              child: Container(color: Colors.white10),
+                            _MacroCard(
+                              label: 'Fat',
+                              value: '${totalFat}g',
+                              color: Colors.orangeAccent,
+                              isPrimary: false,
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _MacroCard(
-                          label: 'Carbs',
-                          value: '${totalCarbs}g',
-                          color: Colors.white,
-                          isPrimary: false,
-                        ),
-                        _MacroCard(
-                          label: 'Protein',
-                          value: '${totalProtein}g',
-                          color: AppTheme.primary,
-                          isPrimary: true,
-                        ),
-                        _MacroCard(
-                          label: 'Fat',
-                          value: '${totalFat}g',
-                          color: Colors.white38,
-                          isPrimary: false,
-                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 24),

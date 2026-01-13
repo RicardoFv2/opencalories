@@ -8,12 +8,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import '../../../../core/services/image_service.dart';
-import '../../../../core/services/tutorial_service.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:opencalories/core/services/image_service.dart';
+import 'package:opencalories/core/services/tutorial_service.dart';
+import 'package:opencalories/core/theme/app_theme.dart';
 import '../../settings/data/api_key_repository.dart';
 import '../../analysis/presentation/analysis_controller.dart';
-import '../../../../core/utils/snackbar_utils.dart';
+import 'package:opencalories/core/utils/snackbar_utils.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -40,11 +40,9 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
         galleryKey: _galleryKey,
         historyKey: _historyKey,
       ),
-      onComplete: (index, key) {
-        // Mark tutorial as shown when completed
-        if (key == _historyKey) {
-          ref.read(tutorialServiceProvider.notifier).markHomeTutorialShown();
-        }
+      onFinish: () {
+        // Mark tutorial as shown when finished or skipped
+        ref.read(tutorialServiceProvider.notifier).markHomeTutorialShown();
       },
     );
   }

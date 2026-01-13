@@ -4,13 +4,13 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/snackbar_utils.dart';
+import 'package:opencalories/core/theme/app_theme.dart';
+import 'package:opencalories/core/utils/snackbar_utils.dart';
 import '../../analysis/data/ai_repository.dart';
 import '../../history/data/meal_repository.dart';
 import '../domain/manual_food_entry.dart';
 import 'package:showcaseview/showcaseview.dart';
-import '../../../../core/services/tutorial_service.dart';
+import 'package:opencalories/core/services/tutorial_service.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -140,12 +140,8 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
         backgroundColor: Colors.transparent,
       ),
       body: ShowCaseWidget(
-        onComplete: (index, key) {
-          if (index == 2) {
-            ref
-                .read(tutorialServiceProvider.notifier)
-                .markManualTutorialShown();
-          }
+        onFinish: () {
+          ref.read(tutorialServiceProvider.notifier).markManualTutorialShown();
         },
         builder: (context) => SingleChildScrollView(
           padding: const EdgeInsets.all(24),

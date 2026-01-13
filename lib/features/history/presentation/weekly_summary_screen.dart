@@ -5,10 +5,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-import '../../../../core/theme/app_theme.dart';
+import 'package:opencalories/core/theme/app_theme.dart';
 import '../data/app_database.dart';
 import 'package:showcaseview/showcaseview.dart';
-import '../../../../core/services/tutorial_service.dart';
+import 'package:opencalories/core/services/tutorial_service.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -26,6 +26,7 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
   late DateTime _startOfWeek;
   final GlobalKey _navKey = GlobalKey();
   final GlobalKey _gridKey = GlobalKey();
+  bool _tutorialStarted = false;
 
   @override
   void initState() {
@@ -79,22 +80,24 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
         ),
       ),
       body: ShowCaseWidget(
-        onComplete: (index, key) {
-          if (index == 1) {
-            ref
-                .read(tutorialServiceProvider.notifier)
-                .markWeeklyTutorialShown();
-          }
+        onFinish: () {
+          ref.read(tutorialServiceProvider.notifier).markWeeklyTutorialShown();
         },
         builder: (context) {
-          WidgetsBinding.instance.addPostFrameCallback((_) async {
-            await ref.read(tutorialServiceProvider.future);
-            final tutorialService = ref.read(tutorialServiceProvider.notifier);
+          if (!_tutorialStarted) {
+            _tutorialStarted = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              await ref.read(tutorialServiceProvider.future);
+              final tutorialService = ref.read(
+                tutorialServiceProvider.notifier,
+              );
 
-            if (!tutorialService.hasShownWeeklyTutorial && context.mounted) {
-              ShowCaseWidget.of(context).startShowCase([_navKey, _gridKey]);
-            }
-          });
+              if (!tutorialService.hasShownWeeklyTutorial && context.mounted) {
+                // ignore: use_build_context_synchronously
+                ShowCaseWidget.of(context).startShowCase([_navKey, _gridKey]);
+              }
+            });
+          }
 
           return Column(
             children: [

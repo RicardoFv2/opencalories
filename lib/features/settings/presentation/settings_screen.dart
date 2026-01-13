@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/api_key_repository.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/snackbar_utils.dart';
-import '../../../../core/services/tutorial_service.dart';
-import '../../../../core/services/calorie_goal_service.dart';
+import 'package:opencalories/core/theme/app_theme.dart';
+import 'package:opencalories/core/utils/snackbar_utils.dart';
+import 'package:opencalories/core/services/tutorial_service.dart';
+import 'package:opencalories/core/services/calorie_goal_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -55,69 +55,70 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 1. Hero Graphic
-            Container(
-              margin: const EdgeInsets.all(16),
-              height: 180,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: AppTheme.primary.withValues(alpha: 0.2),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    blurRadius: 15,
-                  ),
-                ],
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuCyQpXAOclKcePKfVsBD87ITisJezg4kpOcFKaLUM_H_vvnnE99DxDbPTEcK3MVzatJapxNntZ80lDpS7buLyig3_IG79Z83mgyxzWbpeXrApUCO5Gizpphnq76RNfjDBklQabqMe-xlyUO72jL0ulyJ5jvHCcsMOTBh1JEHhNxb6lGUGDsRPRvaf92xrwGgl5TS8Q3-5JJyqhKJOu1TiljSEyYvLFvXsEphXlomRVR9hum5hdHt0mITzByvPwiMCedmlj5YIcBuVM',
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Container(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Column(
+            children: [
+              // 1. Hero Graphic
+              Container(
+                height: 180,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [AppTheme.backgroundDark, Colors.transparent],
+                  border: Border.all(
+                    color: AppTheme.primary.withValues(alpha: 0.2),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primary.withValues(alpha: 0.1),
+                      blurRadius: 15,
+                    ),
+                  ],
+                  image: const DecorationImage(
+                    image: NetworkImage(
+                      'https://lh3.googleusercontent.com/aida-public/AB6AXuCyQpXAOclKcePKfVsBD87ITisJezg4kpOcFKaLUM_H_vvnnE99DxDbPTEcK3MVzatJapxNntZ80lDpS7buLyig3_IG79Z83mgyxzWbpeXrApUCO5Gizpphnq76RNfjDBklQabqMe-xlyUO72jL0ulyJ5jvHCcsMOTBh1JEHhNxb6lGUGDsRPRvaf92xrwGgl5TS8Q3-5JJyqhKJOu1TiljSEyYvLFvXsEphXlomRVR9hum5hdHt0mITzByvPwiMCedmlj5YIcBuVM',
+                    ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [AppTheme.backgroundDark, Colors.transparent],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 32),
 
-            // 2. Headline
-            Text(
-              'Unlock Gemini AI',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-              child: Text(
-                'To analyze your food with Open Calories, we need to connect to Google\'s Gemini brain.',
+              // 2. Headline
+              Text(
+                'Unlock Gemini AI',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey[400], height: 1.5),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 12),
 
-            // 3. API Key Input
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'To analyze your food with Open Calories, we need to connect to Google\'s Gemini brain.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey[400], height: 1.5),
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // 3. API Key Input
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
@@ -164,11 +165,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ],
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextButton.icon(
+              const SizedBox(height: 12),
+
+              TextButton.icon(
                 onPressed: () async {
                   final url = Uri.parse(
                     'https://aistudio.google.com/app/apikey',
@@ -195,14 +195,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   style: TextStyle(color: AppTheme.primary, fontSize: 12),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 32),
 
-            // 4. Daily Calorie Goal
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
+              // 4. Daily Calorie Goal
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
@@ -265,14 +262,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ],
               ),
-            ),
 
-            const SizedBox(height: 32),
+              const SizedBox(height: 48),
 
-            // 5. Connect Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SizedBox(
+              // 5. Connect Button
+              SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: FilledButton(
@@ -315,12 +309,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   child: const Text('Connect & Continue'),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
+              const SizedBox(height: 16),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.lock, size: 14, color: Colors.grey[600]),
@@ -334,14 +325,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ],
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 48),
 
-            // 6. Reset Hints Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: OutlinedButton.icon(
+              // 6. Reset Hints Button
+              OutlinedButton.icon(
                 onPressed: () async {
                   await ref.read(tutorialServiceProvider.future);
                   await ref
@@ -356,13 +344,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.grey[400],
                   side: BorderSide(color: Colors.grey[700]!),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 24,
+                  ),
                 ),
                 icon: const Icon(Icons.help_outline, size: 18),
                 label: const Text('Reset Hints'),
               ),
-            ),
-          ],
+              const SizedBox(height: 48),
+            ],
+          ),
         ),
       ),
     );

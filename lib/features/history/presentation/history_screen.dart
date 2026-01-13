@@ -6,11 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/snackbar_utils.dart';
-import '../../../../core/services/tutorial_service.dart';
-import '../../../../core/services/calorie_goal_service.dart';
-import '../../../../core/widgets/skeleton_card.dart';
+import 'package:opencalories/core/theme/app_theme.dart';
+import 'package:opencalories/core/utils/snackbar_utils.dart';
+import 'package:opencalories/core/services/tutorial_service.dart';
+import 'package:opencalories/core/services/calorie_goal_service.dart';
+import 'package:opencalories/core/widgets/skeleton_card.dart';
 import '../../history/data/app_database.dart';
 import '../../analysis/domain/food_analysis.dart';
 
@@ -77,12 +77,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
         .watchMealsForDate(_currentDate);
 
     return ShowCaseWidget(
-      builder: (context) => _buildScaffold(context, mealsStream),
-      onComplete: (index, key) {
-        if (key == _deleteShowcaseKey) {
-          ref.read(tutorialServiceProvider.notifier).markHistoryTutorialShown();
-        }
+      onFinish: () {
+        ref.read(tutorialServiceProvider.notifier).markHistoryTutorialShown();
       },
+      builder: (context) => _buildScaffold(context, mealsStream),
     );
   }
 
