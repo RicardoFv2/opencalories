@@ -15,6 +15,7 @@ import 'package:opencalories/features/analysis/domain/food_analysis.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:opencalories/features/history/data/meal_repository.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
+import 'package:opencalories/core/utils/food_translation_helper.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -24,6 +25,8 @@ class AnalysisResultScreen extends ConsumerStatefulWidget {
   final FoodAnalysis? analysis;
   final File? imageFile;
   final bool isViewOnly;
+
+  static const path = '/analysis-result';
 
   const AnalysisResultScreen({
     super.key,
@@ -81,8 +84,15 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
 
     final detectedName = items.isNotEmpty
         ? (items.length > 3
-              ? '${items.take(3).map((e) => e.name).join(', ')} +${items.length - 3} more'
-              : items.map((e) => e.name).join(', '))
+              ? '${items.take(3).map((e) => FoodTranslationHelper.getLocalizedFoodItemName(context, e)).join(', ')} +${items.length - 3} ${AppLocalizations.of(context)!.more}'
+              : items
+                    .map(
+                      (e) => FoodTranslationHelper.getLocalizedFoodItemName(
+                        context,
+                        e,
+                      ),
+                    )
+                    .join(', '))
         : AppLocalizations.of(context)!.unknownFood;
 
     return ShowCaseWidget(
@@ -371,7 +381,10 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                                             .start,
                                                     children: [
                                                       Text(
-                                                        item.name,
+                                                        FoodTranslationHelper.getLocalizedFoodItemName(
+                                                          context,
+                                                          item,
+                                                        ),
                                                         style:
                                                             GoogleFonts.spaceGrotesk(
                                                               color:
@@ -384,7 +397,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                                       ),
                                                       const SizedBox(height: 4),
                                                       Text(
-                                                        '${item.portionEstimate} • ${item.calories} ${AppLocalizations.of(context)!.kcal}',
+                                                        '${FoodTranslationHelper.getLocalizedPortion(context, item)} • ${item.calories} ${AppLocalizations.of(context)!.kcal}',
                                                         style:
                                                             GoogleFonts.spaceGrotesk(
                                                               color: Colors
@@ -503,11 +516,17 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
               duration: 400.ms,
               curve: Curves.easeOutBack,
             ),
-            Text(
-              items.isNotEmpty
-                  ? items.first.portionEstimate
-                  : AppLocalizations.of(context)!.oneServing,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                items.isNotEmpty
+                    ? FoodTranslationHelper.getLocalizedPortion(
+                        context,
+                        items.first,
+                      )
+                    : AppLocalizations.of(context)!.oneServing,
+                style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+              ),
             ),
             const SizedBox(height: 8),
             TextButton.icon(

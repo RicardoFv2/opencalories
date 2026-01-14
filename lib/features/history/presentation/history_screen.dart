@@ -15,6 +15,7 @@ import 'package:opencalories/l10n/app_localizations.dart';
 import '../../../core/widgets/language_selector.dart';
 import '../../history/data/app_database.dart';
 import '../../analysis/domain/food_analysis.dart';
+import 'package:opencalories/core/utils/food_translation_helper.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -184,7 +185,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                   child: ListView.builder(
                     itemCount: 3,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemBuilder: (_, __) => const Padding(
+                    itemBuilder: (context, index) => const Padding(
                       padding: EdgeInsets.only(bottom: 16),
                       child: SkeletonCard(width: double.infinity, height: 100),
                     ),
@@ -436,10 +437,11 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                                 tutorialServiceProvider.notifier,
                               );
                               if (!tutorialService.hasShownHistoryTutorial) {
-                                // ignore: use_build_context_synchronously
-                                ShowCaseWidget.of(
-                                  context,
-                                ).startShowCase([_deleteShowcaseKey]);
+                                if (context.mounted) {
+                                  ShowCaseWidget.of(
+                                    context,
+                                  ).startShowCase([_deleteShowcaseKey]);
+                                }
                               }
                             });
                           }
@@ -462,6 +464,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                             ),
                             confirmDismiss: (direction) async {
                               await HapticFeedback.selectionClick();
+                              if (!context.mounted) return false;
                               return await showDialog<bool>(
                                 context: context,
                                 builder: (context) => AlertDialog(
@@ -668,6 +671,7 @@ class _MealCard extends StatelessWidget {
                 .map(
                   (i) => FoodItem(
                     name: i.name,
+                    nameTranslations: i.nameTranslations,
                     calories: i.calories,
                     protein: i.protein,
                     carbs: i.carbs,
@@ -720,7 +724,12 @@ class _MealCard extends StatelessWidget {
           style: const TextStyle(color: Colors.grey, fontSize: 12),
         ),
         subtitle: Text(
-          meal.items.map((i) => i.name).join(', '),
+          meal.items
+              .map(
+                (i) =>
+                    FoodTranslationHelper.getLocalizedMealItemName(context, i),
+              )
+              .join(', '),
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,

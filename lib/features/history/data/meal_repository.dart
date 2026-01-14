@@ -46,6 +46,7 @@ class MealRepository {
         .map(
           (item) => FoodItemsCompanion(
             name: Value(item.name),
+            nameTranslations: Value(item.nameTranslations),
             calories: Value(item.calories),
             protein: Value(item.protein),
             carbs: Value(item.carbs),

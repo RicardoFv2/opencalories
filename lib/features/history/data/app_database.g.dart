@@ -412,6 +412,18 @@ class $FoodItemsTable extends FoodItems
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  @override
+  late final GeneratedColumnWithTypeConverter<Map<String, String>?, String>
+  nameTranslations =
+      GeneratedColumn<String>(
+        'name_translations',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<Map<String, String>?>(
+        $FoodItemsTable.$converternameTranslations,
+      );
   static const VerificationMeta _caloriesMeta = const VerificationMeta(
     'calories',
   );
@@ -457,6 +469,7 @@ class $FoodItemsTable extends FoodItems
     id,
     mealId,
     name,
+    nameTranslations,
     calories,
     protein,
     carbs,
@@ -546,6 +559,12 @@ class $FoodItemsTable extends FoodItems
         DriftSqlType.string,
         data['${effectivePrefix}name'],
       )!,
+      nameTranslations: $FoodItemsTable.$converternameTranslations.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}name_translations'],
+        ),
+      ),
       calories: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}calories'],
@@ -569,12 +588,16 @@ class $FoodItemsTable extends FoodItems
   $FoodItemsTable createAlias(String alias) {
     return $FoodItemsTable(attachedDatabase, alias);
   }
+
+  static TypeConverter<Map<String, String>?, String?>
+  $converternameTranslations = const TranslationMapConverter();
 }
 
 class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
   final int id;
   final int mealId;
   final String name;
+  final Map<String, String>? nameTranslations;
   final int calories;
   final int protein;
   final int carbs;
@@ -583,6 +606,7 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     required this.id,
     required this.mealId,
     required this.name,
+    this.nameTranslations,
     required this.calories,
     required this.protein,
     required this.carbs,
@@ -594,6 +618,11 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     map['id'] = Variable<int>(id);
     map['meal_id'] = Variable<int>(mealId);
     map['name'] = Variable<String>(name);
+    if (!nullToAbsent || nameTranslations != null) {
+      map['name_translations'] = Variable<String>(
+        $FoodItemsTable.$converternameTranslations.toSql(nameTranslations),
+      );
+    }
     map['calories'] = Variable<int>(calories);
     map['protein'] = Variable<int>(protein);
     map['carbs'] = Variable<int>(carbs);
@@ -606,6 +635,9 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
       id: Value(id),
       mealId: Value(mealId),
       name: Value(name),
+      nameTranslations: nameTranslations == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nameTranslations),
       calories: Value(calories),
       protein: Value(protein),
       carbs: Value(carbs),
@@ -622,6 +654,9 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
       id: serializer.fromJson<int>(json['id']),
       mealId: serializer.fromJson<int>(json['mealId']),
       name: serializer.fromJson<String>(json['name']),
+      nameTranslations: serializer.fromJson<Map<String, String>?>(
+        json['nameTranslations'],
+      ),
       calories: serializer.fromJson<int>(json['calories']),
       protein: serializer.fromJson<int>(json['protein']),
       carbs: serializer.fromJson<int>(json['carbs']),
@@ -635,6 +670,9 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
       'id': serializer.toJson<int>(id),
       'mealId': serializer.toJson<int>(mealId),
       'name': serializer.toJson<String>(name),
+      'nameTranslations': serializer.toJson<Map<String, String>?>(
+        nameTranslations,
+      ),
       'calories': serializer.toJson<int>(calories),
       'protein': serializer.toJson<int>(protein),
       'carbs': serializer.toJson<int>(carbs),
@@ -646,6 +684,7 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     int? id,
     int? mealId,
     String? name,
+    Value<Map<String, String>?> nameTranslations = const Value.absent(),
     int? calories,
     int? protein,
     int? carbs,
@@ -654,6 +693,9 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     id: id ?? this.id,
     mealId: mealId ?? this.mealId,
     name: name ?? this.name,
+    nameTranslations: nameTranslations.present
+        ? nameTranslations.value
+        : this.nameTranslations,
     calories: calories ?? this.calories,
     protein: protein ?? this.protein,
     carbs: carbs ?? this.carbs,
@@ -664,6 +706,9 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
       id: data.id.present ? data.id.value : this.id,
       mealId: data.mealId.present ? data.mealId.value : this.mealId,
       name: data.name.present ? data.name.value : this.name,
+      nameTranslations: data.nameTranslations.present
+          ? data.nameTranslations.value
+          : this.nameTranslations,
       calories: data.calories.present ? data.calories.value : this.calories,
       protein: data.protein.present ? data.protein.value : this.protein,
       carbs: data.carbs.present ? data.carbs.value : this.carbs,
@@ -677,6 +722,7 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
           ..write('id: $id, ')
           ..write('mealId: $mealId, ')
           ..write('name: $name, ')
+          ..write('nameTranslations: $nameTranslations, ')
           ..write('calories: $calories, ')
           ..write('protein: $protein, ')
           ..write('carbs: $carbs, ')
@@ -686,8 +732,16 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, mealId, name, calories, protein, carbs, fat);
+  int get hashCode => Object.hash(
+    id,
+    mealId,
+    name,
+    nameTranslations,
+    calories,
+    protein,
+    carbs,
+    fat,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -695,6 +749,7 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
           other.id == this.id &&
           other.mealId == this.mealId &&
           other.name == this.name &&
+          other.nameTranslations == this.nameTranslations &&
           other.calories == this.calories &&
           other.protein == this.protein &&
           other.carbs == this.carbs &&
@@ -705,6 +760,7 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
   final Value<int> id;
   final Value<int> mealId;
   final Value<String> name;
+  final Value<Map<String, String>?> nameTranslations;
   final Value<int> calories;
   final Value<int> protein;
   final Value<int> carbs;
@@ -713,6 +769,7 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     this.id = const Value.absent(),
     this.mealId = const Value.absent(),
     this.name = const Value.absent(),
+    this.nameTranslations = const Value.absent(),
     this.calories = const Value.absent(),
     this.protein = const Value.absent(),
     this.carbs = const Value.absent(),
@@ -722,6 +779,7 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     this.id = const Value.absent(),
     required int mealId,
     required String name,
+    this.nameTranslations = const Value.absent(),
     required int calories,
     required int protein,
     required int carbs,
@@ -736,6 +794,7 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     Expression<int>? id,
     Expression<int>? mealId,
     Expression<String>? name,
+    Expression<String>? nameTranslations,
     Expression<int>? calories,
     Expression<int>? protein,
     Expression<int>? carbs,
@@ -745,6 +804,7 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
       if (id != null) 'id': id,
       if (mealId != null) 'meal_id': mealId,
       if (name != null) 'name': name,
+      if (nameTranslations != null) 'name_translations': nameTranslations,
       if (calories != null) 'calories': calories,
       if (protein != null) 'protein': protein,
       if (carbs != null) 'carbs': carbs,
@@ -756,6 +816,7 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     Value<int>? id,
     Value<int>? mealId,
     Value<String>? name,
+    Value<Map<String, String>?>? nameTranslations,
     Value<int>? calories,
     Value<int>? protein,
     Value<int>? carbs,
@@ -765,6 +826,7 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
       id: id ?? this.id,
       mealId: mealId ?? this.mealId,
       name: name ?? this.name,
+      nameTranslations: nameTranslations ?? this.nameTranslations,
       calories: calories ?? this.calories,
       protein: protein ?? this.protein,
       carbs: carbs ?? this.carbs,
@@ -783,6 +845,13 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
+    }
+    if (nameTranslations.present) {
+      map['name_translations'] = Variable<String>(
+        $FoodItemsTable.$converternameTranslations.toSql(
+          nameTranslations.value,
+        ),
+      );
     }
     if (calories.present) {
       map['calories'] = Variable<int>(calories.value);
@@ -805,6 +874,7 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
           ..write('id: $id, ')
           ..write('mealId: $mealId, ')
           ..write('name: $name, ')
+          ..write('nameTranslations: $nameTranslations, ')
           ..write('calories: $calories, ')
           ..write('protein: $protein, ')
           ..write('carbs: $carbs, ')
@@ -1124,6 +1194,7 @@ typedef $$FoodItemsTableCreateCompanionBuilder =
       Value<int> id,
       required int mealId,
       required String name,
+      Value<Map<String, String>?> nameTranslations,
       required int calories,
       required int protein,
       required int carbs,
@@ -1134,6 +1205,7 @@ typedef $$FoodItemsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> mealId,
       Value<String> name,
+      Value<Map<String, String>?> nameTranslations,
       Value<int> calories,
       Value<int> protein,
       Value<int> carbs,
@@ -1180,6 +1252,16 @@ class $$FoodItemsTableFilterComposer
   ColumnFilters<String> get name => $composableBuilder(
     column: $table.name,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    Map<String, String>?,
+    Map<String, String>,
+    String
+  >
+  get nameTranslations => $composableBuilder(
+    column: $table.nameTranslations,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<int> get calories => $composableBuilder(
@@ -1245,6 +1327,11 @@ class $$FoodItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get nameTranslations => $composableBuilder(
+    column: $table.nameTranslations,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get calories => $composableBuilder(
     column: $table.calories,
     builder: (column) => ColumnOrderings(column),
@@ -1303,6 +1390,12 @@ class $$FoodItemsTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Map<String, String>?, String>
+  get nameTranslations => $composableBuilder(
+    column: $table.nameTranslations,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get calories =>
       $composableBuilder(column: $table.calories, builder: (column) => column);
@@ -1371,6 +1464,8 @@ class $$FoodItemsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> mealId = const Value.absent(),
                 Value<String> name = const Value.absent(),
+                Value<Map<String, String>?> nameTranslations =
+                    const Value.absent(),
                 Value<int> calories = const Value.absent(),
                 Value<int> protein = const Value.absent(),
                 Value<int> carbs = const Value.absent(),
@@ -1379,6 +1474,7 @@ class $$FoodItemsTableTableManager
                 id: id,
                 mealId: mealId,
                 name: name,
+                nameTranslations: nameTranslations,
                 calories: calories,
                 protein: protein,
                 carbs: carbs,
@@ -1389,6 +1485,8 @@ class $$FoodItemsTableTableManager
                 Value<int> id = const Value.absent(),
                 required int mealId,
                 required String name,
+                Value<Map<String, String>?> nameTranslations =
+                    const Value.absent(),
                 required int calories,
                 required int protein,
                 required int carbs,
@@ -1397,6 +1495,7 @@ class $$FoodItemsTableTableManager
                 id: id,
                 mealId: mealId,
                 name: name,
+                nameTranslations: nameTranslations,
                 calories: calories,
                 protein: protein,
                 carbs: carbs,

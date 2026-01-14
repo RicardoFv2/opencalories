@@ -1,12 +1,38 @@
-// unused import removed
-
+import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
-// unused imports removed
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'app_database.g.dart';
+
+// Helper for JSON conversion
+class TranslationMapConverter
+    extends TypeConverter<Map<String, String>?, String?> {
+  const TranslationMapConverter();
+
+  @override
+  Map<String, String>? fromSql(String? fromDb) {
+    if (fromDb == null) return null;
+    try {
+      final decoded = jsonDecode(fromDb);
+      if (decoded is Map) {
+        return decoded.map(
+          (key, value) => MapEntry(key.toString(), value.toString()),
+        );
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  String? toSql(Map<String, String>? value) {
+    if (value == null) return null;
+    return jsonEncode(value);
+  }
+}
 
 // Table Definitions
 
@@ -25,6 +51,8 @@ class FoodItems extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get mealId => integer().references(Meals, #id)();
   TextColumn get name => text()();
+  TextColumn get nameTranslations =>
+      text().map(const TranslationMapConverter()).nullable()();
   IntColumn get calories => integer()();
   IntColumn get protein => integer()();
   IntColumn get carbs => integer()();
@@ -235,18 +263,17 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
       if (from < 2) {
         await m.addColumn(meals, meals.isManualEntry);
-        // In SQLite, making a column nullable is tricky,
-        // but Drift handles it if we use alterTable or just allow it in Dart.
-        // For simply adding a new column and making an old one nullable,
-        // we can use alterTable for the nullability if needed.
         await m.alterTable(TableMigration(meals));
+      }
+      if (from < 3) {
+        await m.addColumn(foodItems, foodItems.nameTranslations);
       }
     },
   );

@@ -88,6 +88,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unknownFood => 'Unknown Food';
 
   @override
+  String get more => 'more';
+
+  @override
   String get kcal => 'kcal';
 
   @override

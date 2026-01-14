@@ -75,10 +75,11 @@ class _ScannerContent extends HookConsumerWidget {
         final tutorialService = ref.read(tutorialServiceProvider.notifier);
 
         if (!tutorialService.hasShownHomeTutorial) {
-          // ignore: use_build_context_synchronously
-          ShowCaseWidget.of(
-            context,
-          ).startShowCase([cameraKey, galleryKey, historyKey]);
+          if (context.mounted) {
+            ShowCaseWidget.of(
+              context,
+            ).startShowCase([cameraKey, galleryKey, historyKey]);
+          }
         }
       });
       return null;

@@ -242,6 +242,12 @@ abstract class AppLocalizations {
   /// **'Unknown Food'**
   String get unknownFood;
 
+  /// No description provided for @more.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get more;
+
   /// No description provided for @kcal.
   ///
   /// In en, this message translates to:

@@ -181,12 +181,18 @@ FoodItem _$FoodItemFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$FoodItem {
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'name_translations')
+  Map<String, String>? get nameTranslations =>
+      throw _privateConstructorUsedError;
   int get calories => throw _privateConstructorUsedError;
   int get protein => throw _privateConstructorUsedError;
   int get carbs => throw _privateConstructorUsedError;
   int get fat => throw _privateConstructorUsedError;
   @JsonKey(name: 'portion_estimate')
   String get portionEstimate => throw _privateConstructorUsedError;
+  @JsonKey(name: 'portion_translations')
+  Map<String, String>? get portionTranslations =>
+      throw _privateConstructorUsedError;
 
   /// Serializes this FoodItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -205,11 +211,14 @@ abstract class $FoodItemCopyWith<$Res> {
   @useResult
   $Res call({
     String name,
+    @JsonKey(name: 'name_translations') Map<String, String>? nameTranslations,
     int calories,
     int protein,
     int carbs,
     int fat,
     @JsonKey(name: 'portion_estimate') String portionEstimate,
+    @JsonKey(name: 'portion_translations')
+    Map<String, String>? portionTranslations,
   });
 }
 
@@ -229,11 +238,13 @@ class _$FoodItemCopyWithImpl<$Res, $Val extends FoodItem>
   @override
   $Res call({
     Object? name = null,
+    Object? nameTranslations = freezed,
     Object? calories = null,
     Object? protein = null,
     Object? carbs = null,
     Object? fat = null,
     Object? portionEstimate = null,
+    Object? portionTranslations = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -241,6 +252,10 @@ class _$FoodItemCopyWithImpl<$Res, $Val extends FoodItem>
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
                       as String,
+            nameTranslations: freezed == nameTranslations
+                ? _value.nameTranslations
+                : nameTranslations // ignore: cast_nullable_to_non_nullable
+                      as Map<String, String>?,
             calories: null == calories
                 ? _value.calories
                 : calories // ignore: cast_nullable_to_non_nullable
@@ -261,6 +276,10 @@ class _$FoodItemCopyWithImpl<$Res, $Val extends FoodItem>
                 ? _value.portionEstimate
                 : portionEstimate // ignore: cast_nullable_to_non_nullable
                       as String,
+            portionTranslations: freezed == portionTranslations
+                ? _value.portionTranslations
+                : portionTranslations // ignore: cast_nullable_to_non_nullable
+                      as Map<String, String>?,
           )
           as $Val,
     );
@@ -278,11 +297,14 @@ abstract class _$$FoodItemImplCopyWith<$Res>
   @useResult
   $Res call({
     String name,
+    @JsonKey(name: 'name_translations') Map<String, String>? nameTranslations,
     int calories,
     int protein,
     int carbs,
     int fat,
     @JsonKey(name: 'portion_estimate') String portionEstimate,
+    @JsonKey(name: 'portion_translations')
+    Map<String, String>? portionTranslations,
   });
 }
 
@@ -301,11 +323,13 @@ class __$$FoodItemImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = null,
+    Object? nameTranslations = freezed,
     Object? calories = null,
     Object? protein = null,
     Object? carbs = null,
     Object? fat = null,
     Object? portionEstimate = null,
+    Object? portionTranslations = freezed,
   }) {
     return _then(
       _$FoodItemImpl(
@@ -313,6 +337,10 @@ class __$$FoodItemImplCopyWithImpl<$Res>
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
                   as String,
+        nameTranslations: freezed == nameTranslations
+            ? _value._nameTranslations
+            : nameTranslations // ignore: cast_nullable_to_non_nullable
+                  as Map<String, String>?,
         calories: null == calories
             ? _value.calories
             : calories // ignore: cast_nullable_to_non_nullable
@@ -333,6 +361,10 @@ class __$$FoodItemImplCopyWithImpl<$Res>
             ? _value.portionEstimate
             : portionEstimate // ignore: cast_nullable_to_non_nullable
                   as String,
+        portionTranslations: freezed == portionTranslations
+            ? _value._portionTranslations
+            : portionTranslations // ignore: cast_nullable_to_non_nullable
+                  as Map<String, String>?,
       ),
     );
   }
@@ -343,18 +375,34 @@ class __$$FoodItemImplCopyWithImpl<$Res>
 class _$FoodItemImpl implements _FoodItem {
   const _$FoodItemImpl({
     required this.name,
+    @JsonKey(name: 'name_translations')
+    final Map<String, String>? nameTranslations,
     required this.calories,
     required this.protein,
     required this.carbs,
     required this.fat,
     @JsonKey(name: 'portion_estimate') required this.portionEstimate,
-  });
+    @JsonKey(name: 'portion_translations')
+    final Map<String, String>? portionTranslations,
+  }) : _nameTranslations = nameTranslations,
+       _portionTranslations = portionTranslations;
 
   factory _$FoodItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$FoodItemImplFromJson(json);
 
   @override
   final String name;
+  final Map<String, String>? _nameTranslations;
+  @override
+  @JsonKey(name: 'name_translations')
+  Map<String, String>? get nameTranslations {
+    final value = _nameTranslations;
+    if (value == null) return null;
+    if (_nameTranslations is EqualUnmodifiableMapView) return _nameTranslations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
   @override
   final int calories;
   @override
@@ -366,10 +414,21 @@ class _$FoodItemImpl implements _FoodItem {
   @override
   @JsonKey(name: 'portion_estimate')
   final String portionEstimate;
+  final Map<String, String>? _portionTranslations;
+  @override
+  @JsonKey(name: 'portion_translations')
+  Map<String, String>? get portionTranslations {
+    final value = _portionTranslations;
+    if (value == null) return null;
+    if (_portionTranslations is EqualUnmodifiableMapView)
+      return _portionTranslations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'FoodItem(name: $name, calories: $calories, protein: $protein, carbs: $carbs, fat: $fat, portionEstimate: $portionEstimate)';
+    return 'FoodItem(name: $name, nameTranslations: $nameTranslations, calories: $calories, protein: $protein, carbs: $carbs, fat: $fat, portionEstimate: $portionEstimate, portionTranslations: $portionTranslations)';
   }
 
   @override
@@ -378,13 +437,21 @@ class _$FoodItemImpl implements _FoodItem {
         (other.runtimeType == runtimeType &&
             other is _$FoodItemImpl &&
             (identical(other.name, name) || other.name == name) &&
+            const DeepCollectionEquality().equals(
+              other._nameTranslations,
+              _nameTranslations,
+            ) &&
             (identical(other.calories, calories) ||
                 other.calories == calories) &&
             (identical(other.protein, protein) || other.protein == protein) &&
             (identical(other.carbs, carbs) || other.carbs == carbs) &&
             (identical(other.fat, fat) || other.fat == fat) &&
             (identical(other.portionEstimate, portionEstimate) ||
-                other.portionEstimate == portionEstimate));
+                other.portionEstimate == portionEstimate) &&
+            const DeepCollectionEquality().equals(
+              other._portionTranslations,
+              _portionTranslations,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -392,11 +459,13 @@ class _$FoodItemImpl implements _FoodItem {
   int get hashCode => Object.hash(
     runtimeType,
     name,
+    const DeepCollectionEquality().hash(_nameTranslations),
     calories,
     protein,
     carbs,
     fat,
     portionEstimate,
+    const DeepCollectionEquality().hash(_portionTranslations),
   );
 
   /// Create a copy of FoodItem
@@ -416,11 +485,15 @@ class _$FoodItemImpl implements _FoodItem {
 abstract class _FoodItem implements FoodItem {
   const factory _FoodItem({
     required final String name,
+    @JsonKey(name: 'name_translations')
+    final Map<String, String>? nameTranslations,
     required final int calories,
     required final int protein,
     required final int carbs,
     required final int fat,
     @JsonKey(name: 'portion_estimate') required final String portionEstimate,
+    @JsonKey(name: 'portion_translations')
+    final Map<String, String>? portionTranslations,
   }) = _$FoodItemImpl;
 
   factory _FoodItem.fromJson(Map<String, dynamic> json) =
@@ -428,6 +501,9 @@ abstract class _FoodItem implements FoodItem {
 
   @override
   String get name;
+  @override
+  @JsonKey(name: 'name_translations')
+  Map<String, String>? get nameTranslations;
   @override
   int get calories;
   @override
@@ -439,6 +515,9 @@ abstract class _FoodItem implements FoodItem {
   @override
   @JsonKey(name: 'portion_estimate')
   String get portionEstimate;
+  @override
+  @JsonKey(name: 'portion_translations')
+  Map<String, String>? get portionTranslations;
 
   /// Create a copy of FoodItem
   /// with the given fields replaced by the non-null parameter values.

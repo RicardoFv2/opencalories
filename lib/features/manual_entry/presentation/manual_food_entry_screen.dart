@@ -130,10 +130,12 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
           );
         }
       } catch (e) {
-        context.showAppSnackBar(
-          AppLocalizations.of(context)!.errorWithMessage(e.toString()),
-          isError: true,
-        );
+        if (context.mounted) {
+          context.showAppSnackBar(
+            AppLocalizations.of(context)!.errorWithMessage(e.toString()),
+            isError: true,
+          );
+        }
       } finally {
         isSaving.value = false;
       }

@@ -27,9 +27,7 @@ class LanguageSelector extends ConsumerWidget {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
-          DropdownButtonFormField<String?>(
-            value: currentLocale?.languageCode, // null means system default
-            dropdownColor: AppTheme.surfaceDark,
+          InputDecorator(
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.black,
@@ -39,22 +37,37 @@ class LanguageSelector extends ConsumerWidget {
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             ),
-            items: [
-              DropdownMenuItem(value: null, child: Text(l10n.systemDefault)),
-              DropdownMenuItem(
-                value: 'en',
-                child: Row(children: [Text('🇺🇸 '), Text(l10n.english)]),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String?>(
+                value: currentLocale?.languageCode,
+                dropdownColor: AppTheme.surfaceDark,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'SpaceGrotesk',
+                ),
+                isExpanded: true,
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                onChanged: (String? value) {
+                  ref
+                      .read(languageServiceProvider.notifier)
+                      .setLocale(value != null ? Locale(value) : null);
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: null,
+                    child: Text(l10n.systemDefault),
+                  ),
+                  DropdownMenuItem(
+                    value: 'en',
+                    child: Row(children: [Text('🇺🇸 '), Text(l10n.english)]),
+                  ),
+                  DropdownMenuItem(
+                    value: 'es',
+                    child: Row(children: [Text('🇪🇸 '), Text(l10n.spanish)]),
+                  ),
+                ],
               ),
-              DropdownMenuItem(
-                value: 'es',
-                child: Row(children: [Text('🇪🇸 '), Text(l10n.spanish)]),
-              ),
-            ],
-            onChanged: (value) {
-              ref
-                  .read(languageServiceProvider.notifier)
-                  .setLocale(value != null ? Locale(value) : null);
-            },
+            ),
           ),
         ],
       ),

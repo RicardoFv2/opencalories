@@ -15,11 +15,14 @@ class FoodAnalysis with _$FoodAnalysis {
 class FoodItem with _$FoodItem {
   const factory FoodItem({
     required String name,
+    @JsonKey(name: 'name_translations') Map<String, String>? nameTranslations,
     required int calories,
     required int protein,
     required int carbs,
     required int fat,
     @JsonKey(name: 'portion_estimate') required String portionEstimate,
+    @JsonKey(name: 'portion_translations')
+    Map<String, String>? portionTranslations,
   }) = _FoodItem;
 
   factory FoodItem.fromJson(Map<String, dynamic> json) =>
