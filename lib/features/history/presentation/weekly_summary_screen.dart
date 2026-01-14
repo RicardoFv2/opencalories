@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:opencalories/l10n/app_localizations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'package:opencalories/core/theme/app_theme.dart';
@@ -63,15 +64,19 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
         .getWeeklySummary(_startOfWeek);
 
     final endOfWeek = _startOfWeek.add(const Duration(days: 6));
+    final locale = Localizations.localeOf(context).toString();
     final dateRangeStr =
-        '${DateFormat('MMM d').format(_startOfWeek)} - ${DateFormat('MMM d').format(endOfWeek)}';
+        '${DateFormat('MMM d', locale).format(_startOfWeek)} - ${DateFormat('MMM d', locale).format(endOfWeek)}';
 
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(
-          'WEEKLY INSIGHTS',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        title: Text(
+          AppLocalizations.of(context)!.weeklyInsights,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
         ),
         backgroundColor: Colors.transparent,
         leading: IconButton(
@@ -104,8 +109,10 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
               // Week Selector
               Showcase(
                 key: _navKey,
-                title: 'Time Travel',
-                description: 'Use arrows to browse previous weeks history.',
+                title: AppLocalizations.of(context)!.tutorialTimeTravelTitle,
+                description: AppLocalizations.of(
+                  context,
+                )!.tutorialTimeTravelDesc,
                 tooltipBackgroundColor: _tutorialBg,
                 titleTextStyle: const TextStyle(
                   color: _tutorialText,
@@ -167,7 +174,9 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
                     if (snapshot.hasError) {
                       return Center(
                         child: Text(
-                          'Error: ${snapshot.error}',
+                          AppLocalizations.of(
+                            context,
+                          )!.errorWithMessage(snapshot.error.toString()),
                           style: const TextStyle(color: Colors.red),
                         ),
                       );
@@ -199,9 +208,12 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
                         if (index == 0) {
                           return Showcase(
                             key: _gridKey,
-                            title: 'Select a Day',
-                            description:
-                                'Tap any day to view its meal history.',
+                            title: AppLocalizations.of(
+                              context,
+                            )!.tutorialSelectDayTitle,
+                            description: AppLocalizations.of(
+                              context,
+                            )!.tutorialSelectDayDesc,
                             tooltipBackgroundColor: _tutorialBg,
                             titleTextStyle: const TextStyle(
                               color: _tutorialText,
@@ -284,7 +296,10 @@ class _DayGridItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    DateFormat('EEEE').format(date).toUpperCase(),
+                    DateFormat(
+                      'EEEE',
+                      Localizations.localeOf(context).toString(),
+                    ).format(date).toUpperCase(),
                     style: const TextStyle(
                       color: AppTheme.primary,
                       fontSize: 10,
@@ -294,7 +309,10 @@ class _DayGridItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    DateFormat('MMM d').format(date),
+                    DateFormat(
+                      'MMM d',
+                      Localizations.localeOf(context).toString(),
+                    ).format(date),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -312,7 +330,7 @@ class _DayGridItem extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '$totalCalories kcal',
+                      '$totalCalories ${AppLocalizations.of(context)!.kcal}',
                       style: const TextStyle(
                         color: AppTheme.primary,
                         fontSize: 12,

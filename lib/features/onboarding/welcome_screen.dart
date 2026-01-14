@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/snackbar_utils.dart';
+import 'package:opencalories/l10n/app_localizations.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -52,7 +53,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'OPEN CALORIES',
+                        AppLocalizations.of(context)!.openCalories,
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           letterSpacing: 2,
                           fontWeight: FontWeight.bold,
@@ -194,7 +195,9 @@ class WelcomeScreen extends StatelessWidget {
                                               .fade(duration: 1.seconds),
                                           const SizedBox(width: 6),
                                           Text(
-                                            'SCANNING...',
+                                            AppLocalizations.of(
+                                              context,
+                                            )!.scanning,
                                             style: TextStyle(
                                               color: AppTheme.primary,
                                               fontSize: 10,
@@ -230,9 +233,11 @@ class WelcomeScreen extends StatelessWidget {
                                   color: Colors.white,
                                 ),
                             children: [
-                              const TextSpan(text: 'See What \n'),
                               TextSpan(
-                                text: 'You Eat.',
+                                text: AppLocalizations.of(context)!.seeWhat,
+                              ),
+                              TextSpan(
+                                text: AppLocalizations.of(context)!.youEat,
                                 style: TextStyle(
                                   shadows: [
                                     Shadow(
@@ -262,7 +267,7 @@ class WelcomeScreen extends StatelessWidget {
                         const SizedBox(height: 16),
 
                         Text(
-                          'Instant calorie analysis and macro breakdowns powered by Open Calories AI.',
+                          AppLocalizations.of(context)!.welcomeDescription,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: Colors.grey[400], height: 1.5),
@@ -281,14 +286,16 @@ class WelcomeScreen extends StatelessWidget {
                                       backgroundColor: AppTheme.primary,
                                       foregroundColor: AppTheme.backgroundDark,
                                     ),
-                                    child: const Row(
+                                    child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
                                         Icon(Icons.center_focus_weak),
                                         SizedBox(width: 8),
                                         Text(
-                                          'Start Scanning',
+                                          AppLocalizations.of(
+                                            context,
+                                          )!.startScanning,
                                           style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -315,7 +322,9 @@ class WelcomeScreen extends StatelessWidget {
                           child: OutlinedButton(
                             onPressed: () {
                               context.showAppSnackBar(
-                                'Device integration coming soon! ⌚',
+                                AppLocalizations.of(
+                                  context,
+                                )!.deviceIntegrationComingSoon,
                               );
                             },
                             style: OutlinedButton.styleFrom(
@@ -327,12 +336,14 @@ class WelcomeScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.bluetooth_connected, size: 20),
                                 SizedBox(width: 8),
-                                Text('Connect Device'),
+                                Text(
+                                  AppLocalizations.of(context)!.connectDevice,
+                                ),
                               ],
                             ),
                           ),

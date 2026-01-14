@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:opencalories/features/settings/data/api_key_repository.dart';
 import 'package:opencalories/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Generate mocks if we were using generated mocks, but for simple storage we can mock manually or use InMemory
 // However, since we rely on FlutterSecureStorage, we need to mock it or the repository.
@@ -33,6 +34,9 @@ void main() {
   testWidgets('App redirects to WelcomeScreen when no API key is found', (
     WidgetTester tester,
   ) async {
+    // Initialize SharedPreferences
+    SharedPreferences.setMockInitialValues({});
+
     // Build our app and trigger a frame.
     // We override the repository to start with no key.
 

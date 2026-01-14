@@ -11,6 +11,8 @@ import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/services/calorie_goal_service.dart';
 import 'package:opencalories/core/widgets/skeleton_card.dart';
+import 'package:opencalories/l10n/app_localizations.dart';
+import '../../../core/widgets/language_selector.dart';
 import '../../history/data/app_database.dart';
 import '../../analysis/domain/food_analysis.dart';
 
@@ -60,14 +62,19 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
     return DateTime(dt.year, dt.month, dt.day);
   }
 
-  String _formatDateLabel(DateTime date) {
+  String _formatDateLabel(BuildContext context, DateTime date) {
     final now = _getDateOnly(DateTime.now());
+    final locale = Localizations.localeOf(context).toString();
     if (date == now) {
-      return 'Today, ${DateFormat('MMM d').format(date)}';
+      return AppLocalizations.of(
+        context,
+      )!.today(DateFormat.Md(locale).format(date));
     } else if (date == now.subtract(const Duration(days: 1))) {
-      return 'Yesterday, ${DateFormat('MMM d').format(date)}';
+      return AppLocalizations.of(
+        context,
+      )!.yesterday(DateFormat.Md(locale).format(date));
     }
-    return DateFormat('EEE, MMM d').format(date);
+    return DateFormat.MMMEd(locale).format(date);
   }
 
   @override
@@ -96,13 +103,52 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
         foregroundColor: Colors.black,
         child: const Icon(Icons.add),
       ),
+
       appBar: AppBar(
-        title: const Text(
-          'HISTORY',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        title: Text(
+          AppLocalizations.of(context)!.history,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
         ),
         backgroundColor: Colors.transparent,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[900],
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.selectLanguage,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const LanguageSelector(),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => context.push('/settings'),
@@ -115,7 +161,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
           if (snapshot.hasError) {
             return Center(
               child: Text(
-                'Error: ${snapshot.error}',
+                AppLocalizations.of(
+                  context,
+                )!.errorWithMessage(snapshot.error.toString()),
                 style: const TextStyle(color: Colors.red),
               ),
             );
@@ -196,7 +244,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            _formatDateLabel(_currentDate),
+                            _formatDateLabel(context, _currentDate),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -236,9 +284,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                 ),
                 child: Column(
                   children: [
-                    const Text(
-                      'DAILY TOTAL',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.dailyTotal,
+                      style: const TextStyle(
                         color: AppTheme.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -254,9 +302,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                         color: Colors.white,
                       ),
                     ),
-                    const Text(
-                      'kcal',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    Text(
+                      AppLocalizations.of(context)!.kcal,
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
                     ),
                     const SizedBox(height: 16),
                     // Goal Progress
@@ -279,7 +327,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '${(progress * 100).toInt()}% of daily goal ($goal)',
+                              AppLocalizations.of(context)!.percentOfDailyGoal(
+                                (progress * 100).toInt(),
+                                goal,
+                              ),
                               style: const TextStyle(
                                 color: Colors.grey,
                                 fontSize: 12,
@@ -303,7 +354,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             _MacroItem(
-                              label: 'Protein',
+                              label: AppLocalizations.of(context)!.protein,
                               value: '${macros['protein']}g',
                               color: Colors.greenAccent,
                             ),
@@ -313,7 +364,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                               color: Colors.white24,
                             ),
                             _MacroItem(
-                              label: 'Carbs',
+                              label: AppLocalizations.of(context)!.carbs,
                               value: '${macros['carbs']}g',
                               color: Colors.blueAccent,
                             ),
@@ -323,7 +374,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                               color: Colors.white24,
                             ),
                             _MacroItem(
-                              label: 'Fat',
+                              label: AppLocalizations.of(context)!.fat,
                               value: '${macros['fat']}g',
                               color: Colors.orangeAccent,
                             ),
@@ -353,8 +404,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                                       _currentDate.month ==
                                           DateTime.now().month &&
                                       _currentDate.year == DateTime.now().year
-                                  ? 'No meals logged today'
-                                  : 'No meals logged for this day',
+                                  ? AppLocalizations.of(
+                                      context,
+                                    )!.noMealsLoggedToday
+                                  : AppLocalizations.of(
+                                      context,
+                                    )!.noMealsLoggedForDay,
                               style: const TextStyle(color: Colors.grey),
                             ),
                           ],
@@ -411,15 +466,23 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   backgroundColor: Colors.grey[900],
-                                  title: const Text('Delete Meal?'),
-                                  content: const Text(
-                                    'This action cannot be undone.',
+                                  title: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.deleteMealTitle,
+                                  ),
+                                  content: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.deleteActionCannotBeUndone,
                                   ),
                                   actions: [
                                     TextButton(
                                       onPressed: () =>
                                           Navigator.pop(context, false),
-                                      child: const Text('Cancel'),
+                                      child: Text(
+                                        AppLocalizations.of(context)!.cancel,
+                                      ),
                                     ),
                                     TextButton(
                                       onPressed: () =>
@@ -427,7 +490,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                                       style: TextButton.styleFrom(
                                         foregroundColor: Colors.red,
                                       ),
-                                      child: const Text('Delete'),
+                                      child: Text(
+                                        AppLocalizations.of(context)!.delete,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -439,7 +504,9 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                                   .read(mealsDaoProvider)
                                   .deleteMeal(meal.meal.id);
                               if (context.mounted) {
-                                context.showAppSnackBar('Meal deleted');
+                                context.showAppSnackBar(
+                                  AppLocalizations.of(context)!.mealDeleted,
+                                );
                               }
                             },
                             child: _MealCard(meal: meal),
@@ -449,9 +516,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                           if (index == 0) {
                             return Showcase(
                               key: _deleteShowcaseKey,
-                              title: 'Erase History',
-                              description:
-                                  'Swipe left on any meal card to delete it from your log.',
+                              title: AppLocalizations.of(
+                                context,
+                              )!.tutorialEraseHistoryTitle,
+                              description: AppLocalizations.of(
+                                context,
+                              )!.tutorialEraseHistoryDesc,
                               tooltipBackgroundColor: _tutorialBg,
                               titleTextStyle: const TextStyle(
                                 color: _tutorialText,
@@ -498,16 +568,16 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                   ),
                   child: const Icon(Icons.camera_alt, color: AppTheme.primary),
                 ),
-                title: const Text(
-                  'Scan Meal',
-                  style: TextStyle(
+                title: Text(
+                  AppLocalizations.of(context)!.scanMealOption,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                subtitle: const Text(
-                  'Use AI to analyze your food photo',
-                  style: TextStyle(color: Colors.grey),
+                subtitle: Text(
+                  AppLocalizations.of(context)!.useAiToAnalyze,
+                  style: const TextStyle(color: Colors.grey),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -524,16 +594,16 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                   ),
                   child: const Icon(Icons.edit_note, color: Colors.blue),
                 ),
-                title: const Text(
-                  'Manual Entry',
-                  style: TextStyle(
+                title: Text(
+                  AppLocalizations.of(context)!.manualEntry,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                subtitle: const Text(
-                  'Type in food name and portion',
-                  style: TextStyle(color: Colors.grey),
+                subtitle: Text(
+                  AppLocalizations.of(context)!.typeInFoodAndPortion,
+                  style: const TextStyle(color: Colors.grey),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -602,7 +672,8 @@ class _MealCard extends StatelessWidget {
                     protein: i.protein,
                     carbs: i.carbs,
                     fat: i.fat,
-                    portionEstimate: '1 serving',
+
+                    portionEstimate: AppLocalizations.of(context)!.oneServing,
                   ),
                 )
                 .toList(),
@@ -668,7 +739,7 @@ class _MealCard extends StatelessWidget {
             ), // Matched bracket here
           ),
           child: Text(
-            '${meal.meal.totalCalories} kcal',
+            '${meal.meal.totalCalories} ${AppLocalizations.of(context)!.kcal}',
             style: const TextStyle(
               color: AppTheme.primary,
               fontWeight: FontWeight.bold,

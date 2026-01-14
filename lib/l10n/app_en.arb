@@ -1,0 +1,162 @@
+{
+  "@@locale": "en",
+  "appTitle": "OpenCalories",
+  
+  "scanMeal": "Scan Meal",
+  "proActive": "OPEN CALORIES PRO: ACTIVE",
+  "alignFoodWithinFrame": "Align food within frame...",
+  "compressingImage": "Compressing image...",
+  "analyzingFood": "Analyzing food...",
+  "analysisFailed": "Analysis failed: {error}",
+  "@analysisFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  
+  "tutorialCaptureTitle": "Capture Reality",
+  "tutorialCaptureDesc": "Take a photo of your meal directly to start the analysis.",
+  "tutorialLoadDataTitle": "Load Data",
+  "tutorialLoadDataDesc": "Pick an existing photo from your device's library.",
+  "tutorialTimeCapsuleTitle": "Time Capsule",
+  "tutorialTimeCapsuleDesc": "Access your full log of past meals and daily stats.",
+  "tutorialInspectComponentsTitle": "Inspect Components",
+  "tutorialInspectComponentsDesc": "When multiple items are detected (e.g., Burger + Fries), tap on an item to see its specific portion size and individual macros.",
+  "tutorialEraseHistoryTitle": "Erase History",
+  "tutorialEraseHistoryDesc": "Swipe left on any meal card to delete it from your log.",
+  
+  "mealDetails": "MEAL DETAILS",
+  "analysis": "ANALYSIS",
+  "pro": "Pro",
+  "matchPercent": "98% Match",
+  "detected": "DETECTED",
+  "detectedFoods": "DETECTED FOODS",
+  "unknownFood": "Unknown Food",
+  "kcal": "kcal",
+  "oneServing": "1 serving",
+  "notWhatYouAte": "Not what you ate? Enter manually",
+  "macroDistribution": "MACRO DISTRIBUTION",
+  "carbs": "Carbs",
+  "protein": "Protein",
+  "fat": "Fat",
+  "retake": "Retake",
+  "logFood": "Log Food",
+  "noItemsToSave": "No items to save",
+  "mealSavedToHistory": "Meal saved to history!",
+  "errorSavingMeal": "Error saving meal: {error}",
+  "@errorSavingMeal": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  
+  "connectIntelligence": "Connect Intelligence",
+  "unlockGeminiAI": "Unlock Gemini AI",
+  "geminiDescription": "To analyze your food with Open Calories, we need to connect to Google's Gemini brain.",
+  "apiKey": "API Key",
+  "getApiKeyHint": "Don't have a key? Get one from Google AI Studio",
+  "couldNotLaunchUrl": "Could not launch URL",
+  "dailyCalorieGoal": "Daily Calorie Goal",
+  "target": "Target",
+  "connectAndContinue": "Connect & Continue",
+  "keyStoredLocally": "Your key is stored locally on device and never shared.",
+  "resetHints": "Reset Hints",
+  "hintsReset": "Hints reset! Tutorials will show again.",
+  "pleaseEnterApiKey": "Please enter an API Key",
+  "invalidKeyFormat": "Invalid Key format. It must start with \"AIza\" and be 39 characters long.",
+  
+  "openCalories": "OPEN CALORIES",
+  "seeWhat": "See What ",
+  "youEat": "You Eat.",
+  "welcomeDescription": "Instant calorie analysis and macro breakdowns powered by Open Calories AI.",
+  "startScanning": "Start Scanning",
+  "connectDevice": "Connect Device",
+  "deviceIntegrationComingSoon": "Device integration coming soon! ⌚",
+  "scanning": "SCANNING...",
+  
+  "history": "HISTORY",
+  "dailyTotal": "DAILY TOTAL",
+  "percentOfDailyGoal": "{percent}% of daily goal ({goal})",
+  "@percentOfDailyGoal": {
+    "placeholders": {
+      "percent": {"type": "int"},
+      "goal": {"type": "int"}
+    }
+  },
+  "noMealsLoggedToday": "No meals logged today",
+  "noMealsLoggedForDay": "No meals logged for this day",
+  "deleteMealTitle": "Delete Meal?",
+  "deleteActionCannotBeUndone": "This action cannot be undone.",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "mealDeleted": "Meal deleted",
+  "scanMealOption": "Scan Meal",
+  "useAiToAnalyze": "Use AI to analyze your food photo",
+  "manualEntry": "Manual Entry",
+  "typeInFoodAndPortion": "Type in food name and portion",
+  "today": "Today, {date}",
+  "@today": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "yesterday": "Yesterday, {date}",
+  "@yesterday": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "errorWithMessage": "Error: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
+  
+  "language": "Language",
+  "systemDefault": "System Default",
+  "english": "English",
+  "spanish": "Español",
+  "selectLanguage": "Select Language",
+  
+  "enterNameAndPortionError": "Please enter name and portion first",
+  "aiEstimationCompleted": "AI estimation completed!",
+  "aiEstimationFailed": "AI Estimation failed: {error}",
+  "@aiEstimationFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "loggedFood": "Logged {name} with {calories} kcal",
+  "@loggedFood": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "calories": {"type": "int"}
+    }
+  },
+  "manualEntryTitle": "MANUAL ENTRY",
+  "requiredSection": "REQUIRED",
+  "tutorialNameTitle": "Name Your Fuel",
+  "tutorialNameDesc": "Enter the name of your food item.",
+  "foodNameLabel": "Food Name",
+  "foodNameHint": "e.g. Tortillas",
+  "pleaseEnterName": "Please enter a name",
+  "portionLabel": "Portion",
+  "portionHint": "e.g. 2 pieces",
+  "pleaseEnterPortion": "Please enter a portion",
+  "tutorialAiTitle": "AI Assist",
+  "tutorialAiDesc": "Let Gemini estimate calories from the food name.",
+  "estimating": "ESTIMATING...",
+  "estimateWithAiAction": "ESTIMATE WITH AI",
+  "nutritionOptionalSection": "NUTRITION (OPTIONAL)",
+  "tutorialFineTuneTitle": "Fine-Tune Data",
+  "tutorialFineTuneDesc": "Manually adjust the nutritional info if needed.",
+  "logMealAction": "LOG MEAL",
+  "caloriesLabel": "Calories",
+
+  "weeklyInsights": "WEEKLY INSIGHTS",
+  "tutorialTimeTravelTitle": "Time Travel",
+  "tutorialTimeTravelDesc": "Use arrows to browse previous weeks history.",
+  "tutorialSelectDayTitle": "Select a Day",
+  "tutorialSelectDayDesc": "Tap any day to view its meal history."
+}

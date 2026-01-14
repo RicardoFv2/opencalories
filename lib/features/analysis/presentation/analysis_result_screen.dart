@@ -14,6 +14,7 @@ import 'package:opencalories/features/analysis/domain/food_analysis.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:opencalories/features/history/data/meal_repository.dart';
+import 'package:opencalories/l10n/app_localizations.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -82,7 +83,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
         ? (items.length > 3
               ? '${items.take(3).map((e) => e.name).join(', ')} +${items.length - 3} more'
               : items.map((e) => e.name).join(', '))
-        : 'Unknown Food';
+        : AppLocalizations.of(context)!.unknownFood;
 
     return ShowCaseWidget(
       builder: (context) => _buildContent(
@@ -118,7 +119,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          widget.isViewOnly ? 'MEAL DETAILS' : 'ANALYSIS',
+          widget.isViewOnly
+              ? AppLocalizations.of(context)!.mealDetails
+              : AppLocalizations.of(context)!.analysis,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             letterSpacing: 2,
             fontWeight: FontWeight.bold,
@@ -135,12 +138,12 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                 color: AppTheme.primary.withValues(alpha: 0.3),
               ),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.usb, size: 16, color: AppTheme.primary),
                 SizedBox(width: 4),
                 Text(
-                  'Pro',
+                  AppLocalizations.of(context)!.pro,
                   style: TextStyle(
                     color: AppTheme.primary,
                     fontSize: 12,
@@ -223,7 +226,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    '98% Match',
+                                    AppLocalizations.of(context)!.matchPercent,
                                     style: GoogleFonts.spaceGrotesk(
                                       color: AppTheme.primary,
                                       fontSize: 11,
@@ -245,7 +248,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'DETECTED',
+                              AppLocalizations.of(context)!.detected,
                               style: GoogleFonts.spaceGrotesk(
                                 color: AppTheme.primary,
                                 fontSize: 12,
@@ -255,9 +258,12 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                             ),
                             Showcase(
                               key: _detectedItemsKey,
-                              title: 'Inspect Components',
-                              description:
-                                  'When multiple items are detected (e.g., Burger + Fries), tap on an item to see its specific portion size and individual macros.',
+                              title: AppLocalizations.of(
+                                context,
+                              )!.tutorialInspectComponentsTitle,
+                              description: AppLocalizations.of(
+                                context,
+                              )!.tutorialInspectComponentsDesc,
                               tooltipBackgroundColor: _tutorialBg,
                               titleTextStyle: const TextStyle(
                                 color: _tutorialText,
@@ -317,7 +323,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                               ),
                                               const SizedBox(width: 12),
                                               Text(
-                                                'DETECTED FOODS',
+                                                AppLocalizations.of(
+                                                  context,
+                                                )!.detectedFoods,
                                                 style: GoogleFonts.spaceGrotesk(
                                                   color: Colors.white,
                                                   fontSize: 18,
@@ -376,7 +384,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                                       ),
                                                       const SizedBox(height: 4),
                                                       Text(
-                                                        '${item.portionEstimate} • ${item.calories} kcal',
+                                                        '${item.portionEstimate} • ${item.calories} ${AppLocalizations.of(context)!.kcal}',
                                                         style:
                                                             GoogleFonts.spaceGrotesk(
                                                               color: Colors
@@ -391,7 +399,10 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                                       Row(
                                                         children: [
                                                           _MacroMiniTag(
-                                                            label: 'Protein',
+                                                            label:
+                                                                AppLocalizations.of(
+                                                                  context,
+                                                                )!.protein,
                                                             value:
                                                                 '${item.protein}g',
                                                             color: Colors
@@ -401,7 +412,10 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                                             width: 8,
                                                           ),
                                                           _MacroMiniTag(
-                                                            label: 'Carbs',
+                                                            label:
+                                                                AppLocalizations.of(
+                                                                  context,
+                                                                )!.carbs,
                                                             value:
                                                                 '${item.carbs}g',
                                                             color: Colors
@@ -411,7 +425,10 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                                             width: 8,
                                                           ),
                                                           _MacroMiniTag(
-                                                            label: 'Fat',
+                                                            label:
+                                                                AppLocalizations.of(
+                                                                  context,
+                                                                )!.fat,
                                                             value:
                                                                 '${item.fat}g',
                                                             color: Colors
@@ -465,13 +482,13 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                const Positioned(
+                Positioned(
                   top: 4,
                   right: -32,
                   child: RotatedBox(
                     quarterTurns: 0,
                     child: Text(
-                      'kcal',
+                      AppLocalizations.of(context)!.kcal,
                       style: TextStyle(
                         fontSize: 18,
                         color: AppTheme.primary,
@@ -487,14 +504,16 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
               curve: Curves.easeOutBack,
             ),
             Text(
-              items.isNotEmpty ? items.first.portionEstimate : '1 serving',
+              items.isNotEmpty
+                  ? items.first.portionEstimate
+                  : AppLocalizations.of(context)!.oneServing,
               style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
             ),
             const SizedBox(height: 8),
             TextButton.icon(
               onPressed: () => context.push('/manual-entry'),
               icon: const Icon(Icons.edit, size: 16),
-              label: const Text('Not what you ate? Enter manually'),
+              label: Text(AppLocalizations.of(context)!.notWhatYouAte),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.grey,
                 textStyle: const TextStyle(fontSize: 12),
@@ -530,11 +549,11 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                     ),
                     child: Column(
                       children: [
-                        const Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'MACRO DISTRIBUTION',
+                              AppLocalizations.of(context)!.macroDistribution,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -583,19 +602,19 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _MacroCard(
-                              label: 'Carbs',
+                              label: AppLocalizations.of(context)!.carbs,
                               value: '${totalCarbs}g',
                               color: Colors.blueAccent,
                               isPrimary: false,
                             ),
                             _MacroCard(
-                              label: 'Protein',
+                              label: AppLocalizations.of(context)!.protein,
                               value: '${totalProtein}g',
                               color: AppTheme.primary,
                               isPrimary: true,
                             ),
                             _MacroCard(
-                              label: 'Fat',
+                              label: AppLocalizations.of(context)!.fat,
                               value: '${totalFat}g',
                               color: Colors.orangeAccent,
                               isPrimary: false,
@@ -648,7 +667,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       icon: const Icon(Icons.replay),
-                      label: const Text('Retake'),
+                      label: Text(AppLocalizations.of(context)!.retake),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -662,7 +681,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                   widget.analysis!.items.isEmpty) {
                                 if (context.mounted) {
                                   context.showAppSnackBar(
-                                    'No items to save',
+                                    AppLocalizations.of(context)!.noItemsToSave,
                                     isError: true,
                                   );
                                 }
@@ -683,13 +702,17 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                 if (context.mounted) {
                                   context.go('/'); // Go home/history
                                   context.showAppSnackBar(
-                                    'Meal saved to history!',
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.mealSavedToHistory,
                                   );
                                 }
                               } catch (e) {
                                 if (context.mounted) {
                                   context.showAppSnackBar(
-                                    'Error saving meal: $e',
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.errorSavingMeal(e.toString()),
                                     isError: true,
                                   );
                                 }
@@ -705,7 +728,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       icon: const Icon(Icons.check_circle),
-                      label: const Text('Log Food'),
+                      label: Text(AppLocalizations.of(context)!.logFood),
                     ),
                   ),
                 ],

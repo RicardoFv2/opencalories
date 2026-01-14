@@ -14,6 +14,7 @@ import 'package:opencalories/core/theme/app_theme.dart';
 import '../../settings/data/api_key_repository.dart';
 import '../../analysis/presentation/analysis_controller.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
+import 'package:opencalories/l10n/app_localizations.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -64,6 +65,7 @@ class _ScannerContent extends HookConsumerWidget {
     final imageService = ref.read(imageServiceProvider.notifier);
     final selectedImage = useState<File?>(null);
     final processingStatus = useState<String?>(null);
+    final l10n = AppLocalizations.of(context)!;
 
     // Check and start tutorial on first build
     useEffect(() {
@@ -94,7 +96,7 @@ class _ScannerContent extends HookConsumerWidget {
         },
         error: (error, stack) {
           context.showAppSnackBar(
-            'Analysis failed: ${error.toString()}',
+            l10n.analysisFailed(error.toString()),
             isError: true,
           );
         },
@@ -102,7 +104,7 @@ class _ScannerContent extends HookConsumerWidget {
     });
 
     Future<void> pickAndProcessImage(ImageSource source) async {
-      processingStatus.value = 'Compressing image...';
+      processingStatus.value = l10n.compressingImage;
       try {
         final picked = await imageService.pickImage(source);
         if (picked != null) {
@@ -174,8 +176,8 @@ class _ScannerContent extends HookConsumerWidget {
                         ref.invalidate(apiKeyProvider);
                       },
                     ),
-                    const Text(
-                      'Scan Meal',
+                    Text(
+                      l10n.scanMeal,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -228,7 +230,7 @@ class _ScannerContent extends HookConsumerWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'OPEN CALORIES PRO: ACTIVE',
+                            l10n.proActive,
                             style: Theme.of(context).textTheme.labelSmall
                                 ?.copyWith(
                                   color: AppTheme.primary,
@@ -311,7 +313,7 @@ class _ScannerContent extends HookConsumerWidget {
                 const SizedBox(height: 24),
 
                 Text(
-                  'Align food within frame...',
+                  l10n.alignFoodWithinFrame,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 14,
@@ -332,9 +334,8 @@ class _ScannerContent extends HookConsumerWidget {
                 // Gallery Button - Showcase Target 2
                 Showcase(
                   key: galleryKey,
-                  title: 'Load Data',
-                  description:
-                      'Pick an existing photo from your device\'s library.',
+                  title: l10n.tutorialLoadDataTitle,
+                  description: l10n.tutorialLoadDataDesc,
                   tooltipBackgroundColor: _tutorialBg,
                   titleTextStyle: const TextStyle(
                     color: _tutorialText,
@@ -354,9 +355,8 @@ class _ScannerContent extends HookConsumerWidget {
                 // Shutter Button - Showcase Target 1 (Camera)
                 Showcase(
                   key: cameraKey,
-                  title: 'Capture Reality',
-                  description:
-                      'Take a photo of your meal directly to start the analysis.',
+                  title: l10n.tutorialCaptureTitle,
+                  description: l10n.tutorialCaptureDesc,
                   tooltipBackgroundColor: _tutorialBg,
                   titleTextStyle: const TextStyle(
                     color: _tutorialText,
@@ -377,7 +377,7 @@ class _ScannerContent extends HookConsumerWidget {
                         if (processingStatus.value == null) {
                           await HapticFeedback.lightImpact();
                           // Process existing image
-                          processingStatus.value = 'Analyzing food...';
+                          processingStatus.value = l10n.analyzingFood;
                           try {
                             await ref
                                 .read(analysisControllerProvider.notifier)
@@ -424,9 +424,8 @@ class _ScannerContent extends HookConsumerWidget {
                 // History Button - Showcase Target 3
                 Showcase(
                   key: historyKey,
-                  title: 'Time Capsule',
-                  description:
-                      'Access your full log of past meals and daily stats.',
+                  title: l10n.tutorialTimeCapsuleTitle,
+                  description: l10n.tutorialTimeCapsuleDesc,
                   tooltipBackgroundColor: _tutorialBg,
                   titleTextStyle: const TextStyle(
                     color: _tutorialText,

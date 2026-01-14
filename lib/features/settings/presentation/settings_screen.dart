@@ -7,6 +7,8 @@ import 'package:opencalories/core/theme/app_theme.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/services/calorie_goal_service.dart';
+import 'package:opencalories/l10n/app_localizations.dart';
+import '../../../../core/widgets/language_selector.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -48,7 +50,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'Connect Intelligence',
+          AppLocalizations.of(context)!.connectIntelligence,
           style: Theme.of(
             context,
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -96,7 +98,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
               // 2. Headline
               Text(
-                'Unlock Gemini AI',
+                AppLocalizations.of(context)!.unlockGeminiAI,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -109,7 +111,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'To analyze your food with Open Calories, we need to connect to Google\'s Gemini brain.',
+                  AppLocalizations.of(context)!.geminiDescription,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey[400], height: 1.5),
                 ),
@@ -121,11 +123,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 4, bottom: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 8),
                     child: Text(
-                      'API Key',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      AppLocalizations.of(context)!.apiKey,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   TextField(
@@ -179,7 +181,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   )) {
                     if (context.mounted) {
                       context.showAppSnackBar(
-                        'Could not launch URL',
+                        AppLocalizations.of(context)!.couldNotLaunchUrl,
                         isError: true,
                       );
                     }
@@ -190,9 +192,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   size: 16,
                   color: AppTheme.primary,
                 ),
-                label: const Text(
-                  'Don\'t have a key? Get one from Google AI Studio',
-                  style: TextStyle(color: AppTheme.primary, fontSize: 12),
+                label: Text(
+                  AppLocalizations.of(context)!.getApiKeyHint,
+                  style: const TextStyle(color: AppTheme.primary, fontSize: 12),
                 ),
               ),
 
@@ -202,11 +204,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 4, bottom: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 8),
                     child: Text(
-                      'Daily Calorie Goal',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      AppLocalizations.of(context)!.dailyCalorieGoal,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   Container(
@@ -228,12 +230,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
-                                  'Target',
-                                  style: TextStyle(color: Colors.grey),
+                                Text(
+                                  AppLocalizations.of(context)!.target,
+                                  style: const TextStyle(color: Colors.grey),
                                 ),
                                 Text(
-                                  '$goalValue kcal',
+                                  '$goalValue ${AppLocalizations.of(context)!.kcal}',
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -263,6 +265,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ],
               ),
 
+              const SizedBox(height: 32),
+
+              // New Language Selector
+              const LanguageSelector(),
+
               const SizedBox(height: 48),
 
               // 5. Connect Button
@@ -288,8 +295,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         SnackBar(
                           content: Text(
                             key.isEmpty
-                                ? 'Please enter an API Key'
-                                : 'Invalid Key format. It must start with "AIza" and be 39 characters long.',
+                                ? AppLocalizations.of(
+                                    context,
+                                  )!.pleaseEnterApiKey
+                                : AppLocalizations.of(
+                                    context,
+                                  )!.invalidKeyFormat,
                           ),
                           backgroundColor: Colors.red,
                         ),
@@ -306,7 +317,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     shadowColor: AppTheme.primary.withValues(alpha: 0.5),
                     elevation: 8,
                   ),
-                  child: const Text('Connect & Continue'),
+                  child: Text(AppLocalizations.of(context)!.connectAndContinue),
                 ),
               ),
 
@@ -318,7 +329,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(
-                      'Your key is stored locally on device and never shared.',
+                      AppLocalizations.of(context)!.keyStoredLocally,
                       style: TextStyle(color: Colors.grey[600], fontSize: 12),
                       textAlign: TextAlign.center,
                     ),
@@ -337,7 +348,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       .resetTutorials();
                   if (context.mounted) {
                     context.showAppSnackBar(
-                      'Hints reset! Tutorials will show again.',
+                      AppLocalizations.of(context)!.hintsReset,
                     );
                   }
                 },
@@ -350,7 +361,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 ),
                 icon: const Icon(Icons.help_outline, size: 18),
-                label: const Text('Reset Hints'),
+                label: Text(AppLocalizations.of(context)!.resetHints),
               ),
               const SizedBox(height: 48),
             ],
