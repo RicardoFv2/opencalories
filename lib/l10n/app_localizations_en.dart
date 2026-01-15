@@ -363,4 +363,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tutorialSelectDayDesc => 'Tap any day to view its meal history.';
+
+  @override
+  String get noFoodDetected => 'No food detected in image. Please scan a meal.';
 }

@@ -117,5 +117,6 @@
   "tutorialTimeTravelTitle": "Viaje en el Tiempo",
   "tutorialTimeTravelDesc": "Usa las flechas para ver semanas anteriores.",
   "tutorialSelectDayTitle": "Selecciona un Día",
-  "tutorialSelectDayDesc": "Toca un día para ver su historial."
+  "tutorialSelectDayDesc": "Toca un día para ver su historial.",
+  "noFoodDetected": "No se detectó comida en la imagen. Por favor, escanea una comida."
 }

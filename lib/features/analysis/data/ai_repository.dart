@@ -33,6 +33,7 @@ CRITICAL INSTRUCTIONS:
 1. Identify Cooking Methods: Look for signs of frying (oil sheen), breading, or sauces that add hidden calories.
 2. Estimate Portions: Be realistic about serving sizes.
 3. Output JSON Only: Do not provide any conversational text.
+4. Non-Food Images: If the image does NOT contain any recognizable food, return an EMPTY 'items' array: {"items": []}.
 
 Return a valid JSON object with an 'items' list. 
 For each item include: 

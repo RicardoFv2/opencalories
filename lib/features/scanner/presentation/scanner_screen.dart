@@ -89,6 +89,13 @@ class _ScannerContent extends HookConsumerWidget {
       next.whenOrNull(
         data: (analysis) {
           if (analysis != null && selectedImage.value != null) {
+            // Check if no food was detected
+            if (analysis.items.isEmpty) {
+              // Show not-food alert
+              context.showAppSnackBar(l10n.noFoodDetected, isError: true);
+              selectedImage.value = null; // Clear the invalid image
+              return;
+            }
             context.push(
               '/analysis',
               extra: {'analysis': analysis, 'image': selectedImage.value},

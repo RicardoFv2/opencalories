@@ -751,6 +751,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap any day to view its meal history.'**
   String get tutorialSelectDayDesc;
+
+  /// No description provided for @noFoodDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'No food detected in image. Please scan a meal.'**
+  String get noFoodDetected;
 }
 
 class _AppLocalizationsDelegate

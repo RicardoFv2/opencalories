@@ -159,5 +159,6 @@
   "tutorialTimeTravelTitle": "Time Travel",
   "tutorialTimeTravelDesc": "Use arrows to browse previous weeks history.",
   "tutorialSelectDayTitle": "Select a Day",
-  "tutorialSelectDayDesc": "Tap any day to view its meal history."
+  "tutorialSelectDayDesc": "Tap any day to view its meal history.",
+  "noFoodDetected": "No food detected in image. Please scan a meal."
 }
