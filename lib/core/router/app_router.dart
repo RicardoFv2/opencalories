@@ -9,6 +9,7 @@ import '../../features/scanner/presentation/scanner_screen.dart';
 import '../../features/analysis/presentation/analysis_result_screen.dart';
 import '../../features/analysis/presentation/full_screen_image_view.dart';
 import '../../features/onboarding/welcome_screen.dart';
+import '../../features/onboarding/splash_screen.dart';
 
 import '../../features/history/presentation/history_screen.dart';
 import '../../features/history/presentation/weekly_summary_screen.dart';
@@ -21,32 +22,46 @@ GoRouter appRouter(Ref ref) {
   final apiKeyAsync = ref.watch(apiKeyProvider);
 
   return GoRouter(
-    initialLocation: '/welcome',
+    initialLocation: '/splash',
     redirect: (context, state) {
       final isLoading = apiKeyAsync.isLoading;
       final hasKey =
           apiKeyAsync.valueOrNull != null &&
           apiKeyAsync.valueOrNull!.isNotEmpty;
 
+      final isSplash = state.matchedLocation == '/splash';
       final isWelcome = state.matchedLocation == '/welcome';
       final isSettings = state.matchedLocation == '/settings';
 
+      // 1. Si está cargando, dejamos que se muestre lo que corresponda
+      // (normalmente será el splash screen al inicio)
       if (isLoading) return null;
 
-      // If user has key, they shouldn't be on welcome or settings (unless explicitly navigated)
-      // But for initial load, if hasKey is true, we want to go to / (History)
-      if (hasKey) {
-        if (isWelcome) {
-          return '/';
-        }
+      // 2. Si estamos en Splash
+      if (isSplash) {
+        // En splash screen, no redirigimos desde el router.
+        // El propio widget SplashScreen se encarga de navegar cuando termina
+        // su animación de tiempo mínimo (2s) + carga de datos.
         return null;
       }
 
-      // If no key
+      // 3. Si ya tiene key (Autenticado)
+      if (hasKey) {
+        // No debería poder ver splash ni welcome
+        if (isWelcome || isSplash) {
+          return '/';
+        }
+        return null; // Dejarlo pasar a donde iba (ej. settings, scan, history)
+      }
+
+      // 4. Si NO tiene key (No Autenticado)
       if (!hasKey) {
-        // Allow access to welcome and settings
+        // Permitir acceso a welcome y settings
         if (isWelcome || isSettings) return null;
-        // Redirect everything else to welcome
+
+        // Cualquier otra ruta protegida redirige a welcome
+        // Nota: Si venía de splash, el splash lo mandará a welcome explícitamente,
+        // así que esto es un fallback de seguridad.
         return '/welcome';
       }
 
@@ -94,6 +109,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/weekly',
         builder: (context, state) => const WeeklySummaryScreen(),
+      ),
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
       ),
     ],
   );
