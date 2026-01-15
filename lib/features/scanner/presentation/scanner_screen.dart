@@ -7,11 +7,13 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:camera/camera.dart';
 
 import 'package:opencalories/core/services/image_service.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
 import '../../settings/data/api_key_repository.dart';
+import '../../settings/data/model_preference_service.dart';
 import '../../analysis/presentation/analysis_controller.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
@@ -32,6 +34,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
   final _cameraKey = GlobalKey();
   final _galleryKey = GlobalKey();
   final _historyKey = GlobalKey();
+  final _modelBadgeKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +43,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
         cameraKey: _cameraKey,
         galleryKey: _galleryKey,
         historyKey: _historyKey,
+        modelBadgeKey: _modelBadgeKey,
       ),
       onFinish: () {
         // Mark tutorial as shown when finished or skipped
@@ -53,11 +57,13 @@ class _ScannerContent extends HookConsumerWidget {
   final GlobalKey cameraKey;
   final GlobalKey galleryKey;
   final GlobalKey historyKey;
+  final GlobalKey modelBadgeKey;
 
   const _ScannerContent({
     required this.cameraKey,
     required this.galleryKey,
     required this.historyKey,
+    required this.modelBadgeKey,
   });
 
   @override
@@ -65,10 +71,41 @@ class _ScannerContent extends HookConsumerWidget {
     final imageService = ref.read(imageServiceProvider.notifier);
     final selectedImage = useState<File?>(null);
     final processingStatus = useState<String?>(null);
+    final rebuildTrigger = useState(0); // Force rebuild for badge update
     final l10n = AppLocalizations.of(context)!;
 
-    // Check and start tutorial on first build
+    // Camera state
+    final cameraController = useState<CameraController?>(null);
+    final isCameraInitialized = useState(false);
+
+    // Initialize camera
     useEffect(() {
+      Future<void> initCamera() async {
+        try {
+          final cameras = await availableCameras();
+          if (cameras.isNotEmpty) {
+            // Use the first camera (usually back camera)
+            final controller = CameraController(
+              cameras.first,
+              ResolutionPreset.medium,
+              enableAudio: false,
+            );
+
+            await controller.initialize();
+
+            if (context.mounted) {
+              cameraController.value = controller;
+              isCameraInitialized.value = true;
+            }
+          }
+        } catch (e) {
+          debugPrint('Error initializing camera: $e');
+        }
+      }
+
+      initCamera();
+
+      // Check and start tutorial on first build
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         // Wait for TutorialService to initialize
         await ref.read(tutorialServiceProvider.future);
@@ -78,12 +115,56 @@ class _ScannerContent extends HookConsumerWidget {
           if (context.mounted) {
             ShowCaseWidget.of(
               context,
-            ).startShowCase([cameraKey, galleryKey, historyKey]);
+            ).startShowCase([cameraKey, galleryKey, historyKey, modelBadgeKey]);
           }
         }
       });
-      return null;
+
+      return () {
+        cameraController.value?.dispose();
+      };
     }, const []);
+
+    Future<void> captureImage() async {
+      final controller = cameraController.value;
+      if (controller == null || !controller.value.isInitialized) return;
+
+      if (controller.value.isTakingPicture) return;
+
+      try {
+        processingStatus.value = l10n.compressingImage;
+        await HapticFeedback.mediumImpact();
+
+        final XFile image = await controller.takePicture();
+        final file = File(image.path);
+
+        final compressed = await imageService.compressImage(file);
+        selectedImage.value = compressed;
+      } catch (e) {
+        debugPrint('Error capturing image: $e');
+        if (context.mounted) {
+          context.showAppSnackBar(
+            l10n.analysisFailed('Capture failed'),
+            isError: true,
+          );
+        }
+      } finally {
+        processingStatus.value = null;
+      }
+    }
+
+    Future<void> pickAndProcessImage(ImageSource source) async {
+      processingStatus.value = l10n.compressingImage;
+      try {
+        final picked = await imageService.pickImage(source);
+        if (picked != null) {
+          final compressed = await imageService.compressImage(picked);
+          selectedImage.value = compressed;
+        }
+      } finally {
+        processingStatus.value = null;
+      }
+    }
 
     ref.listen(analysisControllerProvider, (previous, next) {
       next.whenOrNull(
@@ -111,19 +192,6 @@ class _ScannerContent extends HookConsumerWidget {
       );
     });
 
-    Future<void> pickAndProcessImage(ImageSource source) async {
-      processingStatus.value = l10n.compressingImage;
-      try {
-        final picked = await imageService.pickImage(source);
-        if (picked != null) {
-          final compressed = await imageService.compressImage(picked);
-          selectedImage.value = compressed;
-        }
-      } finally {
-        processingStatus.value = null;
-      }
-    }
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -133,6 +201,8 @@ class _ScannerContent extends HookConsumerWidget {
           Positioned.fill(
             child: selectedImage.value != null
                 ? Image.file(selectedImage.value!, fit: BoxFit.cover)
+                : (isCameraInitialized.value && cameraController.value != null)
+                ? CameraPreview(cameraController.value!)
                 : Container(
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
@@ -216,45 +286,101 @@ class _ScannerContent extends HookConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Active Badge
-                Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppTheme.primary.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.bolt,
-                            color: AppTheme.primary,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n.proActive,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  color: AppTheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
+                Showcase(
+                  key: modelBadgeKey,
+                  title: l10n.tutorialModelTitle,
+                  description: l10n.tutorialModelDesc,
+                  tooltipBackgroundColor: _tutorialBg,
+                  titleTextStyle: const TextStyle(
+                    color: _tutorialText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  descTextStyle: TextStyle(
+                    color: _tutorialText.withValues(alpha: 0.8),
+                    fontSize: 14,
+                  ),
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final asyncModel = ref.watch(
+                        modelPreferenceServiceInitializedProvider,
+                      );
+                      return asyncModel.when(
+                        data: (service) {
+                          final currentModel = service.getSelectedModel();
+                          final friendlyName =
+                              ModelPreferenceService.getFriendlyName(
+                                currentModel,
+                              );
+
+                          return GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => _ModelSelectorSheet(
+                                  service: service,
+                                  currentModel: currentModel,
+                                  onModelSelected: () {
+                                    rebuildTrigger.value++; // Refresh badge
+                                  },
                                 ),
-                          ),
-                        ],
-                      ),
-                    )
-                    .animate(onPlay: (c) => c.repeat(reverse: true))
-                    .scale(
-                      begin: const Offset(1, 1),
-                      end: const Offset(1.05, 1.05),
-                      duration: 2.seconds,
-                    ),
+                              );
+                            },
+                            child:
+                                Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black54,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: AppTheme.primary.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.bolt,
+                                            color: AppTheme.primary,
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            friendlyName.toUpperCase(),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  color: AppTheme.primary,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 1,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                    .animate(
+                                      onPlay: (c) => c.repeat(reverse: true),
+                                    )
+                                    .scale(
+                                      begin: const Offset(1, 1),
+                                      end: const Offset(1.05, 1.05),
+                                      duration: 2.seconds,
+                                    ),
+                          );
+                        },
+                        loading: () => const SizedBox.shrink(),
+                        error: (error, stack) => const SizedBox.shrink(),
+                      );
+                    },
+                  ),
+                ),
 
                 const SizedBox(height: 32),
 
@@ -336,121 +462,198 @@ class _ScannerContent extends HookConsumerWidget {
             bottom: MediaQuery.of(context).padding.bottom + 40,
             left: 0,
             right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // Gallery Button - Showcase Target 2
-                Showcase(
-                  key: galleryKey,
-                  title: l10n.tutorialLoadDataTitle,
-                  description: l10n.tutorialLoadDataDesc,
-                  tooltipBackgroundColor: _tutorialBg,
-                  titleTextStyle: const TextStyle(
-                    color: _tutorialText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  descTextStyle: TextStyle(
-                    color: _tutorialText.withValues(alpha: 0.8),
-                    fontSize: 14,
-                  ),
-                  child: _GlassButton(
-                    icon: Icons.photo_library,
-                    onTap: () => pickAndProcessImage(ImageSource.gallery),
-                  ),
-                ),
-
-                // Shutter Button - Showcase Target 1 (Camera)
-                Showcase(
-                  key: cameraKey,
-                  title: l10n.tutorialCaptureTitle,
-                  description: l10n.tutorialCaptureDesc,
-                  tooltipBackgroundColor: _tutorialBg,
-                  titleTextStyle: const TextStyle(
-                    color: _tutorialText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  descTextStyle: TextStyle(
-                    color: _tutorialText.withValues(alpha: 0.8),
-                    fontSize: 14,
-                  ),
-                  child: GestureDetector(
-                    onTap: () async {
-                      if (selectedImage.value == null) {
-                        await HapticFeedback.heavyImpact();
-                        await pickAndProcessImage(ImageSource.camera);
-                      } else {
-                        // Allow analysis if not currently processing
-                        if (processingStatus.value == null) {
-                          await HapticFeedback.lightImpact();
-                          // Process existing image
-                          processingStatus.value = l10n.analyzingFood;
-                          try {
-                            await ref
-                                .read(analysisControllerProvider.notifier)
-                                .analyze(selectedImage.value!);
-                          } finally {
-                            processingStatus.value = null;
-                          }
-                        }
-                      }
-                    },
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: AppTheme.primary,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primary.withValues(alpha: 0.5),
-                                blurRadius: 20,
+            child: selectedImage.value != null
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child:
+                        Row(
+                          children: [
+                            // Retake Button
+                            _GlassButton(
+                              icon: Icons.refresh,
+                              onTap: () async {
+                                await HapticFeedback.mediumImpact();
+                                selectedImage.value = null;
+                                // Re-initialize camera if needed or just ensure preview resumes
+                                if (isCameraInitialized.value &&
+                                    cameraController.value != null &&
+                                    !cameraController
+                                        .value!
+                                        .value
+                                        .isStreamingImages) {
+                                  await cameraController.value!.resumePreview();
+                                }
+                              },
+                            ),
+                            const SizedBox(width: 16),
+                            // Analyze Button
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () async {
+                                  if (processingStatus.value == null) {
+                                    await HapticFeedback.heavyImpact();
+                                    processingStatus.value = l10n.analyzingFood;
+                                    try {
+                                      await ref
+                                          .read(
+                                            analysisControllerProvider.notifier,
+                                          )
+                                          .analyze(selectedImage.value!);
+                                    } finally {
+                                      processingStatus.value = null;
+                                    }
+                                  }
+                                },
+                                child: Container(
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primary,
+                                    borderRadius: BorderRadius.circular(28),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppTheme.primary.withValues(
+                                          alpha: 0.4,
+                                        ),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.search,
+                                        color: Colors.black,
+                                        size: 24,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        l10n.analyzeFood,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ],
-                          ),
-                          child: Icon(
-                            selectedImage.value == null
-                                ? Icons.camera_alt
-                                : Icons.check,
-                            color: Colors.black,
+                            ),
+                          ],
+                        ).animate().slideY(
+                          begin: 1,
+                          end: 0,
+                          duration: 400.ms,
+                          curve: Curves.easeOutBack,
+                        ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // Gallery Button - Showcase Target 2
+                      Showcase(
+                        key: galleryKey,
+                        title: l10n.tutorialLoadDataTitle,
+                        description: l10n.tutorialLoadDataDesc,
+                        tooltipBackgroundColor: _tutorialBg,
+                        titleTextStyle: const TextStyle(
+                          color: _tutorialText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        descTextStyle: TextStyle(
+                          color: _tutorialText.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                        child: _GlassButton(
+                          icon: Icons.photo_library,
+                          onTap: () => pickAndProcessImage(ImageSource.gallery),
+                        ),
+                      ),
+
+                      // Shutter Button - Showcase Target 1 (Camera)
+                      Showcase(
+                        key: cameraKey,
+                        title: l10n.tutorialCaptureTitle,
+                        description: l10n.tutorialCaptureDesc,
+                        tooltipBackgroundColor: _tutorialBg,
+                        titleTextStyle: const TextStyle(
+                          color: _tutorialText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        descTextStyle: TextStyle(
+                          color: _tutorialText.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                        child: GestureDetector(
+                          onTap: () async {
+                            if (isCameraInitialized.value &&
+                                cameraController.value != null) {
+                              await captureImage();
+                            } else {
+                              await HapticFeedback.heavyImpact();
+                              await pickAndProcessImage(ImageSource.camera);
+                            }
+                          },
+                          child: Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 4),
+                            ),
+                            child: Center(
+                              child: Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primary,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppTheme.primary.withValues(
+                                        alpha: 0.5,
+                                      ),
+                                      blurRadius: 20,
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
 
-                // History Button - Showcase Target 3
-                Showcase(
-                  key: historyKey,
-                  title: l10n.tutorialTimeCapsuleTitle,
-                  description: l10n.tutorialTimeCapsuleDesc,
-                  tooltipBackgroundColor: _tutorialBg,
-                  titleTextStyle: const TextStyle(
-                    color: _tutorialText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                      // History Button - Showcase Target 3
+                      Showcase(
+                        key: historyKey,
+                        title: l10n.tutorialTimeCapsuleTitle,
+                        description: l10n.tutorialTimeCapsuleDesc,
+                        tooltipBackgroundColor: _tutorialBg,
+                        titleTextStyle: const TextStyle(
+                          color: _tutorialText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        descTextStyle: TextStyle(
+                          color: _tutorialText.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                        child: _GlassButton(
+                          icon: Icons.history,
+                          onTap: () => context.go('/'),
+                        ),
+                      ),
+                    ],
                   ),
-                  descTextStyle: TextStyle(
-                    color: _tutorialText.withValues(alpha: 0.8),
-                    fontSize: 14,
-                  ),
-                  child: _GlassButton(
-                    icon: Icons.history,
-                    onTap: () => context.go('/'),
-                  ),
-                ),
-              ],
-            ),
           ),
 
           if (processingStatus.value != null)
@@ -571,4 +774,125 @@ class _ScannerOverlayPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _ModelSelectorSheet extends StatelessWidget {
+  final ModelPreferenceService service;
+  final String currentModel;
+  final VoidCallback onModelSelected;
+
+  const _ModelSelectorSheet({
+    required this.service,
+    required this.currentModel,
+    required this.onModelSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppTheme.surfaceDark,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'AI Model',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => context.pop(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildOption(
+            context,
+            'gemini-2.5-flash',
+            isActive: currentModel == 'gemini-2.5-flash',
+          ),
+          const SizedBox(height: 12),
+          _buildOption(
+            context,
+            'gemini-3-flash-preview',
+            isActive: currentModel == 'gemini-3-flash-preview',
+          ),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOption(
+    BuildContext context,
+    String modelId, {
+    required bool isActive,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        service.setSelectedModel(modelId);
+        onModelSelected();
+        context.pop();
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppTheme.primary.withValues(alpha: 0.1)
+              : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isActive ? AppTheme.primary : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isActive ? Icons.radio_button_checked : Icons.radio_button_off,
+              color: isActive ? AppTheme.primary : Colors.grey,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ModelPreferenceService.getFriendlyName(modelId),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    ModelPreferenceService.getHint(modelId),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: modelId.contains('preview')
+                          ? Colors.orange
+                          : Colors.grey[400],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isActive)
+              const Icon(Icons.bolt, color: AppTheme.primary, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
 }

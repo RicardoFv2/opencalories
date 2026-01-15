@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/api_key_repository.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
+import '../data/model_preference_service.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/services/calorie_goal_service.dart';
@@ -163,6 +164,130 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           });
                         },
                       ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 32),
+
+              // 3.5 AI Model Selector
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 8),
+                    child: Text(
+                      AppLocalizations.of(context)!.aiModel,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceDark,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Consumer(
+                      builder: (context, ref, child) {
+                        final asyncModel = ref.watch(
+                          modelPreferenceServiceInitializedProvider,
+                        );
+
+                        return asyncModel.when(
+                          data: (service) {
+                            final currentModel = service.getSelectedModel();
+                            return DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: currentModel,
+                                isExpanded: true,
+                                dropdownColor: AppTheme.surfaceDark,
+                                icon: const Icon(
+                                  Icons.arrow_drop_down,
+                                  color: AppTheme.primary,
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'gemini-2.5-flash',
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          ModelPreferenceService.getFriendlyName(
+                                            'gemini-2.5-flash',
+                                          ),
+                                        ),
+                                        Text(
+                                          ModelPreferenceService.getHint(
+                                            'gemini-2.5-flash',
+                                          ),
+                                          style: TextStyle(
+                                            color: Colors.grey[400],
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'gemini-3-flash-preview',
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          ModelPreferenceService.getFriendlyName(
+                                            'gemini-3-flash-preview',
+                                          ),
+                                        ),
+                                        Text(
+                                          ModelPreferenceService.getHint(
+                                            'gemini-3-flash-preview',
+                                          ),
+                                          style: TextStyle(
+                                            color: Colors.orange,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    service.setSelectedModel(value);
+                                    setState(() {}); // Refresh UI
+                                  }
+                                },
+                              ),
+                            );
+                          },
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                          error: (err, stack) =>
+                              Text('Error loading settings: $err'),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, top: 8),
+                    child: Text(
+                      AppLocalizations.of(context)!.aiModelDescription,
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   ),
                 ],

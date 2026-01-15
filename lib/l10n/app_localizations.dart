@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Analyzing food...'**
   String get analyzingFood;
 
+  /// No description provided for @analyzeFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze Food'**
+  String get analyzeFood;
+
   /// No description provided for @analysisFailed.
   ///
   /// In en, this message translates to:
@@ -221,8 +227,8 @@ abstract class AppLocalizations {
   /// No description provided for @matchPercent.
   ///
   /// In en, this message translates to:
-  /// **'98% Match'**
-  String get matchPercent;
+  /// **'{percent}% Match'**
+  String matchPercent(int percent);
 
   /// No description provided for @detected.
   ///
@@ -619,6 +625,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'REQUIRED'**
   String get requiredSection;
+
+  /// No description provided for @tutorialDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Great! You are ready.'**
+  String get tutorialDone;
+
+  /// No description provided for @aiModel.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Model'**
+  String get aiModel;
+
+  /// No description provided for @aiModelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your preferred AI model'**
+  String get aiModelDescription;
+
+  /// No description provided for @quotaErrorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: Switch to Gemini 2.5 Flash in Settings for higher limits.'**
+  String get quotaErrorHint;
+
+  /// No description provided for @tutorialModelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch AI Brain'**
+  String get tutorialModelTitle;
+
+  /// No description provided for @tutorialModelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to change your AI model anytime.'**
+  String get tutorialModelDesc;
 
   /// No description provided for @tutorialNameTitle.
   ///

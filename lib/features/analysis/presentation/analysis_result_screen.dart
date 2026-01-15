@@ -236,7 +236,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    AppLocalizations.of(context)!.matchPercent,
+                                    AppLocalizations.of(context)!.matchPercent(
+                                      widget.analysis?.confidence ?? 0,
+                                    ),
                                     style: GoogleFonts.spaceGrotesk(
                                       color: AppTheme.primary,
                                       fontSize: 11,

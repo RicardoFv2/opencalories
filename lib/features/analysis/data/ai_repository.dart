@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../settings/data/api_key_repository.dart';
+import '../../settings/data/model_preference_service.dart';
 import '../domain/food_analysis.dart';
 import 'package:opencalories/core/l10n/supported_languages.dart';
 
@@ -17,7 +19,6 @@ AiRepository aiRepository(Ref ref) {
 
 class AiRepository {
   final Ref _ref;
-  static const _modelName = 'gemini-3-flash-preview';
 
   AiRepository(this._ref);
 
@@ -35,18 +36,26 @@ CRITICAL INSTRUCTIONS:
 3. Output JSON Only: Do not provide any conversational text.
 4. Non-Food Images: If the image does NOT contain any recognizable food, return an EMPTY 'items' array: {"items": []}.
 
-Return a valid JSON object with an 'items' list. 
-For each item include: 
-- name: food name in English (string, required)
-- name_translations: object with food names in: $languages
-- cooking_method: inferred method (e.g., "deep fried", "grilled") - Useful for calorie accuracy.
-- calories: estimated total calories (integer) - Account for oils/fats!
-- protein: protein in grams (integer)
-- carbs: carbohydrates in grams (integer)
-- fat: fat in grams (integer)
-- portion_estimate: portion size description in English (string, required)
-- portion_translations: object with portion descriptions in: $languages
+Return a valid JSON object with the following structure:
+{
+  "items": [
+    // List of food items
+    {
+      "name": "food name in English (string, required)",
+      "name_translations": { ... },
+      "cooking_method": "inferred method",
+      "calories": 100,
+      "protein": 10,
+      "carbs": 20,
+      "fat": 5,
+      "portion_estimate": "portion description",
+      "portion_translations": { ... }
+    }
+  ],
+  "confidence": 95 // (integer, 0-100) Overall certainty score
+}
 
+Use the languages: $languages for translations.
 STRICTLY return valid JSON matching this schema.
 ''');
   }
@@ -85,13 +94,17 @@ STRICTLY return valid JSON matching this schema.
 
   Future<Map<String, dynamic>> _generateAndParse(List<Content> content) async {
     final apiKey = await _ref.read(apiKeyProvider.future);
+    final modelService = await _ref.read(
+      modelPreferenceServiceInitializedProvider.future,
+    );
+    final modelName = modelService.getSelectedModel();
 
     if (apiKey == null || apiKey.isEmpty) {
       throw Exception('No API Key found. Please add one in Settings.');
     }
 
     final model = GenerativeModel(
-      model: _modelName,
+      model: modelName,
       apiKey: apiKey,
       systemInstruction:
           _systemInstruction, // Inyectamos la instrucción maestra
@@ -109,13 +122,26 @@ STRICTLY return valid JSON matching this schema.
       // CAMBIO 4: Sanitización robusta.
       // Aunque usamos JSON mode, limpiamos bloques markdown por seguridad.
       final cleanJson = text.replaceAll(RegExp(r'^```json|```$'), '').trim();
+      debugPrint('AI Raw JSON: $cleanJson'); // Debug log
 
-      return jsonDecode(cleanJson) as Map<String, dynamic>;
+      final json = jsonDecode(cleanJson) as Map<String, dynamic>;
+
+      // Ensure specific fields
+      if (!json.containsKey('confidence')) {
+        json['confidence'] = 85; // Fallback default if AI forgets
+      }
+
+      return json;
     } on SocketException {
       throw Exception('No internet connection. Please check your network.');
     } on GenerativeAIException catch (e) {
-      if (e.message.contains('429')) {
-        throw Exception('Rate limit exceeded. Please try again later.');
+      if (e.message.contains('429') ||
+          e.message.toLowerCase().contains('quota') ||
+          e.message.toLowerCase().contains('quota') ||
+          e.message.toLowerCase().contains('limit')) {
+        throw Exception(
+          'Rate limit exceeded. Please try again in 30 seconds.\nTip: Switch to Gemini 2.5 Flash in Settings for higher limits.',
+        );
       }
       if (e.message.contains('safety')) {
         throw Exception(

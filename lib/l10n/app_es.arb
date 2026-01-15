@@ -7,6 +7,7 @@
   "alignFoodWithinFrame": "Alinea la comida dentro del marco...",
   "compressingImage": "Comprimiendo imagen...",
   "analyzingFood": "Analizando comida...",
+  "analyzeFood": "Analizar Comida",
   "analysisFailed": "Análisis fallido: {error}",
   
   "tutorialCaptureTitle": "Capturar Realidad",
@@ -23,7 +24,12 @@
   "mealDetails": "DETALLES DE COMIDA",
   "analysis": "ANÁLISIS",
   "pro": "Pro",
-  "matchPercent": "98% Coincidencia",
+  "matchPercent": "{percent}% Coincidencia",
+  "@matchPercent": {
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
   "detected": "DETECTADO",
   "detectedFoods": "ALIMENTOS DETECTADOS",
   "unknownFood": "Alimento Desconocido",
@@ -108,6 +114,12 @@
   "estimating": "ESTIMANDO...",
   "estimateWithAiAction": "ESTIMAR CON IA",
   "nutritionOptionalSection": "NUTRICIÓN (OPCIONAL)",
+  "tutorialDone": "¡Genial! Estás listo.",
+  "aiModel": "Modelo de IA",
+  "aiModelDescription": "Elige tu modelo de IA preferido",
+  "quotaErrorHint": "Consejo: Cambia a Gemini 2.5 Flash en Configuración para más límites.",
+  "tutorialModelTitle": "Cambiar Cerebro IA",
+  "tutorialModelDesc": "Toca aquí para cambiar tu modelo de IA.",
   "tutorialFineTuneTitle": "Ajustar Datos",
   "tutorialFineTuneDesc": "Ajusta manualmente la info nutricional si es necesario.",
   "logMealAction": "REGISTRAR COMIDA",

@@ -11,10 +11,14 @@ _$FoodAnalysisImpl _$$FoodAnalysisImplFromJson(Map<String, dynamic> json) =>
       items: (json['items'] as List<dynamic>)
           .map((e) => FoodItem.fromJson(e as Map<String, dynamic>))
           .toList(),
+      confidence: (json['confidence'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$FoodAnalysisImplToJson(_$FoodAnalysisImpl instance) =>
-    <String, dynamic>{'items': instance.items};
+    <String, dynamic>{
+      'items': instance.items,
+      'confidence': instance.confidence,
+    };
 
 _$FoodItemImpl _$$FoodItemImplFromJson(Map<String, dynamic> json) =>
     _$FoodItemImpl(

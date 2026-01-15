@@ -21,7 +21,9 @@ FoodAnalysis _$FoodAnalysisFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$FoodAnalysis {
-  List<FoodItem> get items => throw _privateConstructorUsedError;
+  List<FoodItem> get items =>
+      throw _privateConstructorUsedError; // Confidence score (0-100) representing AI certainty
+  int get confidence => throw _privateConstructorUsedError;
 
   /// Serializes this FoodAnalysis to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -40,7 +42,7 @@ abstract class $FoodAnalysisCopyWith<$Res> {
     $Res Function(FoodAnalysis) then,
   ) = _$FoodAnalysisCopyWithImpl<$Res, FoodAnalysis>;
   @useResult
-  $Res call({List<FoodItem> items});
+  $Res call({List<FoodItem> items, int confidence});
 }
 
 /// @nodoc
@@ -57,13 +59,17 @@ class _$FoodAnalysisCopyWithImpl<$Res, $Val extends FoodAnalysis>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? items = null}) {
+  $Res call({Object? items = null, Object? confidence = null}) {
     return _then(
       _value.copyWith(
             items: null == items
                 ? _value.items
                 : items // ignore: cast_nullable_to_non_nullable
                       as List<FoodItem>,
+            confidence: null == confidence
+                ? _value.confidence
+                : confidence // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -79,7 +85,7 @@ abstract class _$$FoodAnalysisImplCopyWith<$Res>
   ) = __$$FoodAnalysisImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<FoodItem> items});
+  $Res call({List<FoodItem> items, int confidence});
 }
 
 /// @nodoc
@@ -95,13 +101,17 @@ class __$$FoodAnalysisImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? items = null}) {
+  $Res call({Object? items = null, Object? confidence = null}) {
     return _then(
       _$FoodAnalysisImpl(
         items: null == items
             ? _value._items
             : items // ignore: cast_nullable_to_non_nullable
                   as List<FoodItem>,
+        confidence: null == confidence
+            ? _value.confidence
+            : confidence // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -110,8 +120,10 @@ class __$$FoodAnalysisImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$FoodAnalysisImpl implements _FoodAnalysis {
-  const _$FoodAnalysisImpl({required final List<FoodItem> items})
-    : _items = items;
+  const _$FoodAnalysisImpl({
+    required final List<FoodItem> items,
+    this.confidence = 0,
+  }) : _items = items;
 
   factory _$FoodAnalysisImpl.fromJson(Map<String, dynamic> json) =>
       _$$FoodAnalysisImplFromJson(json);
@@ -124,9 +136,14 @@ class _$FoodAnalysisImpl implements _FoodAnalysis {
     return EqualUnmodifiableListView(_items);
   }
 
+  // Confidence score (0-100) representing AI certainty
+  @override
+  @JsonKey()
+  final int confidence;
+
   @override
   String toString() {
-    return 'FoodAnalysis(items: $items)';
+    return 'FoodAnalysis(items: $items, confidence: $confidence)';
   }
 
   @override
@@ -134,13 +151,18 @@ class _$FoodAnalysisImpl implements _FoodAnalysis {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$FoodAnalysisImpl &&
-            const DeepCollectionEquality().equals(other._items, _items));
+            const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.confidence, confidence) ||
+                other.confidence == confidence));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_items));
+  int get hashCode => Object.hash(
+    runtimeType,
+    const DeepCollectionEquality().hash(_items),
+    confidence,
+  );
 
   /// Create a copy of FoodAnalysis
   /// with the given fields replaced by the non-null parameter values.
@@ -157,14 +179,18 @@ class _$FoodAnalysisImpl implements _FoodAnalysis {
 }
 
 abstract class _FoodAnalysis implements FoodAnalysis {
-  const factory _FoodAnalysis({required final List<FoodItem> items}) =
-      _$FoodAnalysisImpl;
+  const factory _FoodAnalysis({
+    required final List<FoodItem> items,
+    final int confidence,
+  }) = _$FoodAnalysisImpl;
 
   factory _FoodAnalysis.fromJson(Map<String, dynamic> json) =
       _$FoodAnalysisImpl.fromJson;
 
   @override
-  List<FoodItem> get items;
+  List<FoodItem> get items; // Confidence score (0-100) representing AI certainty
+  @override
+  int get confidence;
 
   /// Create a copy of FoodAnalysis
   /// with the given fields replaced by the non-null parameter values.

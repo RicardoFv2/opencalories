@@ -27,6 +27,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get analyzingFood => 'Analizando comida...';
 
   @override
+  String get analyzeFood => 'Analizar Comida';
+
+  @override
   String analysisFailed(String error) {
     return 'Análisis fallido: $error';
   }
@@ -76,7 +79,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pro => 'Pro';
 
   @override
-  String get matchPercent => '98% Coincidencia';
+  String matchPercent(int percent) {
+    return '$percent% Coincidencia';
+  }
 
   @override
   String get detected => 'DETECTADO';
@@ -297,6 +302,25 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get requiredSection => 'REQUERIDO';
+
+  @override
+  String get tutorialDone => '¡Genial! Estás listo.';
+
+  @override
+  String get aiModel => 'Modelo de IA';
+
+  @override
+  String get aiModelDescription => 'Elige tu modelo de IA preferido';
+
+  @override
+  String get quotaErrorHint =>
+      'Consejo: Cambia a Gemini 2.5 Flash en Configuración para más límites.';
+
+  @override
+  String get tutorialModelTitle => 'Cambiar Cerebro IA';
+
+  @override
+  String get tutorialModelDesc => 'Toca aquí para cambiar tu modelo de IA.';
 
   @override
   String get tutorialNameTitle => 'Nombra tu Alimento';

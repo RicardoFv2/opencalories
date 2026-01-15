@@ -27,6 +27,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get analyzingFood => 'Analyzing food...';
 
   @override
+  String get analyzeFood => 'Analyze Food';
+
+  @override
   String analysisFailed(String error) {
     return 'Analysis failed: $error';
   }
@@ -76,7 +79,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pro => 'Pro';
 
   @override
-  String get matchPercent => '98% Match';
+  String matchPercent(int percent) {
+    return '$percent% Match';
+  }
 
   @override
   String get detected => 'DETECTED';
@@ -294,6 +299,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get requiredSection => 'REQUIRED';
+
+  @override
+  String get tutorialDone => 'Great! You are ready.';
+
+  @override
+  String get aiModel => 'AI Model';
+
+  @override
+  String get aiModelDescription => 'Choose your preferred AI model';
+
+  @override
+  String get quotaErrorHint =>
+      'Tip: Switch to Gemini 2.5 Flash in Settings for higher limits.';
+
+  @override
+  String get tutorialModelTitle => 'Switch AI Brain';
+
+  @override
+  String get tutorialModelDesc => 'Tap here to change your AI model anytime.';
 
   @override
   String get tutorialNameTitle => 'Name Your Fuel';

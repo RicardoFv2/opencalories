@@ -7,6 +7,7 @@
   "alignFoodWithinFrame": "Align food within frame...",
   "compressingImage": "Compressing image...",
   "analyzingFood": "Analyzing food...",
+  "analyzeFood": "Analyze Food",
   "analysisFailed": "Analysis failed: {error}",
   "@analysisFailed": {
     "placeholders": {
@@ -28,7 +29,12 @@
   "mealDetails": "MEAL DETAILS",
   "analysis": "ANALYSIS",
   "pro": "Pro",
-  "matchPercent": "98% Match",
+  "matchPercent": "{percent}% Match",
+  "@matchPercent": {
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
   "detected": "DETECTED",
   "detectedFoods": "DETECTED FOODS",
   "unknownFood": "Unknown Food",
@@ -137,6 +143,12 @@
   },
   "manualEntryTitle": "MANUAL ENTRY",
   "requiredSection": "REQUIRED",
+  "tutorialDone": "Great! You are ready.",
+  "aiModel": "AI Model",
+  "aiModelDescription": "Choose your preferred AI model",
+  "quotaErrorHint": "Tip: Switch to Gemini 2.5 Flash in Settings for higher limits.",
+  "tutorialModelTitle": "Switch AI Brain",
+  "tutorialModelDesc": "Tap here to change your AI model anytime.",
   "tutorialNameTitle": "Name Your Fuel",
   "tutorialNameDesc": "Enter the name of your food item.",
   "foodNameLabel": "Food Name",

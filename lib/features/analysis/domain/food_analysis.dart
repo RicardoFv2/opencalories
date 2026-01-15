@@ -5,7 +5,11 @@ part 'food_analysis.g.dart';
 
 @freezed
 class FoodAnalysis with _$FoodAnalysis {
-  const factory FoodAnalysis({required List<FoodItem> items}) = _FoodAnalysis;
+  const factory FoodAnalysis({
+    required List<FoodItem> items,
+    // Confidence score (0-100) representing AI certainty
+    @Default(0) int confidence,
+  }) = _FoodAnalysis;
 
   factory FoodAnalysis.fromJson(Map<String, dynamic> json) =>
       _$FoodAnalysisFromJson(json);
