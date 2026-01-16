@@ -59,8 +59,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Color del native splash: #102216
-    const nativeSplashColor = Color(0xFF102216);
+    // Color del native splash: negro puro
+    const nativeSplashColor = Color(0xFF000000);
 
     return Scaffold(
       backgroundColor: nativeSplashColor,
