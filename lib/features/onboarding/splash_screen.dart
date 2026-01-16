@@ -59,19 +59,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Color del native splash: #102216
+    const nativeSplashColor = Color(0xFF102216);
+
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: nativeSplashColor,
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppTheme.backgroundDark,
-              Color.lerp(AppTheme.backgroundDark, AppTheme.primary, 0.05)!,
-            ],
-          ),
-        ),
+        color: nativeSplashColor,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
