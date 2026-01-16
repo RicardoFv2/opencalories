@@ -87,7 +87,7 @@ class _ScannerContent extends HookConsumerWidget {
             // Use the first camera (usually back camera)
             final controller = CameraController(
               cameras.first,
-              ResolutionPreset.medium,
+              ResolutionPreset.high,
               enableAudio: false,
             );
 

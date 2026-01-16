@@ -76,21 +76,33 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Logo Animado
-              Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppTheme.primary.withValues(alpha: 0.1),
-                      border: Border.all(
-                        color: AppTheme.primary.withValues(alpha: 0.2),
-                        width: 2,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.local_dining,
-                      size: 64,
-                      color: AppTheme.primary,
+              // Logo Animado - Usa el mismo logo de la app
+              ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.asset(
+                      'assets/images/seedream-4.5_Add_a_black_background_use_color_code_000000-0.jpg',
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback al icono si la imagen no carga
+                        return Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppTheme.primary.withValues(alpha: 0.1),
+                            border: Border.all(
+                              color: AppTheme.primary.withValues(alpha: 0.2),
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.local_dining,
+                            size: 64,
+                            color: AppTheme.primary,
+                          ),
+                        );
+                      },
                     ),
                   )
                   .animate()

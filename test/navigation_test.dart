@@ -49,10 +49,21 @@ void main() {
       ),
     );
 
+    // Initial state: Splash Screen
+    expect(find.text('OpenCalories'), findsOneWidget);
+
     // Pump to allow the FutureBuilder/AsyncValue to resolve and router into action
-    // We use pump with duration to let animations tick but not wait for infinite ones
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pump(const Duration(seconds: 1));
+    // We use a loop to wait for the transition, as multiple frames/pumps might be needed
+    // The SplashScreen has a 2s delay.
+    bool found = false;
+    for (int i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+      if (find.text('Start Scanning').evaluate().isNotEmpty) {
+        found = true;
+        break;
+      }
+    }
+    expect(found, isTrue, reason: 'Should have navigated to WelcomeScreen');
 
     // Verify that we are on the Welcome Screen
     expect(find.text('Start Scanning'), findsOneWidget);
@@ -72,8 +83,24 @@ void main() {
       ),
     );
 
+    // Initial state: Splash Screen
+    expect(find.text('OpenCalories'), findsOneWidget);
+
     // Allow time for async value and router
-    await tester.pump(const Duration(seconds: 5));
+    // SplashScreen has a 2s delay.
+    bool found = false;
+    for (int i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+      if (find.text('HISTORY').evaluate().isNotEmpty) {
+        found = true;
+        break;
+      }
+    }
+    expect(
+      found,
+      isTrue,
+      reason: 'Should have navigated to History (Home) Screen',
+    );
 
     // Verify we are on History Screen (Home)
     expect(find.text('HISTORY'), findsOneWidget);
