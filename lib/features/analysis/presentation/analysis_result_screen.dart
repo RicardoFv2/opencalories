@@ -273,6 +273,11 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                     backgroundColor: Colors.transparent,
                                     isScrollControlled: true,
                                     builder: (context) => Container(
+                                      constraints: BoxConstraints(
+                                        maxHeight:
+                                            MediaQuery.of(context).size.height *
+                                            0.85,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: const Color(
                                           0xFF1A1A1A,
@@ -340,8 +345,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                           Flexible(
                                             child: ListView.separated(
                                               shrinkWrap: true,
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
+                                              padding: EdgeInsets.zero,
                                               itemCount: items.length,
                                               separatorBuilder:
                                                   (context, index) => Divider(

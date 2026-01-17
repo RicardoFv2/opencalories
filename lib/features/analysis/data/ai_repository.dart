@@ -127,8 +127,10 @@ STRICTLY return valid JSON matching this schema.
       final json = jsonDecode(cleanJson) as Map<String, dynamic>;
 
       // Ensure specific fields
-      if (!json.containsKey('confidence')) {
-        json['confidence'] = 85; // Fallback default if AI forgets
+      if (json['confidence'] == null) {
+        json['confidence'] = 85;
+      } else if (json['confidence'] is String) {
+        json['confidence'] = int.tryParse(json['confidence']) ?? 85;
       }
 
       return json;

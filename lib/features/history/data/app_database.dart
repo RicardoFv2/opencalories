@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -269,16 +270,33 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) async {
+      await m.createAll();
+    },
     onUpgrade: (m, from, to) async {
+      debugPrint('Upgrading database from $from to $to');
       if (from < 2) {
-        await m.addColumn(meals, meals.isManualEntry);
-        await m.alterTable(TableMigration(meals));
+        try {
+          await m.addColumn(meals, meals.isManualEntry);
+        } catch (e) {
+          debugPrint('Migration (v2): isManualEntry column already exists. $e');
+        }
       }
       if (from < 3) {
-        await m.addColumn(foodItems, foodItems.nameTranslations);
+        try {
+          await m.addColumn(foodItems, foodItems.nameTranslations);
+        } catch (e) {
+          debugPrint(
+            'Migration (v3): nameTranslations column already exists. $e',
+          );
+        }
       }
       if (from < 4) {
-        await m.addColumn(meals, meals.confidence);
+        try {
+          await m.addColumn(meals, meals.confidence);
+        } catch (e) {
+          debugPrint('Migration (v4): confidence column already exists. $e');
+        }
       }
     },
   );
