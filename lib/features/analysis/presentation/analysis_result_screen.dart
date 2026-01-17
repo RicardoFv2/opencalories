@@ -272,176 +272,194 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                     context: context,
                                     backgroundColor: Colors.transparent,
                                     isScrollControlled: true,
-                                    builder: (context) => Container(
-                                      constraints: BoxConstraints(
-                                        maxHeight:
-                                            MediaQuery.of(context).size.height *
-                                            0.85,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(
-                                          0xFF1A1A1A,
-                                        ), // Solid dark background
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                              top: Radius.circular(32),
+                                    builder: (context) => SafeArea(
+                                      bottom: false,
+                                      child: Container(
+                                        constraints: BoxConstraints(
+                                          maxHeight:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              0.9,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(
+                                            0xFF1A1A1A,
+                                          ), // Solid dark background
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                                top: Radius.circular(32),
+                                              ),
+                                          border: Border.all(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.1,
                                             ),
-                                        border: Border.all(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.1,
                                           ),
                                         ),
-                                      ),
-                                      padding: const EdgeInsets.fromLTRB(
-                                        24,
-                                        12,
-                                        24,
-                                        24,
-                                      ),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            width: 40,
-                                            height: 4,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white24,
-                                              borderRadius:
-                                                  BorderRadius.circular(2),
+                                        padding: EdgeInsets.fromLTRB(
+                                          24,
+                                          12,
+                                          24,
+                                          24 +
+                                              MediaQuery.of(
+                                                context,
+                                              ).padding.bottom,
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 40,
+                                              height: 4,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white24,
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(height: 24),
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.auto_awesome,
-                                                color: AppTheme.primary,
-                                                size: 24,
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Text(
-                                                AppLocalizations.of(
-                                                  context,
-                                                )!.detectedFoods,
-                                                style: GoogleFonts.spaceGrotesk(
-                                                  color: Colors.white,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  letterSpacing: 1.2,
+                                            const SizedBox(height: 24),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.auto_awesome,
+                                                  color: AppTheme.primary,
+                                                  size: 24,
                                                 ),
-                                              ),
-                                              const Spacer(),
-                                              IconButton(
-                                                onPressed: () =>
-                                                    Navigator.pop(context),
-                                                icon: const Icon(
-                                                  Icons.close,
-                                                  color: Colors.white54,
+                                                const SizedBox(width: 12),
+                                                Text(
+                                                  AppLocalizations.of(
+                                                    context,
+                                                  )!.detectedFoods,
+                                                  style:
+                                                      GoogleFonts.spaceGrotesk(
+                                                        color: Colors.white,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        letterSpacing: 1.2,
+                                                      ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 16),
-                                          Flexible(
-                                            child: ListView.separated(
-                                              shrinkWrap: true,
-                                              padding: EdgeInsets.zero,
-                                              itemCount: items.length,
-                                              separatorBuilder:
-                                                  (context, index) => Divider(
-                                                    color: Colors.white
-                                                        .withValues(
-                                                          alpha: 0.05,
-                                                        ),
+                                                const Spacer(),
+                                                IconButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  icon: const Icon(
+                                                    Icons.close,
+                                                    color: Colors.white54,
                                                   ),
-                                              itemBuilder: (context, index) {
-                                                final item = items[index];
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        vertical: 12,
-                                                      ),
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        FoodTranslationHelper.getLocalizedFoodItemName(
-                                                          context,
-                                                          item,
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Expanded(
+                                              child: SingleChildScrollView(
+                                                padding: EdgeInsets.zero,
+                                                child: Column(
+                                                  children: [
+                                                    for (
+                                                      int i = 0;
+                                                      i < items.length;
+                                                      i++
+                                                    ) ...[
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              vertical: 12,
+                                                            ),
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              FoodTranslationHelper.getLocalizedFoodItemName(
+                                                                context,
+                                                                items[i],
+                                                              ),
+                                                              style: GoogleFonts.spaceGrotesk(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 4,
+                                                            ),
+                                                            Text(
+                                                              '${FoodTranslationHelper.getLocalizedPortion(context, items[i])} • ${items[i].calories} ${AppLocalizations.of(context)!.kcal}',
+                                                              style: GoogleFonts.spaceGrotesk(
+                                                                color: Colors
+                                                                    .white
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.6,
+                                                                    ),
+                                                                fontSize: 14,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 8,
+                                                            ),
+                                                            Row(
+                                                              children: [
+                                                                _MacroMiniTag(
+                                                                  label:
+                                                                      AppLocalizations.of(
+                                                                        context,
+                                                                      )!.protein,
+                                                                  value:
+                                                                      '${items[i].protein}g',
+                                                                  color: Colors
+                                                                      .cyanAccent,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 8,
+                                                                ),
+                                                                _MacroMiniTag(
+                                                                  label:
+                                                                      AppLocalizations.of(
+                                                                        context,
+                                                                      )!.carbs,
+                                                                  value:
+                                                                      '${items[i].carbs}g',
+                                                                  color: Colors
+                                                                      .amberAccent,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 8,
+                                                                ),
+                                                                _MacroMiniTag(
+                                                                  label:
+                                                                      AppLocalizations.of(
+                                                                        context,
+                                                                      )!.fat,
+                                                                  value:
+                                                                      '${items[i].fat}g',
+                                                                  color: Colors
+                                                                      .pinkAccent,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
                                                         ),
-                                                        style:
-                                                            GoogleFonts.spaceGrotesk(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
                                                       ),
-                                                      const SizedBox(height: 4),
-                                                      Text(
-                                                        '${FoodTranslationHelper.getLocalizedPortion(context, item)} • ${item.calories} ${AppLocalizations.of(context)!.kcal}',
-                                                        style:
-                                                            GoogleFonts.spaceGrotesk(
-                                                              color: Colors
-                                                                  .white
-                                                                  .withValues(
-                                                                    alpha: 0.6,
-                                                                  ),
-                                                              fontSize: 14,
-                                                            ),
-                                                      ),
-                                                      const SizedBox(height: 8),
-                                                      Row(
-                                                        children: [
-                                                          _MacroMiniTag(
-                                                            label:
-                                                                AppLocalizations.of(
-                                                                  context,
-                                                                )!.protein,
-                                                            value:
-                                                                '${item.protein}g',
-                                                            color: Colors
-                                                                .cyanAccent,
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 8,
-                                                          ),
-                                                          _MacroMiniTag(
-                                                            label:
-                                                                AppLocalizations.of(
-                                                                  context,
-                                                                )!.carbs,
-                                                            value:
-                                                                '${item.carbs}g',
-                                                            color: Colors
-                                                                .amberAccent,
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 8,
-                                                          ),
-                                                          _MacroMiniTag(
-                                                            label:
-                                                                AppLocalizations.of(
-                                                                  context,
-                                                                )!.fat,
-                                                            value:
-                                                                '${item.fat}g',
-                                                            color: Colors
-                                                                .pinkAccent,
-                                                          ),
-                                                        ],
-                                                      ),
+                                                      if (i < items.length - 1)
+                                                        Divider(
+                                                          color: Colors.white
+                                                              .withValues(
+                                                                alpha: 0.05,
+                                                              ),
+                                                        ),
                                                     ],
-                                                  ),
-                                                );
-                                              },
+                                                  ],
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   );
