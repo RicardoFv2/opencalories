@@ -44,6 +44,8 @@ class Meals extends Table {
   IntColumn get totalCalories => integer()();
   BoolColumn get isManualEntry =>
       boolean().withDefault(const Constant(false))();
+  // Store the AI confidence score
+  IntColumn get confidence => integer().withDefault(const Constant(0))();
 }
 
 @DataClassName('FoodItemEntity')
@@ -263,7 +265,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -274,6 +276,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 3) {
         await m.addColumn(foodItems, foodItems.nameTranslations);
+      }
+      if (from < 4) {
+        await m.addColumn(meals, meals.confidence);
       }
     },
   );

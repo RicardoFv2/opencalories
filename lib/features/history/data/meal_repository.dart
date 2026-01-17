@@ -40,6 +40,7 @@ class MealRepository {
       imagePath: Value(savedPath),
       totalCalories: totalCalories,
       isManualEntry: const Value(false),
+      confidence: Value(analysis.confidence),
     );
 
     final items = analysis.items

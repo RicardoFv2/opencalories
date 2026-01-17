@@ -681,6 +681,7 @@ class _MealCard extends StatelessWidget {
                   ),
                 )
                 .toList(),
+            confidence: meal.meal.confidence,
           );
           context.push(
             '/analysis',

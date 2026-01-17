@@ -74,6 +74,18 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _confidenceMeta = const VerificationMeta(
+    'confidence',
+  );
+  @override
+  late final GeneratedColumn<int> confidence = GeneratedColumn<int>(
+    'confidence',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -81,6 +93,7 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
     imagePath,
     totalCalories,
     isManualEntry,
+    confidence,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -131,6 +144,12 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
         ),
       );
     }
+    if (data.containsKey('confidence')) {
+      context.handle(
+        _confidenceMeta,
+        confidence.isAcceptableOrUnknown(data['confidence']!, _confidenceMeta),
+      );
+    }
     return context;
   }
 
@@ -160,6 +179,10 @@ class $MealsTable extends Meals with TableInfo<$MealsTable, MealEntity> {
         DriftSqlType.bool,
         data['${effectivePrefix}is_manual_entry'],
       )!,
+      confidence: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}confidence'],
+      )!,
     );
   }
 
@@ -175,12 +198,14 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
   final String? imagePath;
   final int totalCalories;
   final bool isManualEntry;
+  final int confidence;
   const MealEntity({
     required this.id,
     required this.createdAt,
     this.imagePath,
     required this.totalCalories,
     required this.isManualEntry,
+    required this.confidence,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -192,6 +217,7 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
     }
     map['total_calories'] = Variable<int>(totalCalories);
     map['is_manual_entry'] = Variable<bool>(isManualEntry);
+    map['confidence'] = Variable<int>(confidence);
     return map;
   }
 
@@ -204,6 +230,7 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
           : Value(imagePath),
       totalCalories: Value(totalCalories),
       isManualEntry: Value(isManualEntry),
+      confidence: Value(confidence),
     );
   }
 
@@ -218,6 +245,7 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
       imagePath: serializer.fromJson<String?>(json['imagePath']),
       totalCalories: serializer.fromJson<int>(json['totalCalories']),
       isManualEntry: serializer.fromJson<bool>(json['isManualEntry']),
+      confidence: serializer.fromJson<int>(json['confidence']),
     );
   }
   @override
@@ -229,6 +257,7 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
       'imagePath': serializer.toJson<String?>(imagePath),
       'totalCalories': serializer.toJson<int>(totalCalories),
       'isManualEntry': serializer.toJson<bool>(isManualEntry),
+      'confidence': serializer.toJson<int>(confidence),
     };
   }
 
@@ -238,12 +267,14 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
     Value<String?> imagePath = const Value.absent(),
     int? totalCalories,
     bool? isManualEntry,
+    int? confidence,
   }) => MealEntity(
     id: id ?? this.id,
     createdAt: createdAt ?? this.createdAt,
     imagePath: imagePath.present ? imagePath.value : this.imagePath,
     totalCalories: totalCalories ?? this.totalCalories,
     isManualEntry: isManualEntry ?? this.isManualEntry,
+    confidence: confidence ?? this.confidence,
   );
   MealEntity copyWithCompanion(MealsCompanion data) {
     return MealEntity(
@@ -256,6 +287,9 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
       isManualEntry: data.isManualEntry.present
           ? data.isManualEntry.value
           : this.isManualEntry,
+      confidence: data.confidence.present
+          ? data.confidence.value
+          : this.confidence,
     );
   }
 
@@ -266,14 +300,21 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
           ..write('createdAt: $createdAt, ')
           ..write('imagePath: $imagePath, ')
           ..write('totalCalories: $totalCalories, ')
-          ..write('isManualEntry: $isManualEntry')
+          ..write('isManualEntry: $isManualEntry, ')
+          ..write('confidence: $confidence')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, createdAt, imagePath, totalCalories, isManualEntry);
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    imagePath,
+    totalCalories,
+    isManualEntry,
+    confidence,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -282,7 +323,8 @@ class MealEntity extends DataClass implements Insertable<MealEntity> {
           other.createdAt == this.createdAt &&
           other.imagePath == this.imagePath &&
           other.totalCalories == this.totalCalories &&
-          other.isManualEntry == this.isManualEntry);
+          other.isManualEntry == this.isManualEntry &&
+          other.confidence == this.confidence);
 }
 
 class MealsCompanion extends UpdateCompanion<MealEntity> {
@@ -291,12 +333,14 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
   final Value<String?> imagePath;
   final Value<int> totalCalories;
   final Value<bool> isManualEntry;
+  final Value<int> confidence;
   const MealsCompanion({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.imagePath = const Value.absent(),
     this.totalCalories = const Value.absent(),
     this.isManualEntry = const Value.absent(),
+    this.confidence = const Value.absent(),
   });
   MealsCompanion.insert({
     this.id = const Value.absent(),
@@ -304,6 +348,7 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
     this.imagePath = const Value.absent(),
     required int totalCalories,
     this.isManualEntry = const Value.absent(),
+    this.confidence = const Value.absent(),
   }) : createdAt = Value(createdAt),
        totalCalories = Value(totalCalories);
   static Insertable<MealEntity> custom({
@@ -312,6 +357,7 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
     Expression<String>? imagePath,
     Expression<int>? totalCalories,
     Expression<bool>? isManualEntry,
+    Expression<int>? confidence,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -319,6 +365,7 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
       if (imagePath != null) 'image_path': imagePath,
       if (totalCalories != null) 'total_calories': totalCalories,
       if (isManualEntry != null) 'is_manual_entry': isManualEntry,
+      if (confidence != null) 'confidence': confidence,
     });
   }
 
@@ -328,6 +375,7 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
     Value<String?>? imagePath,
     Value<int>? totalCalories,
     Value<bool>? isManualEntry,
+    Value<int>? confidence,
   }) {
     return MealsCompanion(
       id: id ?? this.id,
@@ -335,6 +383,7 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
       imagePath: imagePath ?? this.imagePath,
       totalCalories: totalCalories ?? this.totalCalories,
       isManualEntry: isManualEntry ?? this.isManualEntry,
+      confidence: confidence ?? this.confidence,
     );
   }
 
@@ -356,6 +405,9 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
     if (isManualEntry.present) {
       map['is_manual_entry'] = Variable<bool>(isManualEntry.value);
     }
+    if (confidence.present) {
+      map['confidence'] = Variable<int>(confidence.value);
+    }
     return map;
   }
 
@@ -366,7 +418,8 @@ class MealsCompanion extends UpdateCompanion<MealEntity> {
           ..write('createdAt: $createdAt, ')
           ..write('imagePath: $imagePath, ')
           ..write('totalCalories: $totalCalories, ')
-          ..write('isManualEntry: $isManualEntry')
+          ..write('isManualEntry: $isManualEntry, ')
+          ..write('confidence: $confidence')
           ..write(')'))
         .toString();
   }
@@ -904,6 +957,7 @@ typedef $$MealsTableCreateCompanionBuilder =
       Value<String?> imagePath,
       required int totalCalories,
       Value<bool> isManualEntry,
+      Value<int> confidence,
     });
 typedef $$MealsTableUpdateCompanionBuilder =
     MealsCompanion Function({
@@ -912,6 +966,7 @@ typedef $$MealsTableUpdateCompanionBuilder =
       Value<String?> imagePath,
       Value<int> totalCalories,
       Value<bool> isManualEntry,
+      Value<int> confidence,
     });
 
 final class $$MealsTableReferences
@@ -967,6 +1022,11 @@ class $$MealsTableFilterComposer extends Composer<_$AppDatabase, $MealsTable> {
 
   ColumnFilters<bool> get isManualEntry => $composableBuilder(
     column: $table.isManualEntry,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get confidence => $composableBuilder(
+    column: $table.confidence,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1029,6 +1089,11 @@ class $$MealsTableOrderingComposer
     column: $table.isManualEntry,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get confidence => $composableBuilder(
+    column: $table.confidence,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$MealsTableAnnotationComposer
@@ -1056,6 +1121,11 @@ class $$MealsTableAnnotationComposer
 
   GeneratedColumn<bool> get isManualEntry => $composableBuilder(
     column: $table.isManualEntry,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get confidence => $composableBuilder(
+    column: $table.confidence,
     builder: (column) => column,
   );
 
@@ -1118,12 +1188,14 @@ class $$MealsTableTableManager
                 Value<String?> imagePath = const Value.absent(),
                 Value<int> totalCalories = const Value.absent(),
                 Value<bool> isManualEntry = const Value.absent(),
+                Value<int> confidence = const Value.absent(),
               }) => MealsCompanion(
                 id: id,
                 createdAt: createdAt,
                 imagePath: imagePath,
                 totalCalories: totalCalories,
                 isManualEntry: isManualEntry,
+                confidence: confidence,
               ),
           createCompanionCallback:
               ({
@@ -1132,12 +1204,14 @@ class $$MealsTableTableManager
                 Value<String?> imagePath = const Value.absent(),
                 required int totalCalories,
                 Value<bool> isManualEntry = const Value.absent(),
+                Value<int> confidence = const Value.absent(),
               }) => MealsCompanion.insert(
                 id: id,
                 createdAt: createdAt,
                 imagePath: imagePath,
                 totalCalories: totalCalories,
                 isManualEntry: isManualEntry,
+                confidence: confidence,
               ),
           withReferenceMapper: (p0) => p0
               .map(

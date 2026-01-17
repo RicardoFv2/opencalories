@@ -180,51 +180,57 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                           ),
                         ),
                       ),
-                      Positioned(
-                        top: 16,
-                        left: 16,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: BackdropFilter(
-                            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
+                      if ((widget.analysis?.confidence ?? 0) > 0)
+                        Positioned(
+                          top: 16,
+                          left: 16,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: BackdropFilter(
+                              filter: ui.ImageFilter.blur(
+                                sigmaX: 10,
+                                sigmaY: 10,
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.black54,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: AppTheme.primary.withValues(
-                                    alpha: 0.3,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: AppTheme.primary.withValues(
+                                      alpha: 0.3,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.auto_awesome,
-                                    color: AppTheme.primary,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    AppLocalizations.of(context)!.matchPercent(
-                                      widget.analysis?.confidence ?? 0,
-                                    ),
-                                    style: GoogleFonts.spaceGrotesk(
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.auto_awesome,
                                       color: AppTheme.primary,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
+                                      size: 14,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.matchPercent(
+                                        widget.analysis?.confidence ?? 0,
+                                      ),
+                                      style: GoogleFonts.spaceGrotesk(
+                                        color: AppTheme.primary,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
 
                       Positioned(
                         bottom: 16,

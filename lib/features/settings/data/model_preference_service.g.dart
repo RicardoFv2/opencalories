@@ -7,7 +7,7 @@ part of 'model_preference_service.dart';
 // **************************************************************************
 
 String _$modelPreferenceServiceHash() =>
-    r'31be994ccd70ed03eaf4750b90f1936aa31ff0fa';
+    r'08e0eb1b849dc031ee587fd8907252159a4882a8';
 
 /// See also [modelPreferenceService].
 @ProviderFor(modelPreferenceService)
@@ -27,7 +27,7 @@ final modelPreferenceServiceProvider =
 typedef ModelPreferenceServiceRef =
     AutoDisposeProviderRef<ModelPreferenceService>;
 String _$modelPreferenceServiceInitializedHash() =>
-    r'571e14ca01d6a6ce063e1bbb289d1b467c81d055';
+    r'9b7c2e8d3486e0f9b73565df4e26a33d1a2c6f02';
 
 /// See also [modelPreferenceServiceInitialized].
 @ProviderFor(modelPreferenceServiceInitialized)
