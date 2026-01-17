@@ -137,33 +137,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppTheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppTheme.primary.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.usb, size: 16, color: AppTheme.primary),
-                SizedBox(width: 4),
-                Text(
-                  AppLocalizations.of(context)!.pro,
-                  style: TextStyle(
-                    color: AppTheme.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        actions: [],
       ),
       body: SingleChildScrollView(
         child: Column(
