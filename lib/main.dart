@@ -22,7 +22,7 @@ class MyApp extends ConsumerWidget {
       title: 'OpenCalories',
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       routerConfig: router,
       // Localization Setup
       locale: language.valueOrNull, // Overrides system default if set
