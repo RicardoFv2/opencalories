@@ -9,6 +9,8 @@ const String _kResultsShowcase = 'hasShownResultsTutorial';
 const String _kHistoryShowcase = 'hasShownHistoryTutorial';
 const String _kManualShowcase = 'hasShownManualTutorial';
 const String _kWeeklyShowcase = 'hasShownWeeklyTutorial';
+const String _kSettingsShowcase = 'hasShownSettingsTutorial';
+const String _kWelcomeShowcase = 'hasShownWelcomeTutorial';
 
 @Riverpod(keepAlive: true)
 class TutorialService extends _$TutorialService {
@@ -36,6 +38,14 @@ class TutorialService extends _$TutorialService {
   /// Check if the weekly summary tutorial has been shown
   bool get hasShownWeeklyTutorial => _prefs.getBool(_kWeeklyShowcase) ?? false;
 
+  /// Check if the settings tutorial has been shown
+  bool get hasShownSettingsTutorial =>
+      _prefs.getBool(_kSettingsShowcase) ?? false;
+
+  /// Check if the welcome tutorial has been shown
+  bool get hasShownWelcomeTutorial =>
+      _prefs.getBool(_kWelcomeShowcase) ?? false;
+
   /// Mark the home tutorial as shown
   Future<void> markHomeTutorialShown() async {
     await _prefs.setBool(_kHomeShowcase, true);
@@ -61,6 +71,16 @@ class TutorialService extends _$TutorialService {
     await _prefs.setBool(_kWeeklyShowcase, true);
   }
 
+  /// Mark the settings tutorial as shown
+  Future<void> markSettingsTutorialShown() async {
+    await _prefs.setBool(_kSettingsShowcase, true);
+  }
+
+  /// Mark the welcome tutorial as shown
+  Future<void> markWelcomeTutorialShown() async {
+    await _prefs.setBool(_kWelcomeShowcase, true);
+  }
+
   /// Reset all tutorials (for testing/debugging)
   Future<void> resetTutorials() async {
     await _prefs.remove(_kHomeShowcase);
@@ -68,5 +88,7 @@ class TutorialService extends _$TutorialService {
     await _prefs.remove(_kHistoryShowcase);
     await _prefs.remove(_kManualShowcase);
     await _prefs.remove(_kWeeklyShowcase);
+    await _prefs.remove(_kSettingsShowcase);
+    await _prefs.remove(_kWelcomeShowcase);
   }
 }
