@@ -5,6 +5,8 @@ import 'package:opencalories/features/settings/data/api_key_repository.dart';
 import 'package:opencalories/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:opencalories/features/history/data/daily_calories_provider.dart';
+
 // Generate mocks if we were using generated mocks, but for simple storage we can mock manually or use InMemory
 // However, since we rely on FlutterSecureStorage, we need to mock it or the repository.
 // To keep it simple for this sprint verify, we will override the repository provider.
@@ -78,7 +80,10 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [apiKeyRepositoryProvider.overrideWith((ref) => mockRepo)],
+        overrides: [
+          apiKeyRepositoryProvider.overrideWith((ref) => mockRepo),
+          dailyCaloriesProvider.overrideWith((ref) => Stream.value(1500)),
+        ],
         child: const MyApp(),
       ),
     );
@@ -91,7 +96,8 @@ void main() {
     bool found = false;
     for (int i = 0; i < 30; i++) {
       await tester.pump(const Duration(milliseconds: 100));
-      if (find.text('HISTORY').evaluate().isNotEmpty) {
+      // Look for Scanner Screen title "Scan Meal" or similar unique element
+      if (find.text('Scan Meal').evaluate().isNotEmpty) {
         found = true;
         break;
       }
@@ -99,11 +105,11 @@ void main() {
     expect(
       found,
       isTrue,
-      reason: 'Should have navigated to History (Home) Screen',
+      reason: 'Should have navigated to Scanner Screen (Camera First)',
     );
 
-    // Verify we are on History Screen (Home)
-    expect(find.text('HISTORY'), findsOneWidget);
+    // Verify we are on Scanner Screen
+    expect(find.text('Scan Meal'), findsOneWidget);
 
     // Explicitly dispose to clean up infinite animations
     await tester.pumpWidget(Container());

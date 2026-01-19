@@ -49,7 +49,7 @@ GoRouter appRouter(Ref ref) {
       if (hasKey) {
         // No debería poder ver splash ni welcome
         if (isWelcome || isSplash) {
-          return '/';
+          return '/scan';
         }
         return null; // Dejarlo pasar a donde iba (ej. settings, scan, history)
       }

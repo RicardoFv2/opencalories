@@ -49,8 +49,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   void _navigateBasedOnKey(String? apiKey) {
     if (apiKey != null && apiKey.isNotEmpty) {
-      // Tiene Key -> Ir a History (Home)
-      context.go('/');
+      // Tiene Key -> Ir directo a Scanner (Camera First UX)
+      context.go('/scan');
     } else {
       // No tiene Key -> Ir a Welcome
       context.go('/welcome');

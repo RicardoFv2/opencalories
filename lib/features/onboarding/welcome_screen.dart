@@ -12,14 +12,28 @@ import '../../core/services/tutorial_service.dart';
 const _tutorialBg = Color(0xFF102216); // Deep Forest
 const _tutorialText = Color(0xFF13EC5B); // Neon Green
 
-class WelcomeScreen extends ConsumerStatefulWidget {
+class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
 
   @override
-  ConsumerState<WelcomeScreen> createState() => _WelcomeScreenState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ShowCaseWidget(
+      onFinish: () {
+        ref.read(tutorialServiceProvider.notifier).markWelcomeTutorialShown();
+      },
+      builder: (context) => const _WelcomeContent(),
+    );
+  }
 }
 
-class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
+class _WelcomeContent extends ConsumerStatefulWidget {
+  const _WelcomeContent();
+
+  @override
+  ConsumerState<_WelcomeContent> createState() => _WelcomeContentState();
+}
+
+class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
   final _startScanningKey = GlobalKey();
   bool _tutorialStarted = false;
 
@@ -41,67 +55,107 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ShowCaseWidget(
-      onFinish: () {
-        ref.read(tutorialServiceProvider.notifier).markWelcomeTutorialShown();
-      },
-      builder: (context) => Scaffold(
-        body: Stack(
-          children: [
-            // Background Decor
-            Positioned(
-              top: -100,
-              left: -100,
-              child: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).primaryColor.withValues(alpha: 0.2),
-                      blurRadius: 100,
-                      spreadRadius: 50,
-                    ),
-                  ],
-                ),
+    // Determine screen size for responsive layout
+    final size = MediaQuery.of(context).size;
+    final isSmallScreen = size.height < 700;
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Background Decor
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(
+                      context,
+                    ).primaryColor.withValues(alpha: 0.2),
+                    blurRadius: 100,
+                    spreadRadius: 50,
+                  ),
+                ],
               ),
             ),
+          ),
 
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 32),
-                    // Logo
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.local_dining,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          AppLocalizations.of(context)!.openCalories,
-                          style: Theme.of(context).textTheme.labelLarge
-                              ?.copyWith(
-                                letterSpacing: 2,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white70,
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (isSmallScreen)
+                    const SizedBox(height: 16)
+                  else
+                    const Spacer(),
+
+                  // Logo/Illustration Placeholder
+                  Center(
+                    child:
+                        Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                color: AppTheme.surfaceDark,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppTheme.primary.withValues(
+                                      alpha: 0.2,
+                                    ),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
                               ),
-                        ),
-                      ],
+                              child: const Icon(
+                                Icons.local_dining_rounded,
+                                size: 64,
+                                color: AppTheme.primary,
+                              ),
+                            )
+                            .animate()
+                            .scale(duration: 600.ms, curve: Curves.easeOutBack)
+                            .fadeIn(duration: 600.ms),
+                  ),
+
+                  SizedBox(height: isSmallScreen ? 24 : 32),
+
+                  // Welcome Text
+                  Text(
+                    AppLocalizations.of(context)!.openCalories,
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
+                    textAlign: TextAlign.center,
+                  ).animate().fadeIn(delay: 200.ms).moveY(begin: 20, end: 0),
 
-                    const SizedBox(height: 32),
+                  const SizedBox(height: 16),
 
-                    // Hero Image Area
+                  Text(
+                    AppLocalizations.of(context)!.welcomeDescription,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.grey[400],
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ).animate().fadeIn(delay: 400.ms).moveY(begin: 20, end: 0),
+
+                  if (isSmallScreen)
+                    const SizedBox(height: 24)
+                  else
+                    const Spacer(),
+
+                  // Hero Image Area (Only show on larger screens or reduce size)
+                  if (!isSmallScreen)
                     Expanded(
                       flex: 3,
                       child: Container(
@@ -121,7 +175,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            // Placeholder Image (Apple/Scanner visual)
+                            // Placeholder Image
                             Image.network(
                               'https://lh3.googleusercontent.com/aida-public/AB6AXuB90KLW_KTbgpqU3Sp_lJ7_7BxuT6-hgaErq-3qge2Uf9L-amejkYHY3q9Ajel5Hnj8l8oeqt6bGMQANZNzyee2t4uVSTeNAFRg7gs8u0dbOCJRifLelP_py1xKBxze_i-Yu7oudM-WjsQkBswPZD1sY__CYYvqfrcIRXXKxPzzrpnU9ufp8a81_dgfNPRjxV6yv1FgaqQ20_CR0hRHrP72mTwwHzbifezv-i5Wj1nxXyOK1VdbG-myCTBff1of9oT0-Oqd6CWbYNs',
                               fit: BoxFit.cover,
@@ -256,162 +310,119 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       ),
                     ),
 
-                    // Text & Actions
-                    SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              style: Theme.of(context).textTheme.displayMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                    height: 1.1,
-                                    color: Colors.white,
-                                  ),
-                              children: [
-                                TextSpan(
-                                  text: AppLocalizations.of(context)!.seeWhat,
-                                ),
-                                TextSpan(
-                                  text: AppLocalizations.of(context)!.youEat,
-                                  style: TextStyle(
-                                    shadows: [
-                                      Shadow(
-                                        color: AppTheme.primary.withValues(
-                                          alpha: 0.5,
-                                        ),
-                                        blurRadius: 10,
-                                      ),
-                                    ],
-                                    decoration: TextDecoration.none,
-                                    foreground: Paint()
-                                      ..shader =
-                                          const LinearGradient(
-                                            colors: [
-                                              AppTheme.primary,
-                                              Color(0xFF34D399),
-                                            ],
-                                          ).createShader(
-                                            const Rect.fromLTWH(0, 0, 200, 70),
-                                          ),
-                                  ),
-                                ),
-                              ],
+                  const Spacer(),
+
+                  // Action Buttons
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Start Scanning Button
+                      Showcase(
+                            key: _startScanningKey,
+                            title: AppLocalizations.of(
+                              context,
+                            )!.scanMeal, // Use valid key
+                            description: AppLocalizations.of(
+                              context,
+                            )!.tutorialCaptureDesc, // Use valid key
+                            tooltipBackgroundColor: _tutorialBg,
+                            titleTextStyle: const TextStyle(
+                              color: _tutorialText,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          Text(
-                            AppLocalizations.of(context)!.welcomeDescription,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: Colors.grey[400],
-                                  height: 1.5,
-                                ),
-                          ),
-
-                          const SizedBox(height: 32),
-
-                          // Primary Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 56,
-                            child: Showcase(
-                              key: _startScanningKey,
-                              description: 'Configura tu IA aquí para empezar',
-                              tooltipBackgroundColor: _tutorialBg,
-                              textColor: _tutorialText,
-                              child:
-                                  FilledButton(
-                                        onPressed: () =>
-                                            context.go('/settings'),
-                                        style: FilledButton.styleFrom(
-                                          backgroundColor: AppTheme.primary,
-                                          foregroundColor:
-                                              AppTheme.backgroundDark,
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(Icons.center_focus_weak),
-                                            SizedBox(width: 8),
-                                            Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.startScanning,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                      .animate(
-                                        onPlay: (c) =>
-                                            c.repeat(period: 3.seconds),
-                                      )
-                                      .shimmer(
-                                        duration: 1.5.seconds,
-                                        color: Colors.white.withValues(
-                                          alpha: 0.3,
-                                        ),
-                                      ),
+                            descTextStyle: TextStyle(
+                              color: _tutorialText.withValues(alpha: 0.8),
+                              fontSize: 14,
                             ),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // Secondary Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 52,
-                            child: OutlinedButton(
+                            overlayColor: Colors.black.withValues(alpha: 0.7),
+                            child: ElevatedButton(
                               onPressed: () {
-                                context.showAppSnackBar(
-                                  AppLocalizations.of(
-                                    context,
-                                  )!.deviceIntegrationComingSoon,
-                                );
+                                context.push('/scan');
                               },
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primary,
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
                                 ),
+                                elevation: 0,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.bluetooth_connected, size: 20),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    AppLocalizations.of(context)!.connectDevice,
-                                  ),
-                                ],
+                              child: Text(
+                                AppLocalizations.of(context)!.startScanning,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
+                          )
+                          .animate()
+                          .fadeIn(delay: 600.ms)
+                          .moveY(begin: 20, end: 0),
 
-                          const SizedBox(height: 16),
-                        ],
+                      const SizedBox(height: 16),
+
+                      TextButton(
+                        onPressed: () {
+                          context.push('/settings');
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white70,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.unlockGeminiAI, // Use valid key
+                        ),
+                      ).animate().fadeIn(delay: 800.ms),
+
+                      const SizedBox(height: 12),
+
+                      // Secondary Button (Connect Device)
+                      SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            context.showAppSnackBar(
+                              AppLocalizations.of(
+                                context,
+                              )!.deviceIntegrationComingSoon,
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.1),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.bluetooth_connected, size: 20),
+                              SizedBox(width: 8),
+                              Text(AppLocalizations.of(context)!.connectDevice),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+
+                  SizedBox(height: isSmallScreen ? 16 : 32),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

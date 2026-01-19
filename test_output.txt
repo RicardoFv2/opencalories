@@ -1,105 +1,25 @@
 00:00 +0: loading E:/PersonalProyects/opencalories/test/navigation_test.dart
-lib/features/analysis/presentation/analysis_result_screen.dart:146:39: Error: Not a constant expression.
-                  AppLocalizations.of(context)!.pro,
-                                      ^^^^^^^
-lib/features/analysis/presentation/analysis_result_screen.dart:146:36: Error: Method invocation is not a constant expression.
-                  AppLocalizations.of(context)!.pro,
-                                   ^^
-lib/features/analysis/presentation/analysis_result_screen.dart:491:43: Error: Not a constant expression.
-                      AppLocalizations.of(context)!.kcal,
-                                          ^^^^^^^
-lib/features/analysis/presentation/analysis_result_screen.dart:491:40: Error: Method invocation is not a constant expression.
-                      AppLocalizations.of(context)!.kcal,
-                                       ^^
-lib/features/analysis/presentation/analysis_result_screen.dart:556:51: Error: Not a constant expression.
-                              AppLocalizations.of(context)!.macroDistribution,
-                                                  ^^^^^^^
-lib/features/analysis/presentation/analysis_result_screen.dart:556:48: Error: Method invocation is not a constant expression.
-                              AppLocalizations.of(context)!.macroDistribution,
-                                               ^^
-lib/features/onboarding/welcome_screen.dart:297:45: Error: Not a constant expression.
-                                            context,
-                                            ^^^^^^^
-lib/features/onboarding/welcome_screen.dart:296:60: Error: Method invocation is not a constant expression.
-                                          AppLocalizations.of(
-                                                           ^^
-lib/features/onboarding/welcome_screen.dart:345:55: Error: Not a constant expression.
-                                  AppLocalizations.of(context)!.connectDevice,
-                                                      ^^^^^^^
-lib/features/onboarding/welcome_screen.dart:345:52: Error: Method invocation is not a constant expression.
-                                  AppLocalizations.of(context)!.connectDevice,
-                                                   ^^
-lib/features/onboarding/welcome_screen.dart:236:31: Error: The method 'TextTextSpan' isn't defined for the type 'WelcomeScreen'.
- - 'WelcomeScreen' is from 'package:opencalories/features/onboarding/welcome_screen.dart' ('lib/features/onboarding/welcome_screen.dart').
-Try correcting the name to the name of an existing method, or defining a method named 'TextTextSpan'.
-                              TextTextSpan(
-                              ^^^^^^^^^^^^
-lib/features/analysis/presentation/analysis_result_screen.dart:146:47: Error: Not a constant expression.
-                  AppLocalizations.of(context)!.pro,
-                                              ^
-lib/features/analysis/presentation/analysis_result_screen.dart:491:51: Error: Not a constant expression.
-                      AppLocalizations.of(context)!.kcal,
-                                                  ^
-lib/features/analysis/presentation/analysis_result_screen.dart:556:59: Error: Not a constant expression.
-                              AppLocalizations.of(context)!.macroDistribution,
-                                                          ^
-lib/features/onboarding/welcome_screen.dart:298:44: Error: Not a constant expression.
-                                          )!.startScanning,
-                                           ^
-lib/features/onboarding/welcome_screen.dart:345:63: Error: Not a constant expression.
-                                  AppLocalizations.of(context)!.connectDevice,
-                                                              ^
-00:00 +0 -1: loading E:/PersonalProyects/opencalories/test/navigation_test.dart [E]
-  Failed to load "E:/PersonalProyects/opencalories/test/navigation_test.dart":
-  Compilation failed for testPath=E:/PersonalProyects/opencalories/test/navigation_test.dart: lib/features/analysis/presentation/analysis_result_screen.dart:146:39: Error: Not a constant expression.
-                    AppLocalizations.of(context)!.pro,
-                                        ^^^^^^^
-  lib/features/analysis/presentation/analysis_result_screen.dart:146:36: Error: Method invocation is not a constant expression.
-                    AppLocalizations.of(context)!.pro,
-                                     ^^
-  lib/features/analysis/presentation/analysis_result_screen.dart:491:43: Error: Not a constant expression.
-                        AppLocalizations.of(context)!.kcal,
-                                            ^^^^^^^
-  lib/features/analysis/presentation/analysis_result_screen.dart:491:40: Error: Method invocation is not a constant expression.
-                        AppLocalizations.of(context)!.kcal,
-                                         ^^
-  lib/features/analysis/presentation/analysis_result_screen.dart:556:51: Error: Not a constant expression.
-                                AppLocalizations.of(context)!.macroDistribution,
-                                                    ^^^^^^^
-  lib/features/analysis/presentation/analysis_result_screen.dart:556:48: Error: Method invocation is not a constant expression.
-                                AppLocalizations.of(context)!.macroDistribution,
-                                                 ^^
-  lib/features/onboarding/welcome_screen.dart:297:45: Error: Not a constant expression.
-                                              context,
-                                              ^^^^^^^
-  lib/features/onboarding/welcome_screen.dart:296:60: Error: Method invocation is not a constant expression.
-                                            AppLocalizations.of(
-                                                             ^^
-  lib/features/onboarding/welcome_screen.dart:345:55: Error: Not a constant expression.
-                                    AppLocalizations.of(context)!.connectDevice,
-                                                        ^^^^^^^
-  lib/features/onboarding/welcome_screen.dart:345:52: Error: Method invocation is not a constant expression.
-                                    AppLocalizations.of(context)!.connectDevice,
-                                                     ^^
-  lib/features/onboarding/welcome_screen.dart:236:31: Error: The method 'TextTextSpan' isn't defined for the type 'WelcomeScreen'.
-   - 'WelcomeScreen' is from 'package:opencalories/features/onboarding/welcome_screen.dart' ('lib/features/onboarding/welcome_screen.dart').
-  Try correcting the name to the name of an existing method, or defining a method named 'TextTextSpan'.
-                                TextTextSpan(
-                                ^^^^^^^^^^^^
-  lib/features/analysis/presentation/analysis_result_screen.dart:146:47: Error: Not a constant expression.
-                    AppLocalizations.of(context)!.pro,
-                                                ^
-  lib/features/analysis/presentation/analysis_result_screen.dart:491:51: Error: Not a constant expression.
-                        AppLocalizations.of(context)!.kcal,
-                                                    ^
-  lib/features/analysis/presentation/analysis_result_screen.dart:556:59: Error: Not a constant expression.
-                                AppLocalizations.of(context)!.macroDistribution,
-                                                            ^
-  lib/features/onboarding/welcome_screen.dart:298:44: Error: Not a constant expression.
-                                            )!.startScanning,
-                                             ^
-  lib/features/onboarding/welcome_screen.dart:345:63: Error: Not a constant expression.
-                                    AppLocalizations.of(context)!.connectDevice,
-                                                                ^
-  .
-00:00 +0 -1: Some tests failed.
+00:00 +0: App redirects to WelcomeScreen when no API key is found
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following _Exception was thrown running a test:
+Exception: Please provide ShowCaseView context
+
+When the exception was thrown, this was the stack:
+#0      ShowCaseWidget.of (package:showcaseview/src/showcase_widget.dart:114:7)
+#1      _WelcomeScreenState.initState.<anonymous closure> (package:opencalories/features/onboarding/welcome_screen.dart:36:26)
+<asynchronous suspension>
+
+The test description was:
+  App redirects to WelcomeScreen when no API key is found
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:00 +0 -1: App redirects to WelcomeScreen when no API key is found [E]
+  Test failed. See exception logs above.
+  The test description was: App redirects to WelcomeScreen when no API key is found
+  
+Warning: At least one test in this suite creates an HttpClient. When running a test suite that uses
+TestWidgetsFlutterBinding, all HTTP requests will return status code 400, and no network request
+will actually be made. Any test expecting a real network connection and status code will fail.
+To test code that needs an HttpClient, provide your own HttpClient implementation to the code under
+test, so that your test can consistently provide a testable response to the code under test.
+00:00 +0 -1: App allows Home when API key is present
+00:01 +1 -1: Some tests failed.

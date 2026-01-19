@@ -17,6 +17,7 @@ import '../../settings/data/model_preference_service.dart';
 import '../../analysis/presentation/analysis_controller.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
+import '../../history/data/daily_calories_provider.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -285,6 +286,15 @@ class _ScannerContent extends HookConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Daily Calories Badge (New Overlay)
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: const _DailyCaloriesBadge(),
+                  ),
+                ),
+
                 // Active Badge
                 Showcase(
                   key: modelBadgeKey,
@@ -803,7 +813,7 @@ class _ModelSelectorSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'AI Model',
+                'Select AI Model',
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -893,6 +903,81 @@ class _ModelSelectorSheet extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DailyCaloriesBadge extends ConsumerWidget {
+  const _DailyCaloriesBadge();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch daily calories
+    final dailyCaloriesAsync = ref.watch(dailyCaloriesProvider);
+
+    return dailyCaloriesAsync.when(
+      data: (calories) {
+        return GestureDetector(
+          onTap: () => context.go('/'), // Quick access to history
+          child:
+              Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: AppTheme.primary.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.local_fire_department,
+                          color: AppTheme.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '$calories kcal',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.chevron_right,
+                          color: Colors.white54,
+                          size: 16,
+                        ),
+                      ],
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(duration: 600.ms)
+                  .slideY(
+                    begin: -0.5,
+                    end: 0,
+                    duration: 600.ms,
+                    curve: Curves.easeOutBack,
+                  ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (error, stackTrace) => const SizedBox.shrink(),
     );
   }
 }
