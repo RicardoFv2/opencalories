@@ -12,9 +12,9 @@ import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/services/calorie_goal_service.dart';
 import 'package:opencalories/core/widgets/skeleton_card.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
-import '../../../core/widgets/language_selector.dart';
-import '../../history/data/app_database.dart';
-import '../../analysis/domain/food_analysis.dart';
+import 'package:opencalories/core/widgets/language_selector.dart';
+import 'package:opencalories/features/history/data/app_database.dart';
+import 'package:opencalories/features/analysis/domain/food_analysis.dart';
 import 'package:opencalories/core/utils/food_translation_helper.dart';
 
 /// Tutorial colors (Cyberpunk Theme)

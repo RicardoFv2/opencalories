@@ -393,4 +393,21 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get noFoodDetected =>
       'No se detectó comida en la imagen. Por favor, escanea una comida.';
+
+  @override
+  String get editFoodItem => 'Editar Alimento';
+
+  @override
+  String get foodName => 'Nombre del Alimento';
+
+  @override
+  String get save => 'Guardar';
+
+  @override
+  String foodsDetectedCount(int count) {
+    return '$count Alimentos Detectados';
+  }
+
+  @override
+  String get editDetails => 'Editar';
 }

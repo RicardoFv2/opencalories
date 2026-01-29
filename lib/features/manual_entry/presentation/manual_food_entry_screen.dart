@@ -24,7 +24,6 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final nameKey = useMemoized(() => GlobalKey());
     final aiKey = useMemoized(() => GlobalKey());
-    final macrosKey = useMemoized(() => GlobalKey());
 
     // Auto-start tutorial
     useEffect(() {
@@ -33,7 +32,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
         final tutorialService = ref.read(tutorialServiceProvider.notifier);
 
         if (!tutorialService.hasShownManualTutorial && context.mounted) {
-          ShowCaseWidget.of(context).startShowCase([nameKey, aiKey, macrosKey]);
+          ShowCaseWidget.of(context).startShowCase([nameKey, aiKey]);
         }
       });
       return null;
@@ -41,10 +40,9 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
 
     final nameController = useTextEditingController();
     final portionController = useTextEditingController();
-    final caloriesController = useTextEditingController();
-    final proteinController = useTextEditingController();
-    final carbsController = useTextEditingController();
-    final fatController = useTextEditingController();
+
+    // We'll use a ValueNotifier/useState to store the estimated nutrition
+    final estimatedEntry = useState<ManualFoodEntry?>(null);
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final isSaving = useState(false);
@@ -57,11 +55,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
       if (name.isEmpty || portion.isEmpty) {
         context.showAppSnackBar(
           AppLocalizations.of(context)!.enterNameAndPortionError,
-          isError:
-              true, // Using error style (red) or custom logical if needed, but Utils default isError=false.
-          // Since original was orange, Utils mainly supports red/normal. Let's strictly follow Utils API.
-          // IsError=true makes it red. If we want orange, Utils needs update or we accept red/default.
-          // Given simplicity, let's treat validation error as error -> Red.
+          isError: true,
         );
         return;
       }
@@ -74,15 +68,17 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
 
         if (analysis.items.isNotEmpty) {
           final item = analysis.items.first;
-          caloriesController.text = item.calories.toString();
-          proteinController.text = item.protein.toString();
-          carbsController.text = item.carbs.toString();
-          fatController.text = item.fat.toString();
+          estimatedEntry.value = ManualFoodEntry(
+            name: item.name,
+            portion: item.portionEstimate,
+            calories: item.calories,
+            protein: item.protein,
+            carbs: item.carbs,
+            fat: item.fat,
+          );
 
           if (context.mounted) {
-            context.showAppSnackBar(
-              AppLocalizations.of(context)!.aiEstimationCompleted,
-            );
+            context.showAppSnackBar('¡Estimación completada!');
           }
         }
       } catch (e) {
@@ -98,35 +94,27 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
     }
 
     Future<void> saveEntry() async {
-      // Unfocus to ensure text fields commit their values
-      FocusManager.instance.primaryFocus?.unfocus();
-
-      if (formKey.currentState?.validate() != true) return;
+      if (estimatedEntry.value == null) {
+        context.showAppSnackBar(
+          'Por favor, estima primero con IA.',
+          isError: true,
+        );
+        return;
+      }
 
       isSaving.value = true;
       try {
-        final calText = caloriesController.text.trim().replaceAll(',', '.');
-        final proteinText = proteinController.text.trim().replaceAll(',', '.');
-        final carbsText = carbsController.text.trim().replaceAll(',', '.');
-        final fatText = fatController.text.trim().replaceAll(',', '.');
-
-        final entry = ManualFoodEntry(
-          name: nameController.text.trim(),
-          portion: portionController.text.trim(),
-          calories: double.tryParse(calText)?.round(),
-          protein: double.tryParse(proteinText)?.round(),
-          carbs: double.tryParse(carbsText)?.round(),
-          fat: double.tryParse(fatText)?.round(),
-        );
-
-        await ref.read(mealRepositoryProvider).saveManualMeal(entry);
+        await ref
+            .read(mealRepositoryProvider)
+            .saveManualMeal(estimatedEntry.value!);
 
         if (context.mounted) {
           context.go('/');
           context.showAppSnackBar(
-            AppLocalizations.of(
-              context,
-            )!.loggedFood(entry.name, entry.calories ?? 0),
+            AppLocalizations.of(context)!.loggedFood(
+              estimatedEntry.value!.name,
+              estimatedEntry.value!.calories ?? 0,
+            ),
           );
         }
       } catch (e) {
@@ -144,12 +132,9 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(
-          AppLocalizations.of(context)!.manualEntryTitle,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
-          ),
+        title: const Text(
+          'Búsqueda Asistida',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
         ),
         backgroundColor: Colors.transparent,
       ),
@@ -164,14 +149,17 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionTitle(
-                  AppLocalizations.of(context)!.requiredSection,
+                const Text(
+                  'Describe lo que comiste y la IA hará el resto.',
+                  style: TextStyle(color: Colors.white60, fontSize: 14),
                 ),
+                const SizedBox(height: 32),
+                _buildSectionTitle('DETALLES DEL ALIMENTO'),
                 const SizedBox(height: 16),
                 Showcase(
                   key: nameKey,
-                  title: AppLocalizations.of(context)!.tutorialNameTitle,
-                  description: AppLocalizations.of(context)!.tutorialNameDesc,
+                  title: 'Nombre del Alimento',
+                  description: 'Ej: 2 arepas, 1 hamburguesa, etc.',
                   tooltipBackgroundColor: _tutorialBg,
                   titleTextStyle: const TextStyle(
                     color: _tutorialText,
@@ -186,9 +174,6 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
                     controller: nameController,
                     label: AppLocalizations.of(context)!.foodNameLabel,
                     hint: AppLocalizations.of(context)!.foodNameHint,
-                    validator: (v) => v == null || v.isEmpty
-                        ? AppLocalizations.of(context)!.pleaseEnterName
-                        : null,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -196,17 +181,15 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
                   controller: portionController,
                   label: AppLocalizations.of(context)!.portionLabel,
                   hint: AppLocalizations.of(context)!.portionHint,
-                  validator: (v) => v == null || v.isEmpty
-                      ? AppLocalizations.of(context)!.pleaseEnterPortion
-                      : null,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
+                  height: 56,
                   child: Showcase(
                     key: aiKey,
-                    title: AppLocalizations.of(context)!.tutorialAiTitle,
-                    description: AppLocalizations.of(context)!.tutorialAiDesc,
+                    title: 'Magia de IA',
+                    description: 'Pulsa aquí para que la IA estime los macros.',
                     tooltipBackgroundColor: _tutorialBg,
                     titleTextStyle: const TextStyle(
                       color: _tutorialText,
@@ -217,7 +200,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
                       color: _tutorialText.withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
-                    child: OutlinedButton.icon(
+                    child: ElevatedButton.icon(
                       onPressed: isEstimating.value
                           ? null
                           : () async {
@@ -226,121 +209,52 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
                             },
                       icon: isEstimating.value
                           ? const SizedBox(
-                              width: 16,
-                              height: 16,
+                              width: 20,
+                              height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: AppTheme.primary,
+                                color: Colors.black,
                               ),
                             )
                           : const Icon(Icons.auto_awesome, size: 20),
                       label: Text(
-                        isEstimating.value
-                            ? AppLocalizations.of(context)!.estimating
-                            : AppLocalizations.of(
-                                context,
-                              )!.estimateWithAiAction,
+                        isEstimating.value ? 'ESTIMANDO...' : 'ESTIMAR CON IA',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppTheme.primary,
-                        side: const BorderSide(color: AppTheme.primary),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
+                        foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 48),
-                _buildSectionTitle(
-                  AppLocalizations.of(context)!.nutritionOptionalSection,
-                ),
-                const SizedBox(height: 16),
-                Showcase(
-                  key: macrosKey,
-                  title: AppLocalizations.of(context)!.tutorialFineTuneTitle,
-                  description: AppLocalizations.of(
-                    context,
-                  )!.tutorialFineTuneDesc,
-                  tooltipBackgroundColor: _tutorialBg,
-                  titleTextStyle: const TextStyle(
-                    color: _tutorialText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  descTextStyle: TextStyle(
-                    color: _tutorialText.withValues(alpha: 0.8),
-                    fontSize: 14,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTextField(
-                              controller: caloriesController,
-                              label: AppLocalizations.of(
-                                context,
-                              )!.caloriesLabel,
-                              hint: '0',
-                              keyboardType: TextInputType.number,
-                              suffix: AppLocalizations.of(context)!.kcal,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildTextField(
-                              controller: proteinController,
-                              label: AppLocalizations.of(context)!.protein,
-                              hint: '0',
-                              keyboardType: TextInputType.number,
-                              suffix: 'g',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTextField(
-                              controller: carbsController,
-                              label: AppLocalizations.of(context)!.carbs,
-                              hint: '0',
-                              keyboardType: TextInputType.number,
-                              suffix: 'g',
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildTextField(
-                              controller: fatController,
-                              label: AppLocalizations.of(context)!.fat,
-                              hint: '0',
-                              keyboardType: TextInputType.number,
-                              suffix: 'g',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 48),
+                if (estimatedEntry.value != null) ...[
+                  _buildSectionTitle('ESTIMACIÓN RESULTANTE'),
+                  const SizedBox(height: 16),
+                  _buildMacroPreview(estimatedEntry.value!),
+                  const SizedBox(height: 48),
+                ],
                 SizedBox(
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: isSaving.value
+                    onPressed: (isSaving.value || estimatedEntry.value == null)
                         ? null
                         : () async {
                             await HapticFeedback.heavyImpact();
                             saveEntry();
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primary,
-                      foregroundColor: Colors.black,
+                      backgroundColor: estimatedEntry.value == null
+                          ? Colors.white12
+                          : AppTheme.primary,
+                      foregroundColor: estimatedEntry.value == null
+                          ? Colors.white24
+                          : Colors.black,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -348,9 +262,9 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
                     ),
                     child: isSaving.value
                         ? const CircularProgressIndicator(color: Colors.black)
-                        : Text(
-                            AppLocalizations.of(context)!.logMealAction,
-                            style: const TextStyle(
+                        : const Text(
+                            'REGISTRAR ALIMENTO',
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                               letterSpacing: 1.2,
@@ -363,6 +277,47 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMacroPreview(ManualFoodEntry entry) {
+    return Column(
+      children: [
+        _MacroBox(
+          label: 'Calorías',
+          value: '${entry.calories} kcal',
+          color: AppTheme.primary,
+          isMain: true,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _MacroBox(
+                label: 'Prot',
+                value: '${entry.protein}g',
+                color: const Color(0xFF4ADE80),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _MacroBox(
+                label: 'Carb',
+                value: '${entry.carbs}g',
+                color: const Color(0xFF60A5FA),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _MacroBox(
+                label: 'Grasa',
+                value: '${entry.fat}g',
+                color: const Color(0xFFF87171),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -436,6 +391,54 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _MacroBox extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+  final bool isMain;
+
+  const _MacroBox({
+    required this.label,
+    required this.value,
+    required this.color,
+    this.isMain = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(isMain ? 20 : 16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              color: color.withValues(alpha: 0.7),
+              fontSize: isMain ? 14 : 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: isMain ? 28 : 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

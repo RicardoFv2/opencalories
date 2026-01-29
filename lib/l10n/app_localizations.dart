@@ -799,6 +799,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No food detected in image. Please scan a meal.'**
   String get noFoodDetected;
+
+  /// No description provided for @editFoodItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Food Item'**
+  String get editFoodItem;
+
+  /// No description provided for @foodName.
+  ///
+  /// In en, this message translates to:
+  /// **'Food Name'**
+  String get foodName;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @foodsDetectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Foods Detected'**
+  String foodsDetectedCount(int count);
+
+  /// No description provided for @editDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editDetails;
 }
 
 class _AppLocalizationsDelegate

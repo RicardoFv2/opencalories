@@ -2,18 +2,17 @@ import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../features/analysis/domain/food_analysis.dart';
-import '../../features/settings/data/api_key_repository.dart';
-import '../../features/settings/presentation/settings_screen.dart';
-import '../../features/scanner/presentation/scanner_screen.dart';
-import '../../features/analysis/presentation/analysis_result_screen.dart';
-import '../../features/analysis/presentation/full_screen_image_view.dart';
-import '../../features/onboarding/welcome_screen.dart';
-import '../../features/onboarding/splash_screen.dart';
-
-import '../../features/history/presentation/history_screen.dart';
-import '../../features/history/presentation/weekly_summary_screen.dart';
-import '../../features/manual_entry/presentation/manual_food_entry_screen.dart';
+import 'package:opencalories/features/analysis/domain/food_analysis.dart';
+import 'package:opencalories/features/settings/data/api_key_repository.dart';
+import 'package:opencalories/features/settings/presentation/settings_screen.dart';
+import 'package:opencalories/features/scanner/presentation/scanner_screen.dart';
+import 'package:opencalories/features/analysis/presentation/analysis_result_screen.dart';
+import 'package:opencalories/features/analysis/presentation/full_screen_image_view.dart';
+import 'package:opencalories/features/onboarding/welcome_screen.dart';
+import 'package:opencalories/features/onboarding/splash_screen.dart';
+import 'package:opencalories/features/history/presentation/history_screen.dart';
+import 'package:opencalories/features/history/presentation/weekly_summary_screen.dart';
+import 'package:opencalories/features/manual_entry/presentation/manual_food_entry_screen.dart';
 
 part 'app_router.g.dart';
 

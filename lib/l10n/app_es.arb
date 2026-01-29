@@ -130,5 +130,15 @@
   "tutorialTimeTravelDesc": "Usa las flechas para ver semanas anteriores.",
   "tutorialSelectDayTitle": "Selecciona un Día",
   "tutorialSelectDayDesc": "Toca un día para ver su historial.",
-  "noFoodDetected": "No se detectó comida en la imagen. Por favor, escanea una comida."
+  "noFoodDetected": "No se detectó comida en la imagen. Por favor, escanea una comida.",
+  "editFoodItem": "Editar Alimento",
+  "foodName": "Nombre del Alimento",
+  "save": "Guardar",
+  "foodsDetectedCount": "{count} Alimentos Detectados",
+  "@foodsDetectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "editDetails": "Editar"
 }

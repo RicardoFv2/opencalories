@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../data/api_key_repository.dart';
+import 'package:opencalories/features/settings/data/api_key_repository.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
-import '../data/model_preference_service.dart';
+import 'package:opencalories/features/settings/data/model_preference_service.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/services/calorie_goal_service.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
-import '../../../../core/widgets/language_selector.dart';
+import 'package:opencalories/core/widgets/language_selector.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -451,7 +451,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 32),
 
                 // New Language Selector
-                const LanguageSelector(),
+                LanguageSelector(),
 
                 const SizedBox(height: 48),
 
