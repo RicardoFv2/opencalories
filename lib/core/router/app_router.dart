@@ -87,10 +87,13 @@ GoRouter appRouter(Ref ref) {
           final analysis = extra?['analysis'] as FoodAnalysis?;
           final imageFile = extra?['image'] as File?;
           final isViewOnly = extra?['isViewOnly'] as bool? ?? false;
+          final mealIdRaw = extra?['mealId'];
+          final mealId = mealIdRaw is int ? mealIdRaw : null;
           return AnalysisResultScreen(
             analysis: analysis,
             imageFile: imageFile,
             isViewOnly: isViewOnly,
+            mealId: mealId,
           );
         },
       ),

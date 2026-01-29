@@ -240,6 +240,28 @@ class MealsDao extends DatabaseAccessor<AppDatabase> with _$MealsDaoMixin {
         .toList();
   }
 
+  Future<void> updateMeal(
+    int mealId,
+    MealsCompanion meal,
+    List<FoodItemsCompanion> items,
+  ) {
+    return transaction(() async {
+      // 1. Update the meal record
+      await (update(meals)..where((t) => t.id.equals(mealId))).write(meal);
+
+      // 2. Delete old items
+      await (delete(foodItems)..where((t) => t.mealId.equals(mealId))).go();
+
+      // 3. Insert new items
+      await batch((batch) {
+        batch.insertAll(
+          foodItems,
+          items.map((item) => item.copyWith(mealId: Value(mealId))).toList(),
+        );
+      });
+    });
+  }
+
   Future<void> deleteMeal(int mealId) {
     return transaction(() async {
       await (delete(foodItems)..where((t) => t.mealId.equals(mealId))).go();

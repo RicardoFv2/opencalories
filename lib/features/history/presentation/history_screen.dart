@@ -691,6 +691,7 @@ class _MealCard extends StatelessWidget {
                   ? File(meal.meal.imagePath!)
                   : null,
               'isViewOnly': true,
+              'mealId': meal.meal.id,
             },
           );
         },

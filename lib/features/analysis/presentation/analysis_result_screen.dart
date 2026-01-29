@@ -26,6 +26,7 @@ class AnalysisResultScreen extends ConsumerStatefulWidget {
   final FoodAnalysis? analysis;
   final File? imageFile;
   final bool isViewOnly;
+  final int? mealId;
 
   static const path = '/analysis-result';
 
@@ -34,6 +35,7 @@ class AnalysisResultScreen extends ConsumerStatefulWidget {
     this.analysis,
     this.imageFile,
     this.isViewOnly = false,
+    this.mealId,
   });
 
   @override
@@ -45,11 +47,13 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
   // Showcase key for the detected items section
   final _detectedItemsKey = GlobalKey();
   bool _isSaving = false;
+  FoodAnalysis? _originalAnalysis;
 
   @override
   void initState() {
     super.initState();
     if (widget.isViewOnly && widget.analysis != null) {
+      _originalAnalysis = widget.analysis;
       // Small delay to ensure ref is accessible
       Future.microtask(() {
         ref
@@ -90,6 +94,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
       error: (error, stack) =>
           Scaffold(body: Center(child: Text('Error: $error'))),
       data: (analysis) {
+        debugPrint(
+          'AnalysisResultScreen: isViewOnly=${widget.isViewOnly}, mealId=${widget.mealId}',
+        );
         final items = analysis?.items ?? [];
         final totalCalories = items.fold<int>(
           0,
@@ -115,6 +122,12 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
         );
       },
     );
+  }
+
+  bool _hasChanges(FoodAnalysis? current) {
+    if (!widget.isViewOnly) return true; // Always show check/log for new scans
+    if (_originalAnalysis == null || current == null) return false;
+    return _originalAnalysis != current;
   }
 
   Widget _buildContent(
@@ -449,72 +462,118 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            Expanded(
-              child: FilledButton.icon(
-                onPressed: () => context.pop(),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white10,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+            if (!widget.isViewOnly) ...[
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.white10,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  icon: const Icon(Icons.replay),
+                  label: Text(AppLocalizations.of(context)!.retake),
                 ),
-                icon: const Icon(Icons.replay),
-                label: Text(AppLocalizations.of(context)!.retake),
               ),
-            ),
-            const SizedBox(width: 16),
+              const SizedBox(width: 16),
+            ],
             Expanded(
               flex: 2,
-              child: ElevatedButton.icon(
-                onPressed: _isSaving
-                    ? null
-                    : () async {
-                        if (analysis == null || analysis.items.isEmpty) {
-                          if (context.mounted) {
-                            context.showAppSnackBar(
-                              AppLocalizations.of(context)!.noItemsToSave,
-                              isError: true,
-                            );
-                          }
-                          return;
-                        }
+              child:
+                  ElevatedButton.icon(
+                        onPressed: _isSaving
+                            ? null
+                            : () async {
+                                if (analysis == null ||
+                                    analysis.items.isEmpty) {
+                                  if (context.mounted) {
+                                    context.showAppSnackBar(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.noItemsToSave,
+                                      isError: true,
+                                    );
+                                  }
+                                  return;
+                                }
 
-                        await HapticFeedback.heavyImpact();
-                        setState(() => _isSaving = true);
-                        try {
-                          if (widget.imageFile == null) return;
-
-                          await ref
-                              .read(mealRepositoryProvider)
-                              .saveMeal(analysis, widget.imageFile!);
-                          if (context.mounted) {
-                            context.go('/'); // Go home/history
-                            context.showAppSnackBar(
-                              AppLocalizations.of(context)!.mealSavedToHistory,
-                            );
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
-                            context.showAppSnackBar(
-                              AppLocalizations.of(
-                                context,
-                              )!.errorSavingMeal(e.toString()),
-                              isError: true,
-                            );
-                          }
-                        } finally {
-                          if (mounted) {
-                            setState(() => _isSaving = false);
-                          }
-                        }
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primary,
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                icon: const Icon(Icons.check_circle),
-                label: Text(AppLocalizations.of(context)!.logFood),
-              ),
+                                await HapticFeedback.heavyImpact();
+                                setState(() => _isSaving = true);
+                                try {
+                                  if (widget.mealId != null ||
+                                      widget.isViewOnly) {
+                                    if (widget.mealId == null) {
+                                      throw Exception(
+                                        'Error: No se encontró el ID del registro para actualizar.',
+                                      );
+                                    }
+                                    // Update existing record
+                                    await ref
+                                        .read(mealRepositoryProvider)
+                                        .updateMeal(widget.mealId!, analysis);
+                                    if (context.mounted) {
+                                      context.go('/');
+                                      context.showAppSnackBar(
+                                        'Resumen actualizado correctamente',
+                                      );
+                                    }
+                                  } else {
+                                    // Save new record
+                                    if (widget.imageFile == null) return;
+                                    await ref
+                                        .read(mealRepositoryProvider)
+                                        .saveMeal(analysis, widget.imageFile!);
+                                    if (context.mounted) {
+                                      context.go('/');
+                                      context.showAppSnackBar(
+                                        AppLocalizations.of(
+                                          context,
+                                        )!.mealSavedToHistory,
+                                      );
+                                    }
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    context.showAppSnackBar(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.errorSavingMeal(e.toString()),
+                                      isError: true,
+                                    );
+                                  }
+                                } finally {
+                                  if (mounted) {
+                                    setState(() => _isSaving = false);
+                                  }
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primary,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        icon: Icon(
+                          (widget.mealId != null || widget.isViewOnly)
+                              ? Icons.update
+                              : Icons.check_circle,
+                        ),
+                        label: Text(
+                          (widget.mealId != null || widget.isViewOnly)
+                              ? 'ACTUALIZAR'
+                              : AppLocalizations.of(context)!.logFood,
+                        ),
+                      )
+                      .animate(target: _hasChanges(analysis) ? 1 : 0)
+                      .fadeIn()
+                      .scale()
+                      .custom(
+                        builder: (context, value, child) =>
+                            _hasChanges(analysis)
+                            ? child
+                            : const SizedBox.shrink(),
+                      ),
             ),
           ],
         ),
@@ -810,6 +869,7 @@ class _RefineDialog extends StatefulWidget {
 
 class _RefineDialogState extends State<_RefineDialog> {
   late TextEditingController _nameController;
+  late TextEditingController _portionController;
   late FoodItem _pendingItem;
   bool _isReanalyzing = false;
 
@@ -817,12 +877,16 @@ class _RefineDialogState extends State<_RefineDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.item.name);
+    _portionController = TextEditingController(
+      text: widget.item.portionEstimate,
+    );
     _pendingItem = widget.item;
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _portionController.dispose();
     super.dispose();
   }
 
@@ -879,30 +943,76 @@ class _RefineDialogState extends State<_RefineDialog> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      TextField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          labelText: l10n.foodName,
-                          labelStyle: const TextStyle(color: AppTheme.primary),
-                          enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white24),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: TextField(
+                              controller: _nameController,
+                              decoration: InputDecoration(
+                                labelText: l10n.foodName,
+                                labelStyle: const TextStyle(
+                                  color: AppTheme.primary,
+                                ),
+                                enabledBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white24),
+                                ),
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppTheme.primary,
+                                  ),
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                              onChanged: (val) {
+                                setState(() {
+                                  _pendingItem = _pendingItem.copyWith(
+                                    name: val,
+                                    nameTranslations: null,
+                                  );
+                                });
+                              },
+                            ),
                           ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: AppTheme.primary),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                              controller: _portionController,
+                              decoration: InputDecoration(
+                                labelText: 'Porción (Opcional)',
+                                labelStyle: const TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 12,
+                                ),
+                                enabledBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white24),
+                                ),
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: AppTheme.primary,
+                                  ),
+                                ),
+                              ),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                              onChanged: (val) {
+                                setState(() {
+                                  _pendingItem = _pendingItem.copyWith(
+                                    portionEstimate: val,
+                                    portionTranslations: null,
+                                  );
+                                });
+                              },
+                            ),
                           ),
-                        ),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                        onChanged: (val) {
-                          setState(() {
-                            _pendingItem = _pendingItem.copyWith(
-                              name: val,
-                              nameTranslations: null,
-                            );
-                          });
-                        },
+                        ],
                       ),
                       const SizedBox(height: 32),
                       SizedBox(
@@ -920,7 +1030,7 @@ class _RefineDialogState extends State<_RefineDialog> {
                                   try {
                                     final result = await widget.reanalyzeItem(
                                       name,
-                                      _pendingItem.portionEstimate,
+                                      _portionController.text.trim(),
                                     );
 
                                     if (result != null && mounted) {
@@ -965,7 +1075,36 @@ class _RefineDialogState extends State<_RefineDialog> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: TextButton(
+                          onPressed: _isReanalyzing
+                              ? null
+                              : () {
+                                  final name = _nameController.text.trim();
+                                  if (name.isEmpty) return;
+
+                                  widget.onSave(
+                                    _pendingItem.copyWith(
+                                      name: name,
+                                      portionEstimate: _portionController.text
+                                          .trim(),
+                                      nameTranslations:
+                                          null, // Clear translations to force the new name
+                                      portionTranslations: null,
+                                    ),
+                                  );
+                                  Navigator.pop(context);
+                                },
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white70,
+                          ),
+                          child: const Text('GUARDAR SIN REESTIMAR'),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                       TextButton(
                         onPressed: () => Navigator.pop(context),
                         child: Text(

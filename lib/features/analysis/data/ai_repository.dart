@@ -36,6 +36,12 @@ CRITICAL INSTRUCTIONS:
 3. Output JSON Only: Do not provide any conversational text.
 4. Non-Food Images: If the image does NOT contain any recognizable food, return an EMPTY 'items' array: {"items": []}.
 
+CRITICAL CONTEXT:
+Differentiate carefully between Tortillas (very thin, flat, usually folded or stacked) and Arepas (thick, puck-shaped). 
+If the object is a thin corn disc, classify it as a Tortilla.
+Prioritize Latin American/Mexican cuisine identification unless the visual evidence strongly suggests otherwise.
+NEVER classify or translate a 'Tortilla' as an 'Arepa'. They are distinct foods with different nutritional profiles.
+
 Return a valid JSON object with the following structure:
 {
   "items": [
@@ -55,7 +61,8 @@ Return a valid JSON object with the following structure:
   "confidence": 95 // (integer, 0-100) Overall certainty score
 }
 
-Use the languages: $languages for translations.
+Use the languages: $languages for ALL translations in name_translations and portion_translations. 
+Ensure the primary names and portions are accurately translated into the user's requested locale language provided in the list.
 STRICTLY return valid JSON matching this schema.
 ''');
   }
@@ -84,8 +91,16 @@ STRICTLY return valid JSON matching this schema.
     String foodName,
     String portion,
   ) async {
-    // Reutilizamos la lógica. Al pasar solo texto, el System Prompt se adapta.
-    final prompt = 'Food Name: $foodName\nPortion Size: $portion';
+    // We use a more explicit prompt for refinements to ensure the AI respects the user's correction.
+    final prompt =
+        '''
+REFINEMENT REQUEST:
+The user has identified this food specifically as: "$foodName"
+Portion: "$portion"
+
+Please provide the most accurate nutritional estimation possible based on this specific description.
+Ensure the name in "name_translations" matches "$foodName" for the current locale.
+''';
     final content = [Content.text(prompt)];
 
     final jsonMap = await _generateAndParse(content);

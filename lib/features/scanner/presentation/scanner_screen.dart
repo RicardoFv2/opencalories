@@ -23,6 +23,8 @@ import '../../history/data/daily_calories_provider.dart';
 const _tutorialBg = Color(0xFF102216); // Deep Forest
 const _tutorialText = Color(0xFF13EC5B); // Neon Green
 
+final scannerImageProvider = StateProvider<File?>((ref) => null);
+
 class ScannerScreen extends StatefulHookConsumerWidget {
   const ScannerScreen({super.key});
 
@@ -70,7 +72,7 @@ class _ScannerContent extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final imageService = ref.read(imageServiceProvider.notifier);
-    final selectedImage = useState<File?>(null);
+    final selectedImage = ref.watch(scannerImageProvider);
     final processingStatus = useState<String?>(null);
     final rebuildTrigger = useState(0); // Force rebuild for badge update
     final l10n = AppLocalizations.of(context)!;
@@ -140,7 +142,7 @@ class _ScannerContent extends HookConsumerWidget {
         final file = File(image.path);
 
         final compressed = await imageService.compressImage(file);
-        selectedImage.value = compressed;
+        ref.read(scannerImageProvider.notifier).state = compressed;
       } catch (e) {
         debugPrint('Error capturing image: $e');
         if (context.mounted) {
@@ -160,7 +162,7 @@ class _ScannerContent extends HookConsumerWidget {
         final picked = await imageService.pickImage(source);
         if (picked != null) {
           final compressed = await imageService.compressImage(picked);
-          selectedImage.value = compressed;
+          ref.read(scannerImageProvider.notifier).state = compressed;
         }
       } finally {
         processingStatus.value = null;
@@ -170,18 +172,22 @@ class _ScannerContent extends HookConsumerWidget {
     ref.listen(analysisControllerProvider, (previous, next) {
       next.whenOrNull(
         data: (analysis) {
-          if (analysis != null && selectedImage.value != null) {
+          if (analysis != null && selectedImage != null) {
             // Check if no food was detected
             if (analysis.items.isEmpty) {
               // Show not-food alert
               context.showAppSnackBar(l10n.noFoodDetected, isError: true);
-              selectedImage.value = null; // Clear the invalid image
+              ref.read(scannerImageProvider.notifier).state =
+                  null; // Clear the invalid image
               return;
             }
-            context.push(
-              '/analysis',
-              extra: {'analysis': analysis, 'image': selectedImage.value},
-            );
+            final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
+            if (isCurrent) {
+              context.push(
+                '/analysis',
+                extra: {'analysis': analysis, 'image': selectedImage},
+              );
+            }
           }
         },
         error: (error, stack) {
@@ -200,8 +206,8 @@ class _ScannerContent extends HookConsumerWidget {
         children: [
           // 1. Camera Viewfinder / Image Preview
           Positioned.fill(
-            child: selectedImage.value != null
-                ? Image.file(selectedImage.value!, fit: BoxFit.cover)
+            child: selectedImage != null
+                ? Image.file(selectedImage, fit: BoxFit.cover)
                 : (isCameraInitialized.value && cameraController.value != null)
                 ? CameraPreview(cameraController.value!)
                 : Container(
@@ -264,12 +270,12 @@ class _ScannerContent extends HookConsumerWidget {
                       ),
                     ),
                     _CircleButton(
-                      icon: selectedImage.value != null
+                      icon: selectedImage != null
                           ? Icons.close
                           : Icons.arrow_back,
                       onTap: () {
-                        if (selectedImage.value != null) {
-                          selectedImage.value = null;
+                        if (selectedImage != null) {
+                          ref.read(scannerImageProvider.notifier).state = null;
                         } else {
                           if (context.canPop()) context.pop();
                         }
@@ -472,7 +478,7 @@ class _ScannerContent extends HookConsumerWidget {
             bottom: MediaQuery.of(context).padding.bottom + 40,
             left: 0,
             right: 0,
-            child: selectedImage.value != null
+            child: selectedImage != null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child:
@@ -483,7 +489,8 @@ class _ScannerContent extends HookConsumerWidget {
                               icon: Icons.refresh,
                               onTap: () async {
                                 await HapticFeedback.mediumImpact();
-                                selectedImage.value = null;
+                                ref.read(scannerImageProvider.notifier).state =
+                                    null;
                                 // Re-initialize camera if needed or just ensure preview resumes
                                 if (isCameraInitialized.value &&
                                     cameraController.value != null &&
@@ -508,7 +515,7 @@ class _ScannerContent extends HookConsumerWidget {
                                           .read(
                                             analysisControllerProvider.notifier,
                                           )
-                                          .analyze(selectedImage.value!);
+                                          .analyze(selectedImage);
                                     } finally {
                                       processingStatus.value = null;
                                     }

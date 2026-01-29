@@ -61,6 +61,34 @@ class MealRepository {
     await _dao.insertMeal(meal, items);
   }
 
+  Future<void> updateMeal(int mealId, FoodAnalysis analysis) async {
+    // Note: We keep the same image for simplicity in this history-edit-macros flow
+    final totalCalories = analysis.items.fold<int>(
+      0,
+      (sum, item) => sum + item.calories,
+    );
+
+    final meal = MealsCompanion(
+      totalCalories: Value(totalCalories),
+      confidence: Value(analysis.confidence),
+    );
+
+    final items = analysis.items
+        .map(
+          (item) => FoodItemsCompanion(
+            name: Value(item.name),
+            nameTranslations: Value(item.nameTranslations),
+            calories: Value(item.calories),
+            protein: Value(item.protein),
+            carbs: Value(item.carbs),
+            fat: Value(item.fat),
+          ),
+        )
+        .toList();
+
+    await _dao.updateMeal(mealId, meal, items);
+  }
+
   Future<void> saveManualMeal(ManualFoodEntry entry) async {
     final meal = MealsCompanion.insert(
       createdAt: DateTime.now(),
