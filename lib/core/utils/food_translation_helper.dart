@@ -59,4 +59,16 @@ class FoodTranslationHelper {
       translations: item.portionTranslations,
     );
   }
+
+  /// Gets the localized portion estimate from MealItem (database)
+  static String getLocalizedMealItemPortion(
+    BuildContext context,
+    FoodItemEntity item,
+  ) {
+    return getLocalizedName(
+      context,
+      fallbackName: item.portionEstimate,
+      translations: item.portionTranslations,
+    );
+  }
 }

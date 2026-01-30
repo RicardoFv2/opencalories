@@ -517,6 +517,30 @@ class $FoodItemsTable extends FoodItems
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _portionEstimateMeta = const VerificationMeta(
+    'portionEstimate',
+  );
+  @override
+  late final GeneratedColumn<String> portionEstimate = GeneratedColumn<String>(
+    'portion_estimate',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Map<String, String>?, String>
+  portionTranslations =
+      GeneratedColumn<String>(
+        'portion_translations',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<Map<String, String>?>(
+        $FoodItemsTable.$converterportionTranslations,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -527,6 +551,8 @@ class $FoodItemsTable extends FoodItems
     protein,
     carbs,
     fat,
+    portionEstimate,
+    portionTranslations,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -591,6 +617,15 @@ class $FoodItemsTable extends FoodItems
     } else if (isInserting) {
       context.missing(_fatMeta);
     }
+    if (data.containsKey('portion_estimate')) {
+      context.handle(
+        _portionEstimateMeta,
+        portionEstimate.isAcceptableOrUnknown(
+          data['portion_estimate']!,
+          _portionEstimateMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -634,6 +669,17 @@ class $FoodItemsTable extends FoodItems
         DriftSqlType.int,
         data['${effectivePrefix}fat'],
       )!,
+      portionEstimate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}portion_estimate'],
+      )!,
+      portionTranslations: $FoodItemsTable.$converterportionTranslations
+          .fromSql(
+            attachedDatabase.typeMapping.read(
+              DriftSqlType.string,
+              data['${effectivePrefix}portion_translations'],
+            ),
+          ),
     );
   }
 
@@ -644,6 +690,8 @@ class $FoodItemsTable extends FoodItems
 
   static TypeConverter<Map<String, String>?, String?>
   $converternameTranslations = const TranslationMapConverter();
+  static TypeConverter<Map<String, String>?, String?>
+  $converterportionTranslations = const TranslationMapConverter();
 }
 
 class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
@@ -655,6 +703,8 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
   final int protein;
   final int carbs;
   final int fat;
+  final String portionEstimate;
+  final Map<String, String>? portionTranslations;
   const FoodItemEntity({
     required this.id,
     required this.mealId,
@@ -664,6 +714,8 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     required this.protein,
     required this.carbs,
     required this.fat,
+    required this.portionEstimate,
+    this.portionTranslations,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -680,6 +732,14 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     map['protein'] = Variable<int>(protein);
     map['carbs'] = Variable<int>(carbs);
     map['fat'] = Variable<int>(fat);
+    map['portion_estimate'] = Variable<String>(portionEstimate);
+    if (!nullToAbsent || portionTranslations != null) {
+      map['portion_translations'] = Variable<String>(
+        $FoodItemsTable.$converterportionTranslations.toSql(
+          portionTranslations,
+        ),
+      );
+    }
     return map;
   }
 
@@ -695,6 +755,10 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
       protein: Value(protein),
       carbs: Value(carbs),
       fat: Value(fat),
+      portionEstimate: Value(portionEstimate),
+      portionTranslations: portionTranslations == null && nullToAbsent
+          ? const Value.absent()
+          : Value(portionTranslations),
     );
   }
 
@@ -714,6 +778,10 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
       protein: serializer.fromJson<int>(json['protein']),
       carbs: serializer.fromJson<int>(json['carbs']),
       fat: serializer.fromJson<int>(json['fat']),
+      portionEstimate: serializer.fromJson<String>(json['portionEstimate']),
+      portionTranslations: serializer.fromJson<Map<String, String>?>(
+        json['portionTranslations'],
+      ),
     );
   }
   @override
@@ -730,6 +798,10 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
       'protein': serializer.toJson<int>(protein),
       'carbs': serializer.toJson<int>(carbs),
       'fat': serializer.toJson<int>(fat),
+      'portionEstimate': serializer.toJson<String>(portionEstimate),
+      'portionTranslations': serializer.toJson<Map<String, String>?>(
+        portionTranslations,
+      ),
     };
   }
 
@@ -742,6 +814,8 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     int? protein,
     int? carbs,
     int? fat,
+    String? portionEstimate,
+    Value<Map<String, String>?> portionTranslations = const Value.absent(),
   }) => FoodItemEntity(
     id: id ?? this.id,
     mealId: mealId ?? this.mealId,
@@ -753,6 +827,10 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     protein: protein ?? this.protein,
     carbs: carbs ?? this.carbs,
     fat: fat ?? this.fat,
+    portionEstimate: portionEstimate ?? this.portionEstimate,
+    portionTranslations: portionTranslations.present
+        ? portionTranslations.value
+        : this.portionTranslations,
   );
   FoodItemEntity copyWithCompanion(FoodItemsCompanion data) {
     return FoodItemEntity(
@@ -766,6 +844,12 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
       protein: data.protein.present ? data.protein.value : this.protein,
       carbs: data.carbs.present ? data.carbs.value : this.carbs,
       fat: data.fat.present ? data.fat.value : this.fat,
+      portionEstimate: data.portionEstimate.present
+          ? data.portionEstimate.value
+          : this.portionEstimate,
+      portionTranslations: data.portionTranslations.present
+          ? data.portionTranslations.value
+          : this.portionTranslations,
     );
   }
 
@@ -779,7 +863,9 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
           ..write('calories: $calories, ')
           ..write('protein: $protein, ')
           ..write('carbs: $carbs, ')
-          ..write('fat: $fat')
+          ..write('fat: $fat, ')
+          ..write('portionEstimate: $portionEstimate, ')
+          ..write('portionTranslations: $portionTranslations')
           ..write(')'))
         .toString();
   }
@@ -794,6 +880,8 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
     protein,
     carbs,
     fat,
+    portionEstimate,
+    portionTranslations,
   );
   @override
   bool operator ==(Object other) =>
@@ -806,7 +894,9 @@ class FoodItemEntity extends DataClass implements Insertable<FoodItemEntity> {
           other.calories == this.calories &&
           other.protein == this.protein &&
           other.carbs == this.carbs &&
-          other.fat == this.fat);
+          other.fat == this.fat &&
+          other.portionEstimate == this.portionEstimate &&
+          other.portionTranslations == this.portionTranslations);
 }
 
 class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
@@ -818,6 +908,8 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
   final Value<int> protein;
   final Value<int> carbs;
   final Value<int> fat;
+  final Value<String> portionEstimate;
+  final Value<Map<String, String>?> portionTranslations;
   const FoodItemsCompanion({
     this.id = const Value.absent(),
     this.mealId = const Value.absent(),
@@ -827,6 +919,8 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     this.protein = const Value.absent(),
     this.carbs = const Value.absent(),
     this.fat = const Value.absent(),
+    this.portionEstimate = const Value.absent(),
+    this.portionTranslations = const Value.absent(),
   });
   FoodItemsCompanion.insert({
     this.id = const Value.absent(),
@@ -837,6 +931,8 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     required int protein,
     required int carbs,
     required int fat,
+    this.portionEstimate = const Value.absent(),
+    this.portionTranslations = const Value.absent(),
   }) : mealId = Value(mealId),
        name = Value(name),
        calories = Value(calories),
@@ -852,6 +948,8 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     Expression<int>? protein,
     Expression<int>? carbs,
     Expression<int>? fat,
+    Expression<String>? portionEstimate,
+    Expression<String>? portionTranslations,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -862,6 +960,9 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
       if (protein != null) 'protein': protein,
       if (carbs != null) 'carbs': carbs,
       if (fat != null) 'fat': fat,
+      if (portionEstimate != null) 'portion_estimate': portionEstimate,
+      if (portionTranslations != null)
+        'portion_translations': portionTranslations,
     });
   }
 
@@ -874,6 +975,8 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     Value<int>? protein,
     Value<int>? carbs,
     Value<int>? fat,
+    Value<String>? portionEstimate,
+    Value<Map<String, String>?>? portionTranslations,
   }) {
     return FoodItemsCompanion(
       id: id ?? this.id,
@@ -884,6 +987,8 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
       protein: protein ?? this.protein,
       carbs: carbs ?? this.carbs,
       fat: fat ?? this.fat,
+      portionEstimate: portionEstimate ?? this.portionEstimate,
+      portionTranslations: portionTranslations ?? this.portionTranslations,
     );
   }
 
@@ -918,6 +1023,16 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
     if (fat.present) {
       map['fat'] = Variable<int>(fat.value);
     }
+    if (portionEstimate.present) {
+      map['portion_estimate'] = Variable<String>(portionEstimate.value);
+    }
+    if (portionTranslations.present) {
+      map['portion_translations'] = Variable<String>(
+        $FoodItemsTable.$converterportionTranslations.toSql(
+          portionTranslations.value,
+        ),
+      );
+    }
     return map;
   }
 
@@ -931,7 +1046,9 @@ class FoodItemsCompanion extends UpdateCompanion<FoodItemEntity> {
           ..write('calories: $calories, ')
           ..write('protein: $protein, ')
           ..write('carbs: $carbs, ')
-          ..write('fat: $fat')
+          ..write('fat: $fat, ')
+          ..write('portionEstimate: $portionEstimate, ')
+          ..write('portionTranslations: $portionTranslations')
           ..write(')'))
         .toString();
   }
@@ -1273,6 +1390,8 @@ typedef $$FoodItemsTableCreateCompanionBuilder =
       required int protein,
       required int carbs,
       required int fat,
+      Value<String> portionEstimate,
+      Value<Map<String, String>?> portionTranslations,
     });
 typedef $$FoodItemsTableUpdateCompanionBuilder =
     FoodItemsCompanion Function({
@@ -1284,6 +1403,8 @@ typedef $$FoodItemsTableUpdateCompanionBuilder =
       Value<int> protein,
       Value<int> carbs,
       Value<int> fat,
+      Value<String> portionEstimate,
+      Value<Map<String, String>?> portionTranslations,
     });
 
 final class $$FoodItemsTableReferences
@@ -1358,6 +1479,21 @@ class $$FoodItemsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get portionEstimate => $composableBuilder(
+    column: $table.portionEstimate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    Map<String, String>?,
+    Map<String, String>,
+    String
+  >
+  get portionTranslations => $composableBuilder(
+    column: $table.portionTranslations,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
   $$MealsTableFilterComposer get mealId {
     final $$MealsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -1426,6 +1562,16 @@ class $$FoodItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get portionEstimate => $composableBuilder(
+    column: $table.portionEstimate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get portionTranslations => $composableBuilder(
+    column: $table.portionTranslations,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$MealsTableOrderingComposer get mealId {
     final $$MealsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -1482,6 +1628,17 @@ class $$FoodItemsTableAnnotationComposer
 
   GeneratedColumn<int> get fat =>
       $composableBuilder(column: $table.fat, builder: (column) => column);
+
+  GeneratedColumn<String> get portionEstimate => $composableBuilder(
+    column: $table.portionEstimate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<Map<String, String>?, String>
+  get portionTranslations => $composableBuilder(
+    column: $table.portionTranslations,
+    builder: (column) => column,
+  );
 
   $$MealsTableAnnotationComposer get mealId {
     final $$MealsTableAnnotationComposer composer = $composerBuilder(
@@ -1544,6 +1701,9 @@ class $$FoodItemsTableTableManager
                 Value<int> protein = const Value.absent(),
                 Value<int> carbs = const Value.absent(),
                 Value<int> fat = const Value.absent(),
+                Value<String> portionEstimate = const Value.absent(),
+                Value<Map<String, String>?> portionTranslations =
+                    const Value.absent(),
               }) => FoodItemsCompanion(
                 id: id,
                 mealId: mealId,
@@ -1553,6 +1713,8 @@ class $$FoodItemsTableTableManager
                 protein: protein,
                 carbs: carbs,
                 fat: fat,
+                portionEstimate: portionEstimate,
+                portionTranslations: portionTranslations,
               ),
           createCompanionCallback:
               ({
@@ -1565,6 +1727,9 @@ class $$FoodItemsTableTableManager
                 required int protein,
                 required int carbs,
                 required int fat,
+                Value<String> portionEstimate = const Value.absent(),
+                Value<Map<String, String>?> portionTranslations =
+                    const Value.absent(),
               }) => FoodItemsCompanion.insert(
                 id: id,
                 mealId: mealId,
@@ -1574,6 +1739,8 @@ class $$FoodItemsTableTableManager
                 protein: protein,
                 carbs: carbs,
                 fat: fat,
+                portionEstimate: portionEstimate,
+                portionTranslations: portionTranslations,
               ),
           withReferenceMapper: (p0) => p0
               .map(

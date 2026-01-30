@@ -52,6 +52,8 @@ class MealRepository {
             protein: Value(item.protein),
             carbs: Value(item.carbs),
             fat: Value(item.fat),
+            portionEstimate: Value(item.portionEstimate),
+            portionTranslations: Value(item.portionTranslations),
             // mealId will be auto-generated in DAO
           ),
         )
@@ -82,6 +84,8 @@ class MealRepository {
             protein: Value(item.protein),
             carbs: Value(item.carbs),
             fat: Value(item.fat),
+            portionEstimate: Value(item.portionEstimate),
+            portionTranslations: Value(item.portionTranslations),
           ),
         )
         .toList();

@@ -60,6 +60,9 @@ class FoodItems extends Table {
   IntColumn get protein => integer()();
   IntColumn get carbs => integer()();
   IntColumn get fat => integer()();
+  TextColumn get portionEstimate => text().withDefault(const Constant(''))();
+  TextColumn get portionTranslations =>
+      text().map(const TranslationMapConverter()).nullable()();
 }
 
 // DAO
@@ -288,7 +291,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -318,6 +321,14 @@ class AppDatabase extends _$AppDatabase {
           await m.addColumn(meals, meals.confidence);
         } catch (e) {
           debugPrint('Migration (v4): confidence column already exists. $e');
+        }
+      }
+      if (from < 5) {
+        try {
+          await m.addColumn(foodItems, foodItems.portionEstimate);
+          await m.addColumn(foodItems, foodItems.portionTranslations);
+        } catch (e) {
+          debugPrint('Migration (v5): portion columns already exist. $e');
         }
       }
     },

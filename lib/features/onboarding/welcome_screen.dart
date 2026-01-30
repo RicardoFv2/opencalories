@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/snackbar_utils.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 import '../../core/services/tutorial_service.dart';
+import '../settings/data/api_key_repository.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = Color(0xFF102216); // Deep Forest
@@ -43,6 +44,8 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!_tutorialStarted) {
         _tutorialStarted = true;
+        // Wait for entrance animations to complete
+        await Future.delayed(const Duration(milliseconds: 1500));
         await ref.read(tutorialServiceProvider.future);
         final tutorialService = ref.read(tutorialServiceProvider.notifier);
 
@@ -318,51 +321,56 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                     children: [
                       // Start Scanning Button
                       Showcase(
-                            key: _startScanningKey,
-                            title: AppLocalizations.of(
-                              context,
-                            )!.scanMeal, // Use valid key
-                            description: AppLocalizations.of(
-                              context,
-                            )!.tutorialCaptureDesc, // Use valid key
-                            tooltipBackgroundColor: _tutorialBg,
-                            titleTextStyle: const TextStyle(
-                              color: _tutorialText,
-                              fontSize: 18,
+                        key: _startScanningKey,
+                        title: AppLocalizations.of(
+                          context,
+                        )!.scanMeal, // Use valid key
+                        description: AppLocalizations.of(
+                          context,
+                        )!.tutorialCaptureDesc, // Use valid key
+                        tooltipBackgroundColor: _tutorialBg,
+                        titleTextStyle: const TextStyle(
+                          color: _tutorialText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        descTextStyle: TextStyle(
+                          color: _tutorialText.withValues(alpha: 0.8),
+                          fontSize: 14,
+                        ),
+                        overlayColor: Colors.black.withValues(alpha: 0.7),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final hasKey =
+                                ref
+                                    .read(apiKeyProvider)
+                                    .valueOrNull
+                                    ?.isNotEmpty ??
+                                false;
+                            if (hasKey) {
+                              context.push('/scan');
+                            } else {
+                              context.push('/settings');
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primary,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.startScanning,
+                            style: const TextStyle(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
-                            descTextStyle: TextStyle(
-                              color: _tutorialText.withValues(alpha: 0.8),
-                              fontSize: 14,
-                            ),
-                            overlayColor: Colors.black.withValues(alpha: 0.7),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                context.push('/scan');
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.primary,
-                                foregroundColor: Colors.black,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: Text(
-                                AppLocalizations.of(context)!.startScanning,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          )
-                          .animate()
-                          .fadeIn(delay: 600.ms)
-                          .moveY(begin: 20, end: 0),
+                          ),
+                        ),
+                      ).animate().fadeIn(delay: 600.ms),
 
                       const SizedBox(height: 16),
 

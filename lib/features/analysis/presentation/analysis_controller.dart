@@ -19,7 +19,6 @@ class AnalysisController extends _$AnalysisController {
     final result = await AsyncValue.guard(
       () => ref.read(aiRepositoryProvider).analyzeFood(image),
     );
-
     state = result.whenData((analysis) {
       final sortedItems = List<FoodItem>.from(analysis.items)
         ..sort((a, b) => b.protein.compareTo(a.protein));

@@ -676,8 +676,8 @@ class _MealCard extends StatelessWidget {
                     protein: i.protein,
                     carbs: i.carbs,
                     fat: i.fat,
-
-                    portionEstimate: AppLocalizations.of(context)!.oneServing,
+                    portionEstimate: i.portionEstimate,
+                    portionTranslations: i.portionTranslations,
                   ),
                 )
                 .toList(),

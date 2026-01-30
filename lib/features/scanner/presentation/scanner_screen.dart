@@ -91,7 +91,8 @@ class _ScannerContent extends HookConsumerWidget {
             final controller = CameraController(
               cameras.first,
               ResolutionPreset.high,
-              enableAudio: false,
+              enableAudio:
+                  false, // Disable audio to prevent web permission issues
             );
 
             await controller.initialize();
