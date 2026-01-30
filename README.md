@@ -48,8 +48,9 @@
 
 ### Prerequisites
 
-1. **Flutter SDK** — Ensure you have Flutter installed. Run `flutter doctor` to verify.
-2. **Gemini API Key** — Get a free API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+1. **Flutter SDK** — Ensure you have [Flutter installed](https://docs.flutter.dev/get-started/install). Run `flutter doctor` to verify.
+2. **Android Command Line Tools** — Required for Android builds. You can download just the [command line tools](https://developer.android.com/studio#command-line-tools-only) if you prefer not to install the full Android Studio.
+3. **Gemini API Key** — Get a free API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 ### Installation
 
@@ -87,14 +88,13 @@
 
 ## 📱 Screenshots
 
-> 📷 **Coming soon!** Screenshots will be added here showcasing the app's UI.
+|                  Scanner (Cyberpunk UI)                  |                     AI Analysis Result                     |                    Food Detection Mode                    |
+| :------------------------------------------------------: | :--------------------------------------------------------: | :-------------------------------------------------------: |
+| <img src="screenshots/scanning_meal.jpeg" width="300" /> | <img src="screenshots/analysis_screen.jpeg" width="300" /> | <img src="screenshots/detected_foods.jpeg" width="300" /> |
 
-<!--
-Add your screenshots here using this format:
-| Welcome | Scanner | Analysis | Manual Entry |
-|:-------:|:-------:|:--------:|:------------:|
-| ![Welcome](screenshots/welcome.png) | ![Scanner](screenshots/scanner.png) | ![Analysis](screenshots/analysis.png) | ![Manual](screenshots/manual.png) |
--->
+|                    History & Progress                     |                       Secure Setup                       |
+| :-------------------------------------------------------: | :------------------------------------------------------: |
+| <img src="screenshots/history_screen.jpeg" width="300" /> | <img src="screenshots/unlock_gemini.jpeg" width="300" /> |
 
 ---
 
