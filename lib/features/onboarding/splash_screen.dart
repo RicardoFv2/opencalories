@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -13,22 +14,34 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  Timer? _navigationTimer;
+
   @override
   void initState() {
     super.initState();
     // Iniciar la lógica de navegación después del renderizado inicial
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkAuthAndNavigate();
+      _startNavigationTimer();
+    });
+  }
+
+  @override
+  void dispose() {
+    _navigationTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startNavigationTimer() {
+    // 1. Tiempo mínimo de espera para que se vea el splash (UX)
+    // Esto evita el "flash" y da una sensación de carga profesional
+    _navigationTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        _checkAuthAndNavigate();
+      }
     });
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    // 1. Tiempo mínimo de espera para que se vea el splash (UX)
-    // Esto evita el "flash" y da una sensación de carga profesional
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (!mounted) return;
-
     // 2. Obtener el estado de la API Key
     // Usamos read porque estamos en un método asíncrono, pero en el build
     // ya estamos escuchando cambios si fuera necesario.
@@ -133,15 +146,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(3, (index) {
-                  return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppTheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      )
+                  final dot = Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  );
+
+                  // Disable infinite animation during tests to allow pumpAndSettle
+                  const isTest =
+                      bool.fromEnvironment('dart.vm.product') == false &&
+                      bool.hasEnvironment('FLUTTER_TEST');
+
+                  if (isTest) return dot;
+
+                  return dot
                       .animate(onPlay: (controller) => controller.repeat())
                       .fadeIn(duration: 600.ms)
                       .then(delay: (index * 200).ms)

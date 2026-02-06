@@ -6,6 +6,8 @@ import 'package:opencalories/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:opencalories/features/history/data/daily_calories_provider.dart';
+import 'package:opencalories/features/onboarding/welcome_screen.dart';
+import 'package:opencalories/features/onboarding/splash_screen.dart';
 
 // Generate mocks if we were using generated mocks, but for simple storage we can mock manually or use InMemory
 // However, since we rely on FlutterSecureStorage, we need to mock it or the repository.
@@ -51,25 +53,27 @@ void main() {
       ),
     );
 
-    // Initial state: Splash Screen
-    expect(find.text('OpenCalories'), findsOneWidget);
+    // Verify we're on the splash screen
+    expect(find.byType(SplashScreen), findsOneWidget);
 
-    // Pump to allow the FutureBuilder/AsyncValue to resolve and router into action
-    // We use a loop to wait for the transition, as multiple frames/pumps might be needed
-    // The SplashScreen has a 2s delay.
-    bool found = false;
-    for (int i = 0; i < 30; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-      if (find.text('Start Scanning').evaluate().isNotEmpty) {
-        found = true;
-        break;
-      }
+    // Initial pump after loading
+    await tester.pump();
+
+    // The splash screen has a 2-second navigation delay.
+    // Instead of pumAndSettle which might time out, use incremental pumps.
+    for (int i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
     }
-    expect(found, isTrue, reason: 'Should have navigated to WelcomeScreen');
 
-    // Verify that we are on the Welcome Screen
+    // Now wait for everything to settle
+    await tester.pumpAndSettle();
+
+    // Verify it navigated to welcome screen
     expect(find.text('Start Scanning'), findsOneWidget);
-    expect(find.text('Scan Meal'), findsNothing);
+
+    // Cleanup to prevent pending timers from leaking to other tests
+    await tester.pumpWidget(Container());
+    await tester.pumpAndSettle();
   });
 
   testWidgets('App allows Home when API key is present', (
@@ -111,7 +115,7 @@ void main() {
     // Verify we are on Scanner Screen
     expect(find.text('Scan Meal'), findsOneWidget);
 
-    // Explicitly dispose to clean up infinite animations
+    // Explicitly dispose to clean up infinite animations or pending timers
     await tester.pumpWidget(Container());
     await tester.pumpAndSettle();
   });

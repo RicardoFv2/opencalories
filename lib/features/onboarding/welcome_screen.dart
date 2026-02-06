@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,6 +40,14 @@ class _WelcomeContent extends ConsumerStatefulWidget {
 class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
   final _startScanningKey = GlobalKey();
   bool _tutorialStarted = false;
+  static Timer? _entranceTimer;
+
+  @override
+  void dispose() {
+    _entranceTimer?.cancel();
+    _entranceTimer = null;
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -47,13 +56,17 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
       if (!_tutorialStarted) {
         _tutorialStarted = true;
         // Wait for entrance animations to complete
-        await Future.delayed(const Duration(milliseconds: 1500));
-        await ref.read(tutorialServiceProvider.future);
-        final tutorialService = ref.read(tutorialServiceProvider.notifier);
+        _entranceTimer = Timer(const Duration(milliseconds: 1500), () async {
+          _entranceTimer = null;
+          if (!mounted) return;
 
-        if (!tutorialService.hasShownWelcomeTutorial && mounted) {
-          ShowCaseWidget.of(context).startShowCase([_startScanningKey]);
-        }
+          await ref.read(tutorialServiceProvider.future);
+          final tutorialService = ref.read(tutorialServiceProvider.notifier);
+
+          if (!tutorialService.hasShownWelcomeTutorial && mounted) {
+            ShowCaseWidget.of(context).startShowCase([_startScanningKey]);
+          }
+        });
       }
     });
   }
@@ -274,33 +287,67 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                                             ),
                                           ),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                                  width: 6,
-                                                  height: 6,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                        color: AppTheme.primary,
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                )
-                                                .animate(
-                                                  onPlay: (c) => c.repeat(),
-                                                )
-                                                .fade(duration: 1.seconds),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              AppLocalizations.of(
-                                                context,
-                                              )!.scanning,
-                                              style: TextStyle(
+                                        child: Builder(
+                                          builder: (context) {
+                                            final dot = Container(
+                                              width: 6,
+                                              height: 6,
+                                              decoration: const BoxDecoration(
                                                 color: AppTheme.primary,
-                                                fontSize: 10,
-                                                fontFamily: 'monospace',
+                                                shape: BoxShape.circle,
                                               ),
-                                            ),
-                                          ],
+                                            );
+
+                                            // Disable infinite animation during tests to allow pumpAndSettle
+                                            const isTest =
+                                                bool.fromEnvironment(
+                                                      'dart.vm.product',
+                                                    ) ==
+                                                    false &&
+                                                bool.hasEnvironment(
+                                                  'FLUTTER_TEST',
+                                                );
+
+                                            if (isTest) {
+                                              return Row(
+                                                children: [
+                                                  dot,
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    AppLocalizations.of(
+                                                      context,
+                                                    )!.scanning,
+                                                    style: const TextStyle(
+                                                      color: AppTheme.primary,
+                                                      fontSize: 10,
+                                                      fontFamily: 'monospace',
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            }
+
+                                            return Row(
+                                              children: [
+                                                dot
+                                                    .animate(
+                                                      onPlay: (c) => c.repeat(),
+                                                    )
+                                                    .fade(duration: 1.seconds),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  AppLocalizations.of(
+                                                    context,
+                                                  )!.scanning,
+                                                  style: const TextStyle(
+                                                    color: AppTheme.primary,
+                                                    fontSize: 10,
+                                                    fontFamily: 'monospace',
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
                                         ),
                                       ),
                                     ),

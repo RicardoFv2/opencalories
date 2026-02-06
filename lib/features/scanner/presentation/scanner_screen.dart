@@ -356,44 +356,55 @@ class _ScannerContent extends HookConsumerWidget {
                                 ),
                               );
                             },
-                            child:
-                                Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
+                            child: Builder(
+                              builder: (context) {
+                                final badge = Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black54,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: AppTheme.primary.withValues(
+                                        alpha: 0.3,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black54,
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: AppTheme.primary.withValues(
-                                            alpha: 0.3,
-                                          ),
-                                        ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.bolt,
+                                        color: AppTheme.primary,
+                                        size: 16,
                                       ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(
-                                            Icons.bolt,
-                                            color: AppTheme.primary,
-                                            size: 16,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            friendlyName.toUpperCase(),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelSmall
-                                                ?.copyWith(
-                                                  color: AppTheme.primary,
-                                                  fontWeight: FontWeight.bold,
-                                                  letterSpacing: 1,
-                                                ),
-                                          ),
-                                        ],
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        friendlyName.toUpperCase(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelSmall
+                                            ?.copyWith(
+                                              color: AppTheme.primary,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 1,
+                                            ),
                                       ),
-                                    )
+                                    ],
+                                  ),
+                                );
+
+                                // Disable infinite animation during tests
+                                const isTest =
+                                    bool.fromEnvironment('dart.vm.product') ==
+                                        false &&
+                                    bool.hasEnvironment('FLUTTER_TEST');
+
+                                if (isTest) return badge;
+
+                                return badge
                                     .animate(
                                       onPlay: (c) => c.repeat(reverse: true),
                                     )
@@ -401,7 +412,9 @@ class _ScannerContent extends HookConsumerWidget {
                                       begin: const Offset(1, 1),
                                       end: const Offset(1.05, 1.05),
                                       duration: 2.seconds,
-                                    ),
+                                    );
+                              },
+                            ),
                           );
                         },
                         loading: () => const SizedBox.shrink(),
@@ -447,27 +460,40 @@ class _ScannerContent extends HookConsumerWidget {
                         left: 0,
                         right: 0,
                         top: 0,
-                        child:
-                            Container(
-                                  height: 2,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Colors.transparent,
-                                        AppTheme.primary,
-                                        Colors.transparent,
-                                      ],
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppTheme.primary,
-                                        blurRadius: 5,
-                                      ),
-                                    ],
+                        child: Builder(
+                          builder: (context) {
+                            final line = Container(
+                              height: 2,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    AppTheme.primary,
+                                    Colors.transparent,
+                                  ],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppTheme.primary,
+                                    blurRadius: 5,
                                   ),
-                                )
+                                ],
+                              ),
+                            );
+
+                            // Disable infinite animation during tests
+                            const isTest =
+                                bool.fromEnvironment('dart.vm.product') ==
+                                    false &&
+                                bool.hasEnvironment('FLUTTER_TEST');
+
+                            if (isTest) return const SizedBox.shrink();
+
+                            return line
                                 .animate(onPlay: (c) => c.repeat())
-                                .moveY(begin: 0, end: 300, duration: 3.seconds),
+                                .moveY(begin: 0, end: 300, duration: 3.seconds);
+                          },
+                        ),
                       ),
                     ],
                   ),

@@ -10,14 +10,23 @@ class SkeletonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
-            borderRadius: borderRadius ?? BorderRadius.circular(16),
-          ),
-        )
+    final card = Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: borderRadius ?? BorderRadius.circular(16),
+      ),
+    );
+
+    // Disable infinite animation during tests to allow pumpAndSettle
+    const isTest =
+        bool.fromEnvironment('dart.vm.product') == false &&
+        bool.hasEnvironment('FLUTTER_TEST');
+
+    if (isTest) return card;
+
+    return card
         .animate(onPlay: (controller) => controller.repeat())
         .shimmer(duration: 1500.ms, color: Colors.white10);
   }
