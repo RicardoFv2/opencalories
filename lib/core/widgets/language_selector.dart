@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 import '../services/language_service.dart';
 import '../theme/app_theme.dart';
+import '../theme/design_tokens.dart';
 
 class LanguageSelector extends ConsumerWidget {
   const LanguageSelector({super.key});
@@ -17,7 +18,7 @@ class LanguageSelector extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceDark,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: DesignTokens.textDim.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,7 +47,10 @@ class LanguageSelector extends ConsumerWidget {
                   fontFamily: 'SpaceGrotesk',
                 ),
                 isExpanded: true,
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                icon: const Icon(
+                  Icons.arrow_drop_down,
+                  color: DesignTokens.textDim,
+                ),
                 onChanged: (String? value) {
                   ref
                       .read(languageServiceProvider.notifier)

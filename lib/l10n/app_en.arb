@@ -182,5 +182,9 @@
       "count": {"type": "int"}
     }
   },
-  "editDetails": "Edit"
+  "editDetails": "Edit",
+  "logout": "Logout",
+  "close": "Close",
+  "back": "Back",
+  "gallery": "Gallery"
 }

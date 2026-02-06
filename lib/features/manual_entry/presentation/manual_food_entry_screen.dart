@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import '../../analysis/data/ai_repository.dart';
@@ -14,8 +15,8 @@ import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
-const _tutorialBg = Color(0xFF102216); // Deep Forest
-const _tutorialText = Color(0xFF13EC5B); // Neon Green
+const _tutorialBg = DesignTokens.surface;
+const _tutorialText = DesignTokens.primary;
 
 class ManualFoodEntryScreen extends HookConsumerWidget {
   const ManualFoodEntryScreen({super.key});
@@ -296,7 +297,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
               child: _MacroBox(
                 label: 'Prot',
                 value: '${entry.protein}g',
-                color: const Color(0xFF4ADE80),
+                color: DesignTokens.success,
               ),
             ),
             const SizedBox(width: 12),
@@ -304,7 +305,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
               child: _MacroBox(
                 label: 'Carb',
                 value: '${entry.carbs}g',
-                color: const Color(0xFF60A5FA),
+                color: DesignTokens.info,
               ),
             ),
             const SizedBox(width: 12),
@@ -312,7 +313,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
               child: _MacroBox(
                 label: 'Grasa',
                 value: '${entry.fat}g',
-                color: const Color(0xFFF87171),
+                color: DesignTokens.error,
               ),
             ),
           ],

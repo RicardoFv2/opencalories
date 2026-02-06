@@ -140,5 +140,9 @@
       "count": {"type": "int"}
     }
   },
-  "editDetails": "Editar"
+  "editDetails": "Editar",
+  "logout": "Cerrar Sesión",
+  "close": "Cerrar",
+  "back": "Atrás",
+  "gallery": "Galería"
 }

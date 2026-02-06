@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:opencalories/features/settings/data/api_key_repository.dart';
+import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
 import 'package:opencalories/features/settings/data/model_preference_service.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
@@ -13,8 +14,8 @@ import 'package:opencalories/l10n/app_localizations.dart';
 import 'package:opencalories/core/widgets/language_selector.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
-const _tutorialBg = Color(0xFF102216); // Deep Forest
-const _tutorialText = Color(0xFF13EC5B); // Neon Green
+const _tutorialBg = DesignTokens.surface;
+const _tutorialText = DesignTokens.primary;
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -67,13 +68,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 mounted) {
               // Wait for any screen transition to finish
               await Future.delayed(const Duration(milliseconds: 800));
-              if (mounted) {
-                ShowCaseWidget.of(context).startShowCase([
-                  _getApiKeyButtonKey,
-                  _apiKeyFieldKey,
-                  _calorieGoalKey,
-                ]);
-              }
+              if (!mounted) return;
+              ShowCaseWidget.of(context).startShowCase([
+                _getApiKeyButtonKey,
+                _apiKeyFieldKey,
+                _calorieGoalKey,
+              ]);
             }
           }
         });

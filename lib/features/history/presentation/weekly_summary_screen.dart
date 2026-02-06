@@ -6,14 +6,15 @@ import 'package:intl/intl.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
 import '../data/app_database.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
-const _tutorialBg = Color(0xFF102216); // Deep Forest
-const _tutorialText = Color(0xFF13EC5B); // Neon Green
+const _tutorialBg = DesignTokens.surface;
+const _tutorialText = DesignTokens.primary;
 
 class WeeklySummaryScreen extends ConsumerStatefulWidget {
   const WeeklySummaryScreen({super.key});
@@ -263,8 +264,8 @@ class _DayGridItem extends StatelessWidget {
       child: Container(
         height: 220, // Fixed height for consistent stepped look
         decoration: BoxDecoration(
-          color: Colors.grey[900],
-          borderRadius: BorderRadius.circular(24),
+          color: DesignTokens.surface,
+          borderRadius: BorderRadius.circular(DesignTokens.radiusXL),
           image: imagePath != null
               ? DecorationImage(
                   image: FileImage(File(imagePath)),
@@ -276,7 +277,7 @@ class _DayGridItem extends StatelessWidget {
                 )
               : null,
           border: isToday
-              ? Border.all(color: AppTheme.primary, width: 2)
+              ? Border.all(color: DesignTokens.primary, width: 2)
               : Border.all(color: Colors.white10),
         ),
         child: Stack(

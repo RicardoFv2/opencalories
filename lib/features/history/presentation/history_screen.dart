@@ -6,11 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:showcaseview/showcaseview.dart';
 
+import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/services/calorie_goal_service.dart';
-import 'package:opencalories/core/widgets/skeleton_card.dart';
+import 'package:opencalories/core/widgets/shimmer_loading.dart';
+import 'package:opencalories/features/history/presentation/widgets/history_skeletons.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 import 'package:opencalories/core/widgets/language_selector.dart';
 import 'package:opencalories/features/history/data/app_database.dart';
@@ -18,8 +20,8 @@ import 'package:opencalories/features/analysis/domain/food_analysis.dart';
 import 'package:opencalories/core/utils/food_translation_helper.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
-const _tutorialBg = Color(0xFF102216); // Deep Forest
-const _tutorialText = Color(0xFF13EC5B); // Neon Green
+const _tutorialBg = DesignTokens.surface;
+const _tutorialText = DesignTokens.primary;
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -174,21 +176,18 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
               children: [
                 const SizedBox(height: 16),
                 // Date Nav Skeleton
-                const Center(child: SkeletonCard(width: 180, height: 40)),
-                // Summary Card Skeleton
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: SkeletonCard(width: double.infinity, height: 220),
+                const Center(
+                  child: ShimmerBox(width: 180, height: 40, borderRadius: 20),
                 ),
+                // Summary Card Skeleton
+                const SkeletonHistorySummary(),
                 // List Skeletons
                 Expanded(
                   child: ListView.builder(
                     itemCount: 3,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemBuilder: (context, index) => const Padding(
-                      padding: EdgeInsets.only(bottom: 16),
-                      child: SkeletonCard(width: double.infinity, height: 100),
-                    ),
+                    itemBuilder: (context, index) =>
+                        const SkeletonHistoryCard(),
                   ),
                 ),
               ],

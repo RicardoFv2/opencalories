@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:camera/camera.dart';
 
+import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/services/image_service.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
@@ -20,8 +21,8 @@ import 'package:opencalories/l10n/app_localizations.dart';
 import '../../history/data/daily_calories_provider.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
-const _tutorialBg = Color(0xFF102216); // Deep Forest
-const _tutorialText = Color(0xFF13EC5B); // Neon Green
+const _tutorialBg = DesignTokens.surface;
+const _tutorialText = DesignTokens.primary;
 
 final scannerImageProvider = StateProvider<File?>((ref) => null);
 
@@ -81,8 +82,14 @@ class _ScannerContent extends HookConsumerWidget {
     final cameraController = useState<CameraController?>(null);
     final isCameraInitialized = useState(false);
 
-    // Initialize camera
+    // Initialize camera and reset state
     useEffect(() {
+      // 1. Reset any previous scan/analysis state
+      Future.microtask(() {
+        ref.read(scannerImageProvider.notifier).state = null;
+        ref.invalidate(analysisControllerProvider);
+      });
+
       Future<void> initCamera() async {
         try {
           final cameras = await availableCameras();
@@ -256,6 +263,7 @@ class _ScannerContent extends HookConsumerWidget {
                   children: [
                     _CircleButton(
                       icon: Icons.logout,
+                      semanticLabel: l10n.logout,
                       onTap: () async {
                         // Clear API key to reset app state (Back to Welcome)
                         await ref.read(apiKeyRepositoryProvider).deleteApiKey();
@@ -274,6 +282,9 @@ class _ScannerContent extends HookConsumerWidget {
                       icon: selectedImage != null
                           ? Icons.close
                           : Icons.arrow_back,
+                      semanticLabel: selectedImage != null
+                          ? l10n.close
+                          : l10n.back,
                       onTap: () {
                         if (selectedImage != null) {
                           ref.read(scannerImageProvider.notifier).state = null;
@@ -488,6 +499,7 @@ class _ScannerContent extends HookConsumerWidget {
                             // Retake Button
                             _GlassButton(
                               icon: Icons.refresh,
+                              semanticLabel: l10n.retake,
                               onTap: () async {
                                 await HapticFeedback.mediumImpact();
                                 ref.read(scannerImageProvider.notifier).state =
@@ -525,29 +537,46 @@ class _ScannerContent extends HookConsumerWidget {
                                 child: Container(
                                   height: 56,
                                   decoration: BoxDecoration(
-                                    color: AppTheme.primary,
+                                    color: processingStatus.value != null
+                                        ? AppTheme.primary.withValues(
+                                            alpha: 0.5,
+                                          )
+                                        : AppTheme.primary,
                                     borderRadius: BorderRadius.circular(28),
                                     boxShadow: [
-                                      BoxShadow(
-                                        color: AppTheme.primary.withValues(
-                                          alpha: 0.4,
+                                      if (processingStatus.value == null)
+                                        BoxShadow(
+                                          color: AppTheme.primary.withValues(
+                                            alpha: 0.4,
+                                          ),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
                                         ),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      ),
                                     ],
                                   ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(
-                                        Icons.search,
-                                        color: Colors.black,
-                                        size: 24,
-                                      ),
+                                      if (processingStatus.value != null)
+                                        const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.black,
+                                          ),
+                                        )
+                                      else
+                                        const Icon(
+                                          Icons.search,
+                                          color: Colors.black,
+                                          size: 24,
+                                        ),
                                       const SizedBox(width: 8),
                                       Text(
-                                        l10n.analyzeFood,
+                                        processingStatus.value != null
+                                            ? l10n.analyzingFood.toUpperCase()
+                                            : l10n.analyzeFood.toUpperCase(),
                                         style: const TextStyle(
                                           color: Colors.black,
                                           fontSize: 16,
@@ -588,6 +617,7 @@ class _ScannerContent extends HookConsumerWidget {
                         ),
                         child: _GlassButton(
                           icon: Icons.photo_library,
+                          semanticLabel: l10n.gallery,
                           onTap: () => pickAndProcessImage(ImageSource.gallery),
                         ),
                       ),
@@ -607,42 +637,49 @@ class _ScannerContent extends HookConsumerWidget {
                           color: _tutorialText.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
-                        child: GestureDetector(
-                          onTap: () async {
-                            if (isCameraInitialized.value &&
-                                cameraController.value != null) {
-                              await captureImage();
-                            } else {
-                              await HapticFeedback.heavyImpact();
-                              await pickAndProcessImage(ImageSource.camera);
-                            }
-                          },
-                          child: Container(
-                            width: 72,
-                            height: 72,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 4),
-                            ),
-                            child: Center(
-                              child: Container(
-                                width: 56,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primary,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppTheme.primary.withValues(
-                                        alpha: 0.5,
-                                      ),
-                                      blurRadius: 20,
-                                    ),
-                                  ],
+                        child: Semantics(
+                          button: true,
+                          label: l10n.scanning,
+                          child: GestureDetector(
+                            onTap: () async {
+                              if (isCameraInitialized.value &&
+                                  cameraController.value != null) {
+                                await captureImage();
+                              } else {
+                                await HapticFeedback.heavyImpact();
+                                await pickAndProcessImage(ImageSource.camera);
+                              }
+                            },
+                            child: Container(
+                              width: 72,
+                              height: 72,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 4,
                                 ),
-                                child: const Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.black,
+                              ),
+                              child: Center(
+                                child: Container(
+                                  width: 56,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primary,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppTheme.primary.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                        blurRadius: 20,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -667,6 +704,7 @@ class _ScannerContent extends HookConsumerWidget {
                         ),
                         child: _GlassButton(
                           icon: Icons.history,
+                          semanticLabel: l10n.history,
                           onTap: () => context.go('/'),
                         ),
                       ),
@@ -704,21 +742,34 @@ class _ScannerContent extends HookConsumerWidget {
 class _CircleButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  const _CircleButton({required this.icon, required this.onTap});
+  final String? semanticLabel;
+
+  const _CircleButton({
+    required this.icon,
+    required this.onTap,
+    this.semanticLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: Colors.black26,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white10),
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.black26,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white10),
+          ),
+          child: Icon(icon, color: Colors.white, size: 24),
         ),
-        child: Icon(icon, color: Colors.white, size: 24),
       ),
     );
   }
@@ -727,21 +778,34 @@ class _CircleButton extends StatelessWidget {
 class _GlassButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  const _GlassButton({required this.icon, required this.onTap});
+  final String? semanticLabel;
+
+  const _GlassButton({
+    required this.icon,
+    required this.onTap,
+    this.semanticLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white24),
+    return Semantics(
+      button: true,
+      label: semanticLabel,
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onTap();
+        },
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Icon(icon, color: Colors.white, size: 24),
         ),
-        child: Icon(icon, color: Colors.white, size: 24),
       ),
     );
   }

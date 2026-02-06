@@ -407,4 +407,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editDetails => 'Edit';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get gallery => 'Gallery';
 }

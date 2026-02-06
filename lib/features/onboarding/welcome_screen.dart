@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:opencalories/core/theme/design_tokens.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/snackbar_utils.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
@@ -10,8 +12,8 @@ import '../../core/services/tutorial_service.dart';
 import '../settings/data/api_key_repository.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
-const _tutorialBg = Color(0xFF102216); // Deep Forest
-const _tutorialText = Color(0xFF13EC5B); // Neon Green
+const _tutorialBg = DesignTokens.surface;
+const _tutorialText = DesignTokens.primary;
 
 class WelcomeScreen extends ConsumerWidget {
   const WelcomeScreen({super.key});
@@ -73,13 +75,11 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
               width: 300,
               height: 300,
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                color: DesignTokens.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Theme.of(
-                      context,
-                    ).primaryColor.withValues(alpha: 0.2),
+                    color: DesignTokens.primary.withValues(alpha: 0.2),
                     blurRadius: 100,
                     spreadRadius: 50,
                   ),
@@ -146,7 +146,7 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                   Text(
                     AppLocalizations.of(context)!.welcomeDescription,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[400],
+                      color: DesignTokens.textSecondary,
                       height: 1.5,
                     ),
                     textAlign: TextAlign.center,
@@ -341,6 +341,7 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                         overlayColor: Colors.black.withValues(alpha: 0.7),
                         child: ElevatedButton(
                           onPressed: () {
+                            HapticFeedback.lightImpact();
                             final hasKey =
                                 ref
                                     .read(apiKeyProvider)
@@ -362,11 +363,15 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          child: Text(
-                            AppLocalizations.of(context)!.startScanning,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          child: Semantics(
+                            label: AppLocalizations.of(context)!.startScanning,
+                            button: true,
+                            child: Text(
+                              AppLocalizations.of(context)!.startScanning,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -376,16 +381,21 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
 
                       TextButton(
                         onPressed: () {
+                          HapticFeedback.lightImpact();
                           context.push('/settings');
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.white70,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: Text(
-                          AppLocalizations.of(
-                            context,
-                          )!.unlockGeminiAI, // Use valid key
+                        child: Semantics(
+                          label: AppLocalizations.of(context)!.unlockGeminiAI,
+                          button: true,
+                          child: Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.unlockGeminiAI, // Use valid key
+                          ),
                         ),
                       ).animate().fadeIn(delay: 800.ms),
 
@@ -397,6 +407,7 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                         height: 52,
                         child: OutlinedButton(
                           onPressed: () {
+                            HapticFeedback.lightImpact();
                             context.showAppSnackBar(
                               AppLocalizations.of(
                                 context,
@@ -412,13 +423,19 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.bluetooth_connected, size: 20),
-                              SizedBox(width: 8),
-                              Text(AppLocalizations.of(context)!.connectDevice),
-                            ],
+                          child: Semantics(
+                            label: AppLocalizations.of(context)!.connectDevice,
+                            button: true,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.bluetooth_connected, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  AppLocalizations.of(context)!.connectDevice,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

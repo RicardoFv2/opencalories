@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:showcaseview/showcaseview.dart';
+import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
@@ -19,8 +20,8 @@ import 'package:opencalories/l10n/app_localizations.dart';
 import 'package:opencalories/core/utils/food_translation_helper.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
-const _tutorialBg = Color(0xFF102216); // Deep Forest
-const _tutorialText = Color(0xFF13EC5B); // Neon Green
+const _tutorialBg = DesignTokens.surface;
+const _tutorialText = DesignTokens.primary;
 
 class AnalysisResultScreen extends ConsumerStatefulWidget {
   final FoodAnalysis? analysis;
@@ -294,8 +295,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
 
             // 3. Calories Hero
             const SizedBox(height: 16),
-            Stack(
-              clipBehavior: Clip.none,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '$totalCalories',
@@ -306,18 +308,15 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                Positioned(
-                  top: 4,
-                  right: -32,
-                  child: RotatedBox(
-                    quarterTurns: 0,
-                    child: Text(
-                      AppLocalizations.of(context)!.kcal,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: AppTheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                const SizedBox(width: 4),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    AppLocalizations.of(context)!.kcal,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: DesignTokens.primary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -336,7 +335,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                         items.first,
                       )
                     : AppLocalizations.of(context)!.oneServing,
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                style: TextStyle(color: DesignTokens.textDim, fontSize: 14),
               ),
             ),
             const SizedBox(height: 8),
@@ -406,9 +405,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                 if (fatPercent > 0)
                                   Expanded(
                                     flex: fatPercent,
-                                    child: Container(
-                                      color: Colors.orangeAccent,
-                                    ),
+                                    child: Container(color: DesignTokens.error),
                                   ),
                                 if (totalGrams == 0)
                                   Expanded(
@@ -426,19 +423,19 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                             _MacroCard(
                               label: AppLocalizations.of(context)!.carbs,
                               value: '${totalCarbs}g',
-                              color: Colors.blueAccent,
+                              color: DesignTokens.info,
                               isPrimary: false,
                             ),
                             _MacroCard(
                               label: AppLocalizations.of(context)!.protein,
                               value: '${totalProtein}g',
-                              color: AppTheme.primary,
+                              color: DesignTokens.primary,
                               isPrimary: true,
                             ),
                             _MacroCard(
                               label: AppLocalizations.of(context)!.fat,
                               value: '${totalFat}g',
-                              color: Colors.orangeAccent,
+                              color: DesignTokens.error,
                               isPrimary: false,
                             ),
                           ],
@@ -710,7 +707,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                           context,
                                         )!.protein,
                                         value: '${items[i].protein}g',
-                                        color: Colors.cyanAccent,
+                                        color: DesignTokens.primary,
                                       ),
                                       const SizedBox(width: 8),
                                       _MacroMiniTag(
@@ -718,7 +715,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                           context,
                                         )!.carbs,
                                         value: '${items[i].carbs}g',
-                                        color: Colors.amberAccent,
+                                        color: DesignTokens.info,
                                       ),
                                       const SizedBox(width: 8),
                                       _MacroMiniTag(
@@ -726,7 +723,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                           context,
                                         )!.fat,
                                         value: '${items[i].fat}g',
-                                        color: Colors.pinkAccent,
+                                        color: DesignTokens.error,
                                       ),
                                     ],
                                   ),
@@ -1079,7 +1076,7 @@ class _RefineDialogState extends State<_RefineDialog> {
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primary,
+                            backgroundColor: DesignTokens.primary,
                             foregroundColor: Colors.black,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),

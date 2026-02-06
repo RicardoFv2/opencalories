@@ -410,4 +410,16 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get editDetails => 'Editar';
+
+  @override
+  String get logout => 'Cerrar Sesión';
+
+  @override
+  String get close => 'Cerrar';
+
+  @override
+  String get back => 'Atrás';
+
+  @override
+  String get gallery => 'Galería';
 }
