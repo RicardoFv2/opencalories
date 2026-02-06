@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:opencalories/core/utils/platform_utils.dart';
 
 class SkeletonCard extends StatelessWidget {
   final double? width;
@@ -20,11 +21,7 @@ class SkeletonCard extends StatelessWidget {
     );
 
     // Disable infinite animation during tests to allow pumpAndSettle
-    const isTest =
-        bool.fromEnvironment('dart.vm.product') == false &&
-        bool.hasEnvironment('FLUTTER_TEST');
-
-    if (isTest) return card;
+    if (kIsTest) return card;
 
     return card
         .animate(onPlay: (controller) => controller.repeat())

@@ -64,10 +64,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
     }
 
-    // Now wait for everything to settle
-    await tester.pumpAndSettle();
-
     // Verify it navigated to welcome screen
+    // Instead of pumpAndSettle that might time out, use incremental pumps
+    await tester.pump(const Duration(milliseconds: 500));
     expect(find.text('Start Scanning'), findsOneWidget);
 
     // Cleanup to prevent pending timers from leaking to other tests

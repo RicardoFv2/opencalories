@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:opencalories/core/utils/platform_utils.dart';
 import '../../core/theme/app_theme.dart';
 import '../settings/data/api_key_repository.dart';
 
@@ -157,11 +158,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   );
 
                   // Disable infinite animation during tests to allow pumpAndSettle
-                  const isTest =
-                      bool.fromEnvironment('dart.vm.product') == false &&
-                      bool.hasEnvironment('FLUTTER_TEST');
-
-                  if (isTest) return dot;
+                  if (kIsTest) return dot;
 
                   return dot
                       .animate(onPlay: (controller) => controller.repeat())

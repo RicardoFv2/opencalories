@@ -7,6 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:opencalories/core/theme/design_tokens.dart';
 import '../../core/theme/app_theme.dart';
+import 'package:opencalories/core/utils/platform_utils.dart';
 import '../../core/utils/snackbar_utils.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 import '../../core/services/tutorial_service.dart';
@@ -298,17 +299,7 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                                               ),
                                             );
 
-                                            // Disable infinite animation during tests to allow pumpAndSettle
-                                            const isTest =
-                                                bool.fromEnvironment(
-                                                      'dart.vm.product',
-                                                    ) ==
-                                                    false &&
-                                                bool.hasEnvironment(
-                                                  'FLUTTER_TEST',
-                                                );
-
-                                            if (isTest) {
+                                            if (kIsTest) {
                                               return Row(
                                                 children: [
                                                   dot,

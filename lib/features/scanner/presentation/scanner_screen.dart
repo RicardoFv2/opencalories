@@ -14,6 +14,7 @@ import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/services/image_service.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
+import 'package:opencalories/core/utils/platform_utils.dart';
 import '../../settings/data/api_key_repository.dart';
 import '../../settings/data/model_preference_service.dart';
 import '../../analysis/presentation/analysis_controller.dart';
@@ -375,11 +376,27 @@ class _ScannerContent extends HookConsumerWidget {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(
-                                        Icons.bolt,
-                                        color: AppTheme.primary,
-                                        size: 16,
-                                      ),
+                                      if (kIsTest)
+                                        const Icon(
+                                          Icons.bolt,
+                                          color: AppTheme.primary,
+                                          size: 16,
+                                        )
+                                      else
+                                        const Icon(
+                                              Icons.bolt,
+                                              color: AppTheme.primary,
+                                              size: 16,
+                                            )
+                                            .animate(
+                                              onPlay: (c) =>
+                                                  c.repeat(reverse: true),
+                                            )
+                                            .scale(
+                                              begin: const Offset(1, 1),
+                                              end: const Offset(1.05, 1.05),
+                                              duration: 2.seconds,
+                                            ),
                                       const SizedBox(width: 8),
                                       Text(
                                         friendlyName.toUpperCase(),
@@ -396,23 +413,9 @@ class _ScannerContent extends HookConsumerWidget {
                                   ),
                                 );
 
-                                // Disable infinite animation during tests
-                                const isTest =
-                                    bool.fromEnvironment('dart.vm.product') ==
-                                        false &&
-                                    bool.hasEnvironment('FLUTTER_TEST');
+                                if (kIsTest) return badge;
 
-                                if (isTest) return badge;
-
-                                return badge
-                                    .animate(
-                                      onPlay: (c) => c.repeat(reverse: true),
-                                    )
-                                    .scale(
-                                      begin: const Offset(1, 1),
-                                      end: const Offset(1.05, 1.05),
-                                      duration: 2.seconds,
-                                    );
+                                return badge;
                               },
                             ),
                           );
@@ -462,36 +465,38 @@ class _ScannerContent extends HookConsumerWidget {
                         top: 0,
                         child: Builder(
                           builder: (context) {
-                            final line = Container(
+                            return Container(
                               height: 2,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.transparent,
-                                    AppTheme.primary,
-                                    Colors.transparent,
-                                  ],
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppTheme.primary,
-                                    blurRadius: 5,
-                                  ),
-                                ],
-                              ),
+                              child: kIsTest
+                                  ? Container(
+                                      color: AppTheme.primary.withValues(
+                                        alpha: 0.5,
+                                      ),
+                                    )
+                                  : Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                AppTheme.primary.withValues(
+                                                  alpha: 0,
+                                                ),
+                                                AppTheme.primary.withValues(
+                                                  alpha: 0.5,
+                                                ),
+                                                AppTheme.primary.withValues(
+                                                  alpha: 0,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                        .animate(onPlay: (c) => c.repeat())
+                                        .moveY(
+                                          begin: 0,
+                                          end: 300,
+                                          duration: 3.seconds,
+                                        ),
                             );
-
-                            // Disable infinite animation during tests
-                            const isTest =
-                                bool.fromEnvironment('dart.vm.product') ==
-                                    false &&
-                                bool.hasEnvironment('FLUTTER_TEST');
-
-                            if (isTest) return const SizedBox.shrink();
-
-                            return line
-                                .animate(onPlay: (c) => c.repeat())
-                                .moveY(begin: 0, end: 300, duration: 3.seconds);
                           },
                         ),
                       ),
