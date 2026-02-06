@@ -95,11 +95,16 @@ STRICTLY return valid JSON matching this schema.
     final prompt =
         '''
 REFINEMENT REQUEST:
-The user has identified this food specifically as: "$foodName"
-Portion: "$portion"
+The user has corrected the identification of this food item.
+Current Identification: "$foodName"
+Current Portion/Quantity: "$portion"
 
-Please provide the most accurate nutritional estimation possible based on this specific description.
-Ensure the name in "name_translations" matches "$foodName" for the current locale.
+STRICT INSTRUCTIONS:
+1. QUANTITY IS PRIORITY: If "$foodName" or "$portion" contains numbers or quantifiers (e.g., "2 tortillas", "500ml", "un par de huevos"), YOU MUST calculate the nutritional values for THAT EXACT QUANTITY.
+2. INGREDIENT SUBSTITUTION: If the user changed the substance (e.g., from "Bread" to "Tortilla"), discard all old nutritional data and start fresh for the new ingredient.
+3. CONFLICT RESOLUTION: If "$foodName" and "$portion" seem to conflict, prioritize the quantity information found in "$foodName" (e.g., if Name is "2 egg whites" and Portion is "1 unit", calculate precisely for 2 egg whites).
+4. OUTPUT FORMAT: Ensure the name in "name_translations" for the current locale precisely reflects "$foodName".
+5. PORTION REFLECTION: Ensure "portion_estimate" in the JSON reflects the actual quantity used for calculation.
 ''';
     final content = [Content.text(prompt)];
 
