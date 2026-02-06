@@ -6,7 +6,6 @@ import 'package:opencalories/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:opencalories/features/history/data/daily_calories_provider.dart';
-import 'package:opencalories/features/onboarding/welcome_screen.dart';
 import 'package:opencalories/features/onboarding/splash_screen.dart';
 
 // Generate mocks if we were using generated mocks, but for simple storage we can mock manually or use InMemory
