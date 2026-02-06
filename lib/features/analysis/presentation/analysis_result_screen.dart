@@ -1063,14 +1063,14 @@ class _RefineDialogState extends State<_RefineDialog> {
                                       _portionController.text.trim(),
                                     );
 
-                                    if (result != null && mounted) {
+                                    if (result != null && context.mounted) {
                                       widget.onSave(result);
                                       Navigator.pop(context);
-                                    } else {
+                                    } else if (mounted) {
                                       setState(() => _isReanalyzing = false);
                                     }
                                   } catch (e) {
-                                    if (mounted) {
+                                    if (context.mounted) {
                                       setState(() => _isReanalyzing = false);
                                       context.showAppSnackBar(
                                         'Error: $e',
