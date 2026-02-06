@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -148,8 +149,9 @@ class _ScannerContent extends HookConsumerWidget {
 
         final XFile image = await controller.takePicture();
         final file = File(image.path);
-
-        final compressed = await imageService.compressImage(file);
+        final compressed = await ref
+            .read(imageServiceProvider.notifier)
+            .compressImage(file);
         ref.read(scannerImageProvider.notifier).state = compressed;
       } catch (e) {
         debugPrint('Error capturing image: $e');
@@ -169,8 +171,7 @@ class _ScannerContent extends HookConsumerWidget {
       try {
         final picked = await imageService.pickImage(source);
         if (picked != null) {
-          final compressed = await imageService.compressImage(picked);
-          ref.read(scannerImageProvider.notifier).state = compressed;
+          ref.read(scannerImageProvider.notifier).state = picked;
         }
       } finally {
         processingStatus.value = null;
@@ -522,7 +523,30 @@ class _ScannerContent extends HookConsumerWidget {
                                 onTap: () async {
                                   if (processingStatus.value == null) {
                                     await HapticFeedback.heavyImpact();
-                                    processingStatus.value = l10n.analyzingFood;
+
+                                    // Local list of statuses to cycle through
+                                    final statuses = [
+                                      l10n.analyzingFood,
+                                      l10n.analyzingProteins,
+                                      l10n.calculatingMacros,
+                                      l10n.estimatingPortions,
+                                    ];
+
+                                    processingStatus.value = statuses[0];
+
+                                    // Logic to cycle statuses every 2 seconds
+                                    final statusTimer = Timer.periodic(
+                                      const Duration(seconds: 2),
+                                      (timer) {
+                                        if (timer.tick < statuses.length) {
+                                          processingStatus.value =
+                                              statuses[timer.tick];
+                                        } else {
+                                          timer.cancel();
+                                        }
+                                      },
+                                    );
+
                                     try {
                                       await ref
                                           .read(
@@ -530,6 +554,7 @@ class _ScannerContent extends HookConsumerWidget {
                                           )
                                           .analyze(selectedImage);
                                     } finally {
+                                      statusTimer.cancel();
                                       processingStatus.value = null;
                                     }
                                   }
@@ -899,8 +924,8 @@ class _ModelSelectorSheet extends StatelessWidget {
           const SizedBox(height: 16),
           _buildOption(
             context,
-            'gemini-2.5-flash',
-            isActive: currentModel == 'gemini-2.5-flash',
+            'gemini-2.5-flash-preview-09-2025',
+            isActive: currentModel == 'gemini-2.5-flash-preview-09-2025',
           ),
           const SizedBox(height: 12),
           _buildOption(

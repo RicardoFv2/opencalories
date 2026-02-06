@@ -134,6 +134,24 @@ abstract class AppLocalizations {
   /// **'Analyzing food...'**
   String get analyzingFood;
 
+  /// No description provided for @analyzingProteins.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning proteins...'**
+  String get analyzingProteins;
+
+  /// No description provided for @calculatingMacros.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating macros...'**
+  String get calculatingMacros;
+
+  /// No description provided for @estimatingPortions.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimating portions...'**
+  String get estimatingPortions;
+
   /// No description provided for @analyzeFood.
   ///
   /// In en, this message translates to:

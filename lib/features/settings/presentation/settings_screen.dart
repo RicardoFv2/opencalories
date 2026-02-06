@@ -268,7 +268,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
-                                        value: 'gemini-2.5-flash',
+                                        value:
+                                            'gemini-2.5-flash-preview-09-2025',
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -277,12 +278,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                           children: [
                                             Text(
                                               ModelPreferenceService.getFriendlyName(
-                                                'gemini-2.5-flash',
+                                                'gemini-2.5-flash-preview-09-2025',
                                               ),
                                             ),
                                             Text(
                                               ModelPreferenceService.getHint(
-                                                'gemini-2.5-flash',
+                                                'gemini-2.5-flash-preview-09-2025',
                                               ),
                                               style: TextStyle(
                                                 color: Colors.grey[400],

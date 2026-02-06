@@ -7,6 +7,9 @@
   "alignFoodWithinFrame": "Align food within frame...",
   "compressingImage": "Compressing image...",
   "analyzingFood": "Analyzing food...",
+  "analyzingProteins": "Scanning proteins...",
+  "calculatingMacros": "Calculating macros...",
+  "estimatingPortions": "Estimating portions...",
   "analyzeFood": "Analyze Food",
   "analysisFailed": "Analysis failed: {error}",
   "@analysisFailed": {

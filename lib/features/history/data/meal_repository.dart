@@ -47,13 +47,11 @@ class MealRepository {
         .map(
           (item) => FoodItemsCompanion(
             name: Value(item.name),
-            nameTranslations: Value(item.nameTranslations),
             calories: Value(item.calories),
             protein: Value(item.protein),
             carbs: Value(item.carbs),
             fat: Value(item.fat),
             portionEstimate: Value(item.portionEstimate),
-            portionTranslations: Value(item.portionTranslations),
             // mealId will be auto-generated in DAO
           ),
         )
@@ -79,13 +77,11 @@ class MealRepository {
         .map(
           (item) => FoodItemsCompanion(
             name: Value(item.name),
-            nameTranslations: Value(item.nameTranslations),
             calories: Value(item.calories),
             protein: Value(item.protein),
             carbs: Value(item.carbs),
             fat: Value(item.fat),
             portionEstimate: Value(item.portionEstimate),
-            portionTranslations: Value(item.portionTranslations),
           ),
         )
         .toList();

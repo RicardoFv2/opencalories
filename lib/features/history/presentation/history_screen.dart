@@ -670,13 +670,11 @@ class _MealCard extends StatelessWidget {
                 .map(
                   (i) => FoodItem(
                     name: i.name,
-                    nameTranslations: i.nameTranslations,
                     calories: i.calories,
                     protein: i.protein,
                     carbs: i.carbs,
                     fat: i.fat,
                     portionEstimate: i.portionEstimate,
-                    portionTranslations: i.portionTranslations,
                   ),
                 )
                 .toList(),

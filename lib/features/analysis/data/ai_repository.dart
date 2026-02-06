@@ -9,7 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../settings/data/api_key_repository.dart';
 import '../../settings/data/model_preference_service.dart';
 import '../domain/food_analysis.dart';
-import 'package:opencalories/core/l10n/supported_languages.dart';
+import 'package:opencalories/core/services/language_service.dart';
 
 part 'ai_repository.g.dart';
 
@@ -21,31 +21,47 @@ AiRepository aiRepository(Ref ref) {
 class AiRepository {
   final Ref _ref;
 
+  // Cached model instance to avoid re-initialization overhead
+  GenerativeModel? _cachedModel;
+  String? _cachedModelName;
+  String? _cachedApiKey;
+  String? _cachedLanguage;
+
   AiRepository(this._ref);
+
+  Future<FoodAnalysis> refineAnalysis(
+    String originalResponse,
+    String userInput,
+    String language,
+  ) async {
+    final prompt =
+        '''
+Refine this food analysis based on: "$userInput".
+Context: $originalResponse
+
+Expert RULE: If unsure between Tortilla/Pupusa, use Tortilla.
+TORTILLA: Thin, dry corn disc (70-90kcal).
+PUPUSA: Thick, moist, visible cheese/filling at edges (180-350kcal).
+
+Return JSON ONLY (minimized):
+{"items":[{"n":"name","q":"qty","cal":int,"p":int,"c":int,"f":int}],"conf":int}
+
+Return "n" and "q" in $language ONLY.
+''';
+    final content = [Content.text(prompt)];
+    final jsonMap = await _generateAndParse(content);
+    return FoodAnalysis.fromJson(jsonMap);
+  }
 
   /// CAMBIO 2: System Instruction centralizada.
   /// Define la "personalidad" y el formato estricto JSON una sola vez para toda la clase.
-  Content get _systemInstruction {
-    final languages = SupportedLanguages.toPromptString();
+  Content _getSystemInstruction(String language) {
     return Content.system('''
-Identify food in image/text. Return JSON:
-{
-  "items": [
-    {
-      "name": "English name",
-      "name_translations": { ... },
-      "cooking_method": "method",
-      "calories": int,
-      "protein": int,
-      "carbs": int,
-      "fat": int,
-      "portion_estimate": "desc",
-      "portion_translations": { ... }
-    }
-  ],
-  "confidence": int
-}
-Empty "items" if no food. Use languages: $languages for all translations.
+Expert SV Nutritionist. RULE: Distinguish Tortilla vs Pupusa. 
+TORTILLA: Thin, flat, dry corn disc, no leaks. (70-90kcal). 
+PUPUSA: Thick, moist, visible filling/cheese at edges. (180-350kcal). 
+If unsure, it's a TORTILLA. Return JSON ONLY: {"items":[{"n":"name","q":"qty","cal":int,"p":int,"c":int,"f":int}],"conf":int}
+Empty items if no food. Return "n" and "q" in $language ONLY.
 ''');
   }
 
@@ -55,17 +71,22 @@ Empty "items" if no food. Use languages: $languages for all translations.
       GenerationConfig(responseMimeType: 'application/json', temperature: 0.2);
 
   Future<FoodAnalysis> analyzeFood(File image) async {
+    final sw = Stopwatch()..start();
     final imageBytes = await image.readAsBytes();
+    debugPrint('⏱️ Image read and ready: ${sw.elapsedMilliseconds}ms');
 
-    // El prompt es simple porque el System Instruction ya hace el trabajo pesado.
+    // The prompt is simple because the System Instruction already does the heavy lifting.
     final content = [
       Content.multi([
-        TextPart('Analyze this meal accurately based on the visual evidence.'),
+        TextPart(
+          'Analyze this meal accurately. User is from El Salvador. Pay close attention to distinguishing tortillas from pupusas.',
+        ),
         DataPart('image/jpeg', imageBytes),
       ]),
     ];
 
     final jsonMap = await _generateAndParse(content);
+    debugPrint('⏱️ Total analyzeFood session: ${sw.elapsedMilliseconds}ms');
     return FoodAnalysis.fromJson(jsonMap);
   }
 
@@ -73,51 +94,75 @@ Empty "items" if no food. Use languages: $languages for all translations.
     String foodName,
     String portion,
   ) async {
-    // We use a more explicit prompt for refinements to ensure the AI respects the user's correction.
     final prompt =
         '''
-REFINEMENT REQUEST:
-The user has corrected the identification of this food item.
-Current Identification: "$foodName"
-Current Portion/Quantity: "$portion"
+Analyze this food: "$foodName" (Portion: "$portion").
+Expert SV Nutritionist Logic:
+1. QUANTITY IS PRIORITY: Calculate precisely for the requested amount.
+2. TORTILLA vs PUPUSA:
+   - Tortilla: Thin, dry, corn (70-90kcal).
+   - Pupusa: Thick, moist, filling/cheese (180-350kcal).
+   - If unsure, use TORTILLA.
 
-STRICT INSTRUCTIONS:
-1. QUANTITY IS PRIORITY: If "$foodName" or "$portion" contains numbers or quantifiers (e.g., "2 tortillas", "500ml", "un par de huevos"), YOU MUST calculate the nutritional values for THAT EXACT QUANTITY.
-2. INGREDIENT SUBSTITUTION: If the user changed the substance (e.g., from "Bread" to "Tortilla"), discard all old nutritional data and start fresh for the new ingredient.
-3. CONFLICT RESOLUTION: If "$foodName" and "$portion" seem to conflict, prioritize the quantity information found in "$foodName" (e.g., if Name is "2 egg whites" and Portion is "1 unit", calculate precisely for 2 egg whites).
-4. OUTPUT FORMAT: Ensure the name in "name_translations" for the current locale precisely reflects "$foodName".
-5. PORTION REFLECTION: Ensure "portion_estimate" in the JSON reflects the actual quantity used for calculation.
+Return JSON ONLY (minimized):
+{"items":[{"n":"name","q":"qty","cal":int,"p":int,"c":int,"f":int}],"conf":int}
 ''';
     final content = [Content.text(prompt)];
-
     final jsonMap = await _generateAndParse(content);
     return FoodAnalysis.fromJson(jsonMap);
   }
 
-  Future<Map<String, dynamic>> _generateAndParse(List<Content> content) async {
+  /// Returns a cached or new GenerativeModel instance.
+  /// Only creates a new model if the API key or model name has changed.
+  Future<GenerativeModel> _getOrCreateModel() async {
     final apiKey = await _ref.read(apiKeyProvider.future);
     final modelService = await _ref.read(
       modelPreferenceServiceInitializedProvider.future,
     );
     final modelName = modelService.getSelectedModel();
 
+    // Get current language for prompt
+    final locale = await _ref.read(languageServiceProvider.future);
+    final String language = locale?.languageCode == 'es'
+        ? 'Spanish'
+        : 'English';
+
     if (apiKey == null || apiKey.isEmpty) {
       throw Exception('No API Key found. Please add one in Settings.');
     }
 
-    final model = GenerativeModel(
+    // Return cached model if configuration hasn't changed
+    if (_cachedModel != null &&
+        _cachedModelName == modelName &&
+        _cachedApiKey == apiKey &&
+        _cachedLanguage == language) {
+      return _cachedModel!;
+    }
+
+    // Create and cache new model
+    _cachedModel = GenerativeModel(
       model: modelName,
       apiKey: apiKey,
-      systemInstruction:
-          _systemInstruction, // Inyectamos la instrucción maestra
-      generationConfig: _generationConfig, // Inyectamos la config JSON
+      systemInstruction: _getSystemInstruction(language),
+      generationConfig: _generationConfig,
     );
+    _cachedModelName = modelName;
+    _cachedApiKey = apiKey;
+    _cachedLanguage = language;
+
+    return _cachedModel!;
+  }
+
+  Future<Map<String, dynamic>> _generateAndParse(List<Content> content) async {
+    final model = await _getOrCreateModel();
 
     try {
+      final sw = Stopwatch()..start();
       final response = await _withTimeout(
         () => model.generateContent(content),
         timeout: const Duration(seconds: 30),
       );
+      debugPrint('⏱️ AI Generation time: ${sw.elapsedMilliseconds}ms');
       final text = response.text;
 
       if (text == null) {
@@ -132,10 +177,10 @@ STRICT INSTRUCTIONS:
       final json = jsonDecode(cleanJson) as Map<String, dynamic>;
 
       // Ensure specific fields
-      if (json['confidence'] == null) {
-        json['confidence'] = 85;
-      } else if (json['confidence'] is String) {
-        json['confidence'] = int.tryParse(json['confidence']) ?? 85;
+      if (json['conf'] == null) {
+        json['conf'] = 85;
+      } else if (json['conf'] is String) {
+        json['conf'] = int.tryParse(json['conf']) ?? 85;
       }
 
       return json;

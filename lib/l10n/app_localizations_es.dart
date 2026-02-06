@@ -27,6 +27,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get analyzingFood => 'Analizando comida...';
 
   @override
+  String get analyzingProteins => 'Escaneando proteínas...';
+
+  @override
+  String get calculatingMacros => 'Calculando macros...';
+
+  @override
+  String get estimatingPortions => 'Estimando porciones...';
+
+  @override
   String get analyzeFood => 'Analizar Comida';
 
   @override

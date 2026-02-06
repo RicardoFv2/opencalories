@@ -49,6 +49,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
   final _detectedItemsKey = GlobalKey();
   bool _isSaving = false;
   FoodAnalysis? _originalAnalysis;
+  bool _shouldStartTutorial = false;
 
   @override
   void initState() {
@@ -66,22 +67,20 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
   }
 
   Future<void> _maybeStartTutorial() async {
-    // Wait for the widget tree to be built
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Only show tutorial if there are items and this is not view-only mode
-      final items = widget.analysis?.items ?? [];
-      if (items.isEmpty || widget.isViewOnly) return;
+    // Only show tutorial if there are items and this is not view-only mode
+    final items = widget.analysis?.items ?? [];
+    if (items.isEmpty || widget.isViewOnly) return;
 
-      // Wait for TutorialService to initialize
-      await ref.read(tutorialServiceProvider.future);
-      final tutorialService = ref.read(tutorialServiceProvider.notifier);
+    // Wait for TutorialService to initialize
+    await ref.read(tutorialServiceProvider.future);
+    final tutorialService = ref.read(tutorialServiceProvider.notifier);
 
-      if (!tutorialService.hasShownResultsTutorial) {
-        // ignore: use_build_context_synchronously
-        ShowCaseWidget.of(context).startShowCase([_detectedItemsKey]);
-        await tutorialService.markResultsTutorialShown();
+    if (!tutorialService.hasShownResultsTutorial) {
+      // Set flag to trigger tutorial after ShowCaseWidget is built
+      if (mounted) {
+        setState(() => _shouldStartTutorial = true);
       }
-    });
+    }
   }
 
   @override
@@ -110,15 +109,31 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
         final totalFat = items.fold<int>(0, (sum, item) => sum + item.fat);
 
         return ShowCaseWidget(
-          builder: (context) => _buildContent(
-            context,
-            analysis,
-            items,
-            totalCalories,
-            totalCarbs,
-            totalProtein,
-            totalFat,
-          ),
+          onFinish: () async {
+            await ref
+                .read(tutorialServiceProvider.notifier)
+                .markResultsTutorialShown();
+          },
+          builder: (showcaseContext) {
+            // Trigger tutorial after ShowCaseWidget is ready
+            if (_shouldStartTutorial) {
+              _shouldStartTutorial = false;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ShowCaseWidget.of(
+                  showcaseContext,
+                ).startShowCase([_detectedItemsKey]);
+              });
+            }
+            return _buildContent(
+              showcaseContext,
+              analysis,
+              items,
+              totalCalories,
+              totalCarbs,
+              totalProtein,
+              totalFat,
+            );
+          },
         );
       },
     );
@@ -989,7 +1004,6 @@ class _RefineDialogState extends State<_RefineDialog> {
                                 setState(() {
                                   _pendingItem = _pendingItem.copyWith(
                                     name: val,
-                                    nameTranslations: null,
                                   );
                                 });
                               },
@@ -1023,7 +1037,6 @@ class _RefineDialogState extends State<_RefineDialog> {
                                 setState(() {
                                   _pendingItem = _pendingItem.copyWith(
                                     portionEstimate: val,
-                                    portionTranslations: null,
                                   );
                                 });
                               },
@@ -1108,9 +1121,6 @@ class _RefineDialogState extends State<_RefineDialog> {
                                       name: name,
                                       portionEstimate: _portionController.text
                                           .trim(),
-                                      nameTranslations:
-                                          null, // Clear translations to force the new name
-                                      portionTranslations: null,
                                     ),
                                   );
                                   Navigator.pop(context);

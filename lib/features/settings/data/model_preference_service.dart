@@ -12,7 +12,7 @@ ModelPreferenceService modelPreferenceService(Ref ref) {
 class ModelPreferenceService {
   final SharedPreferences _prefs;
   static const _keyModel = 'selected_ai_model';
-  static const defaultModel = 'gemini-2.5-flash';
+  static const defaultModel = 'gemini-3-flash-preview';
 
   ModelPreferenceService(this._prefs);
 
@@ -26,21 +26,21 @@ class ModelPreferenceService {
 
   static String getFriendlyName(String modelId) {
     switch (modelId) {
-      case 'gemini-2.5-flash':
+      case 'gemini-2.5-flash-preview-09-2025':
         return 'Gemini 2.5 Flash';
       case 'gemini-3-flash-preview':
         return 'Gemini 3 Preview';
       default:
-        return 'Gemini 2.5 Flash';
+        return 'Gemini 3 Preview';
     }
   }
 
   static String getHint(String modelId) {
     switch (modelId) {
-      case 'gemini-2.5-flash':
-        return 'Balanced (Recommended)';
+      case 'gemini-2.5-flash-preview-09-2025':
+        return 'Stable (Food Optimized)';
       case 'gemini-3-flash-preview':
-        return 'Experimental (Low Limits)';
+        return 'Experimental (Fastest)';
       default:
         return '';
     }
