@@ -42,9 +42,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void dispose() {
     _apiKeyController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -54,6 +57,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       onFinish: () {
         ref.read(tutorialServiceProvider.notifier).markSettingsTutorialShown();
       },
+      enableAutoScroll: true,
       builder: (context) {
         // Trigger tutorial if needed after frame
         WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -68,10 +72,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 mounted) {
               // Wait for any screen transition to finish
               await Future.delayed(const Duration(milliseconds: 800));
-              if (!mounted) return;
+              if (!context.mounted) return;
               ShowCaseWidget.of(context).startShowCase([
-                _getApiKeyButtonKey,
                 _apiKeyFieldKey,
+                _getApiKeyButtonKey,
                 _calorieGoalKey,
               ]);
             }
@@ -97,6 +101,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ),
           body: SingleChildScrollView(
+            controller: _scrollController,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Column(

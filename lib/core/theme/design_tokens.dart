@@ -18,6 +18,11 @@ class DesignTokens {
   static const Color info = Color(0xFF3B82F6);
   static const Color success = Color(0xFF10B981);
 
+  // Macro Nutrient Colors
+  static const Color proteinColor = Color(0xFF10B981); // Emerald green
+  static const Color carbsColor = Color(0xFF3B82F6); // Blue
+  static const Color fatColor = Color(0xFFFFA726); // Orange
+
   // Spacing
   static const double spaceXS = 4.0;
   static const double spaceS = 8.0;

@@ -395,17 +395,23 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                 if (proteinPercent > 0)
                                   Expanded(
                                     flex: proteinPercent,
-                                    child: Container(color: AppTheme.primary),
+                                    child: Container(
+                                      color: DesignTokens.proteinColor,
+                                    ),
                                   ),
                                 if (carbsPercent > 0)
                                   Expanded(
                                     flex: carbsPercent,
-                                    child: Container(color: Colors.blueAccent),
+                                    child: Container(
+                                      color: DesignTokens.carbsColor,
+                                    ),
                                   ),
                                 if (fatPercent > 0)
                                   Expanded(
                                     flex: fatPercent,
-                                    child: Container(color: DesignTokens.error),
+                                    child: Container(
+                                      color: DesignTokens.fatColor,
+                                    ),
                                   ),
                                 if (totalGrams == 0)
                                   Expanded(
@@ -423,19 +429,19 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                             _MacroCard(
                               label: AppLocalizations.of(context)!.carbs,
                               value: '${totalCarbs}g',
-                              color: DesignTokens.info,
+                              color: DesignTokens.carbsColor,
                               isPrimary: false,
                             ),
                             _MacroCard(
                               label: AppLocalizations.of(context)!.protein,
                               value: '${totalProtein}g',
-                              color: DesignTokens.primary,
+                              color: DesignTokens.proteinColor,
                               isPrimary: true,
                             ),
                             _MacroCard(
                               label: AppLocalizations.of(context)!.fat,
                               value: '${totalFat}g',
-                              color: DesignTokens.error,
+                              color: DesignTokens.fatColor,
                               isPrimary: false,
                             ),
                           ],
@@ -707,7 +713,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                           context,
                                         )!.protein,
                                         value: '${items[i].protein}g',
-                                        color: DesignTokens.primary,
+                                        color: DesignTokens.proteinColor,
                                       ),
                                       const SizedBox(width: 8),
                                       _MacroMiniTag(
@@ -715,7 +721,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                           context,
                                         )!.carbs,
                                         value: '${items[i].carbs}g',
-                                        color: DesignTokens.info,
+                                        color: DesignTokens.carbsColor,
                                       ),
                                       const SizedBox(width: 8),
                                       _MacroMiniTag(
@@ -723,7 +729,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                           context,
                                         )!.fat,
                                         value: '${items[i].fat}g',
-                                        color: DesignTokens.error,
+                                        color: DesignTokens.fatColor,
                                       ),
                                     ],
                                   ),

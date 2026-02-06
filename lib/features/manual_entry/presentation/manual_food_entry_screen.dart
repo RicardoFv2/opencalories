@@ -297,7 +297,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
               child: _MacroBox(
                 label: 'Prot',
                 value: '${entry.protein}g',
-                color: DesignTokens.success,
+                color: DesignTokens.proteinColor,
               ),
             ),
             const SizedBox(width: 12),
@@ -305,7 +305,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
               child: _MacroBox(
                 label: 'Carb',
                 value: '${entry.carbs}g',
-                color: DesignTokens.info,
+                color: DesignTokens.carbsColor,
               ),
             ),
             const SizedBox(width: 12),
@@ -313,7 +313,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
               child: _MacroBox(
                 label: 'Grasa',
                 value: '${entry.fat}g',
-                color: DesignTokens.error,
+                color: DesignTokens.fatColor,
               ),
             ),
           ],

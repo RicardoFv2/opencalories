@@ -356,7 +356,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                             _MacroItem(
                               label: AppLocalizations.of(context)!.protein,
                               value: '${macros['protein']}g',
-                              color: Colors.greenAccent,
+                              color: DesignTokens.proteinColor,
                             ),
                             Container(
                               width: 1,
@@ -366,7 +366,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                             _MacroItem(
                               label: AppLocalizations.of(context)!.carbs,
                               value: '${macros['carbs']}g',
-                              color: Colors.blueAccent,
+                              color: DesignTokens.carbsColor,
                             ),
                             Container(
                               width: 1,
@@ -376,7 +376,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                             _MacroItem(
                               label: AppLocalizations.of(context)!.fat,
                               value: '${macros['fat']}g',
-                              color: Colors.orangeAccent,
+                              color: DesignTokens.fatColor,
                             ),
                           ],
                         );
