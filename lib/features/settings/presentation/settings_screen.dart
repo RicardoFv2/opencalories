@@ -53,6 +53,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ShowCaseWidget(
       onFinish: () {
         ref.read(tutorialServiceProvider.notifier).markSettingsTutorialShown();
@@ -330,7 +331,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 child: CircularProgressIndicator(),
                               ),
                               error: (err, stack) =>
-                                  Text('Error loading settings: $err'),
+                                  Text(l10n.errorWithMessage(err.toString())),
                             );
                           },
                         ),

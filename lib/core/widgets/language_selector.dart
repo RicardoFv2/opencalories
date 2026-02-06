@@ -63,11 +63,15 @@ class LanguageSelector extends ConsumerWidget {
                   ),
                   DropdownMenuItem(
                     value: 'en',
-                    child: Row(children: [Text('🇺🇸 '), Text(l10n.english)]),
+                    child: Row(
+                      children: [const Text('🇺🇸 '), Text(l10n.english)],
+                    ),
                   ),
                   DropdownMenuItem(
                     value: 'es',
-                    child: Row(children: [Text('🇪🇸 '), Text(l10n.spanish)]),
+                    child: Row(
+                      children: [const Text('🇪🇸 '), Text(l10n.spanish)],
+                    ),
                   ),
                 ],
               ),

@@ -118,6 +118,12 @@ Contributions are welcome! Here's how you can help:
 
 ---
 
+## 🛡️ Security
+
+If you discover any security-related issues, please do NOT open a public issue. Instead, please report them privately by opening a [GitHub Security Advisory](https://github.com/RicardoFv2/opencalories/security/advisories/new).
+
+---
+
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).

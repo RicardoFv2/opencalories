@@ -422,4 +422,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get gallery => 'Galería';
+
+  @override
+  String get saveWithoutReestimating => 'Guardar sin reestimar';
 }

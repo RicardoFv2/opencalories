@@ -186,5 +186,6 @@
   "logout": "Logout",
   "close": "Close",
   "back": "Back",
-  "gallery": "Gallery"
+  "gallery": "Gallery",
+  "saveWithoutReestimating": "Save without reestimating"
 }

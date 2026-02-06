@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -27,43 +28,24 @@ class AiRepository {
   Content get _systemInstruction {
     final languages = SupportedLanguages.toPromptString();
     return Content.system('''
-You are an expert nutritionist using advanced computer vision and data analysis. 
-Analyze the input (visual image or text description) to estimate nutritional values accurately.
-
-CRITICAL INSTRUCTIONS:
-1. Identify Cooking Methods: Look for signs of frying (oil sheen), breading, or sauces that add hidden calories.
-2. Estimate Portions: Be realistic about serving sizes.
-3. Output JSON Only: Do not provide any conversational text.
-4. Non-Food Images: If the image does NOT contain any recognizable food, return an EMPTY 'items' array: {"items": []}.
-
-CRITICAL CONTEXT:
-Differentiate carefully between Tortillas (very thin, flat, usually folded or stacked) and Arepas (thick, puck-shaped). 
-If the object is a thin corn disc, classify it as a Tortilla.
-Prioritize Latin American/Mexican cuisine identification unless the visual evidence strongly suggests otherwise.
-NEVER classify or translate a 'Tortilla' as an 'Arepa'. They are distinct foods with different nutritional profiles.
-
-Return a valid JSON object with the following structure:
+Identify food in image/text. Return JSON:
 {
   "items": [
-    // List of food items
     {
-      "name": "food name in English (string, required)",
+      "name": "English name",
       "name_translations": { ... },
-      "cooking_method": "inferred method",
-      "calories": 100,
-      "protein": 10,
-      "carbs": 20,
-      "fat": 5,
-      "portion_estimate": "portion description",
+      "cooking_method": "method",
+      "calories": int,
+      "protein": int,
+      "carbs": int,
+      "fat": int,
+      "portion_estimate": "desc",
       "portion_translations": { ... }
     }
   ],
-  "confidence": 95 // (integer, 0-100) Overall certainty score
+  "confidence": int
 }
-
-Use the languages: $languages for ALL translations in name_translations and portion_translations. 
-Ensure the primary names and portions are accurately translated into the user's requested locale language provided in the list.
-STRICTLY return valid JSON matching this schema.
+Empty "items" if no food. Use languages: $languages for all translations.
 ''');
   }
 
@@ -132,7 +114,10 @@ STRICT INSTRUCTIONS:
     );
 
     try {
-      final response = await model.generateContent(content);
+      final response = await _withTimeout(
+        () => model.generateContent(content),
+        timeout: const Duration(seconds: 30),
+      );
       final text = response.text;
 
       if (text == null) {
@@ -174,5 +159,28 @@ STRICT INSTRUCTIONS:
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
     }
+  }
+
+  Future<T> _withTimeout<T>(
+    Future<T> Function() operation, {
+    Duration timeout = const Duration(seconds: 30),
+    int maxRetries = 2,
+  }) async {
+    int attempt = 0;
+    while (attempt < maxRetries) {
+      try {
+        return await operation().timeout(timeout);
+      } on TimeoutException {
+        attempt++;
+        if (attempt >= maxRetries) {
+          throw Exception(
+            'Analysis timeout. Please check your connection and try again.',
+          );
+        }
+        // Exponential backoff
+        await Future.delayed(Duration(seconds: attempt * 2));
+      }
+    }
+    throw Exception('Max retries exceeded');
   }
 }

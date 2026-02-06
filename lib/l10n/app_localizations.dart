@@ -853,6 +853,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Gallery'**
   String get gallery;
+
+  /// No description provided for @saveWithoutReestimating.
+  ///
+  /// In en, this message translates to:
+  /// **'Save without reestimating'**
+  String get saveWithoutReestimating;
 }
 
 class _AppLocalizationsDelegate

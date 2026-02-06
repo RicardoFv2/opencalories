@@ -86,14 +86,16 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Always watch the controller to allow reactive updates even from history
     final analysisState = ref.watch(analysisControllerProvider);
 
     return analysisState.when(
       loading: () =>
           const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (error, stack) =>
-          Scaffold(body: Center(child: Text('Error: $error'))),
+      error: (error, stack) => Scaffold(
+        body: Center(child: Text(l10n.errorWithMessage(error.toString()))),
+      ),
       data: (analysis) {
         final items = analysis?.items ?? [];
         final totalCalories = items.fold<int>(
@@ -1116,7 +1118,9 @@ class _RefineDialogState extends State<_RefineDialog> {
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white70,
                           ),
-                          child: const Text('GUARDAR SIN REESTIMAR'),
+                          child: Text(
+                            l10n.saveWithoutReestimating.toUpperCase(),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),

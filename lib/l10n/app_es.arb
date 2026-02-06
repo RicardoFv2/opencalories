@@ -9,6 +9,11 @@
   "analyzingFood": "Analizando comida...",
   "analyzeFood": "Analizar Comida",
   "analysisFailed": "Análisis fallido: {error}",
+  "@analysisFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   
   "tutorialCaptureTitle": "Capturar Realidad",
   "tutorialCaptureDesc": "Toma una foto de tu comida directamente para iniciar el análisis.",
@@ -46,6 +51,11 @@
   "noItemsToSave": "No hay elementos para guardar",
   "mealSavedToHistory": "¡Comida guardada en el historial!",
   "errorSavingMeal": "Error al guardar comida: {error}",
+  "@errorSavingMeal": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   
   "connectIntelligence": "Conectar Inteligencia",
   "unlockGeminiAI": "Desbloquea Gemini AI",
@@ -74,6 +84,12 @@
   "history": "HISTORIAL",
   "dailyTotal": "TOTAL DIARIO",
   "percentOfDailyGoal": "{percent}% de la meta diaria ({goal})",
+  "@percentOfDailyGoal": {
+    "placeholders": {
+      "percent": {"type": "int"},
+      "goal": {"type": "int"}
+    }
+  },
   "noMealsLoggedToday": "No hay comidas registradas hoy",
   "noMealsLoggedForDay": "No hay comidas registradas para este día",
   "deleteMealTitle": "¿Eliminar Comida?",
@@ -86,8 +102,23 @@
   "manualEntry": "Entrada Manual",
   "typeInFoodAndPortion": "Escribe el nombre del alimento y la porción",
   "today": "Hoy, {date}",
+  "@today": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
   "yesterday": "Ayer, {date}",
+  "@yesterday": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
   "errorWithMessage": "Error: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {"type": "String"}
+    }
+  },
   
   "language": "Idioma",
   "systemDefault": "Predeterminado del Sistema",
@@ -98,9 +129,26 @@
   "enterNameAndPortionError": "Ingrese nombre y porción primero",
   "aiEstimationCompleted": "¡Estimación de IA completada!",
   "aiEstimationFailed": "Fallo en estimación de IA: {error}",
+  "@aiEstimationFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
   "loggedFood": "Registrado {name} con {calories} kcal",
+  "@loggedFood": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "calories": {"type": "int"}
+    }
+  },
   "manualEntryTitle": "ENTRADA MANUAL",
   "requiredSection": "REQUERIDO",
+  "tutorialDone": "¡Genial! Estás listo.",
+  "aiModel": "Modelo de IA",
+  "aiModelDescription": "Elige tu modelo de IA preferido",
+  "quotaErrorHint": "Consejo: Cambia a Gemini 2.5 Flash en Configuración para más límites.",
+  "tutorialModelTitle": "Cambiar Cerebro IA",
+  "tutorialModelDesc": "Toca aquí para cambiar tu modelo de IA.",
   "tutorialNameTitle": "Nombra tu Alimento",
   "tutorialNameDesc": "Introduce el nombre de tu alimento.",
   "foodNameLabel": "Nombre",
@@ -114,12 +162,6 @@
   "estimating": "ESTIMANDO...",
   "estimateWithAiAction": "ESTIMAR CON IA",
   "nutritionOptionalSection": "NUTRICIÓN (OPCIONAL)",
-  "tutorialDone": "¡Genial! Estás listo.",
-  "aiModel": "Modelo de IA",
-  "aiModelDescription": "Elige tu modelo de IA preferido",
-  "quotaErrorHint": "Consejo: Cambia a Gemini 2.5 Flash en Configuración para más límites.",
-  "tutorialModelTitle": "Cambiar Cerebro IA",
-  "tutorialModelDesc": "Toca aquí para cambiar tu modelo de IA.",
   "tutorialFineTuneTitle": "Ajustar Datos",
   "tutorialFineTuneDesc": "Ajusta manualmente la info nutricional si es necesario.",
   "logMealAction": "REGISTRAR COMIDA",
@@ -144,5 +186,6 @@
   "logout": "Cerrar Sesión",
   "close": "Cerrar",
   "back": "Atrás",
-  "gallery": "Galería"
+  "gallery": "Galería",
+  "saveWithoutReestimating": "Guardar sin reestimar"
 }
