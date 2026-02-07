@@ -465,7 +465,7 @@ class _ScannerContent extends HookConsumerWidget {
                         top: 0,
                         child: Builder(
                           builder: (context) {
-                            return Container(
+                            return SizedBox(
                               height: 2,
                               child: kIsTest
                                   ? Container(
