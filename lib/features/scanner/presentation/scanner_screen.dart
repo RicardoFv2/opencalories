@@ -20,6 +20,7 @@ import '../../settings/data/model_preference_service.dart';
 import '../../analysis/presentation/analysis_controller.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
+import 'package:opencalories/core/widgets/glass_modal.dart';
 import '../../history/data/daily_calories_provider.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
@@ -345,10 +346,11 @@ class _ScannerContent extends HookConsumerWidget {
 
                           return GestureDetector(
                             onTap: () {
-                              showModalBottomSheet(
+                              HapticFeedback.lightImpact();
+                              GlassModal.show(
                                 context: context,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => _ModelSelectorSheet(
+                                title: 'Select AI Model',
+                                child: _ModelSelectorSheet(
                                   service: service,
                                   currentModel: currentModel,
                                   onModelSelected: () {
@@ -460,46 +462,57 @@ class _ScannerContent extends HookConsumerWidget {
 
                       // Scan Line
                       Positioned(
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        child: Builder(
-                          builder: (context) {
-                            return SizedBox(
-                              height: 2,
-                              child: kIsTest
-                                  ? Container(
-                                      color: AppTheme.primary.withValues(
-                                        alpha: 0.5,
-                                      ),
-                                    )
-                                  : Container(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                AppTheme.primary.withValues(
-                                                  alpha: 0,
-                                                ),
-                                                AppTheme.primary.withValues(
-                                                  alpha: 0.5,
-                                                ),
-                                                AppTheme.primary.withValues(
-                                                  alpha: 0,
-                                                ),
-                                              ],
+                            left: -20,
+                            right: -20,
+                            top: 0,
+                            child: Builder(
+                              builder: (context) {
+                                return Column(
+                                  children: [
+                                    Container(
+                                      height: 2,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.primary,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppTheme.primary.withValues(
+                                              alpha: 0.8,
                                             ),
+                                            blurRadius: 15,
+                                            spreadRadius: 2,
                                           ),
-                                        )
-                                        .animate(onPlay: (c) => c.repeat())
-                                        .moveY(
-                                          begin: 0,
-                                          end: 300,
-                                          duration: 3.seconds,
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            AppTheme.primary.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            AppTheme.primary.withValues(
+                                              alpha: 0,
+                                            ),
+                                          ],
                                         ),
-                            );
-                          },
-                        ),
-                      ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          )
+                          .animate(onPlay: (c) => c.repeat())
+                          .moveY(
+                            begin: 0,
+                            end: 300,
+                            duration: 2.5.seconds,
+                            curve: Curves.easeInOut,
+                          ),
                     ],
                   ),
                 ),
@@ -561,6 +574,8 @@ class _ScannerContent extends HookConsumerWidget {
                                       l10n.analyzingProteins,
                                       l10n.calculatingMacros,
                                       l10n.estimatingPortions,
+                                      'IDENTIFYING LOCAL INGREDIENTS...',
+                                      'FINALIZING REPORT...',
                                     ];
 
                                     processingStatus.value = statuses[0];
@@ -927,46 +942,23 @@ class _ModelSelectorSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.surfaceDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Select AI Model',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => context.pop(),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildOption(
-            context,
-            'gemini-2.5-flash-preview-09-2025',
-            isActive: currentModel == 'gemini-2.5-flash-preview-09-2025',
-          ),
-          const SizedBox(height: 12),
-          _buildOption(
-            context,
-            'gemini-3-flash-preview',
-            isActive: currentModel == 'gemini-3-flash-preview',
-          ),
-          const SizedBox(height: 32),
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildOption(
+          context,
+          'gemini-2.5-flash-preview-09-2025',
+          isActive: currentModel == 'gemini-2.5-flash-preview-09-2025',
+        ),
+        const SizedBox(height: 12),
+        _buildOption(
+          context,
+          'gemini-3-flash-preview',
+          isActive: currentModel == 'gemini-3-flash-preview',
+        ),
+        const SizedBox(height: 32),
+      ],
     );
   }
 

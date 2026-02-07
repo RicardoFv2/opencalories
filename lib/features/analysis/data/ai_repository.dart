@@ -58,9 +58,15 @@ Return "n" and "q" in $language ONLY.
   Content _getSystemInstruction(String language) {
     return Content.system('''
 Expert SV Nutritionist. RULE: Distinguish Tortilla vs Pupusa. 
-TORTILLA: Thin, flat, dry corn disc, no leaks. (70-90kcal). 
-PUPUSA: Thick, moist, visible filling/cheese at edges. (180-350kcal). 
-If unsure, it's a TORTILLA. Return JSON ONLY: {"items":[{"n":"name","q":"qty","cal":int,"p":int,"c":int,"f":int}],"conf":int}
+User is in El Salvador. Grilled beef is ALWAYS served with TORTILLAS.
+
+TORTILLA: Thin, flat, dry corn disc, no leaks (70-90kcal). 
+PUPUSA: Thick, moist, visible filling/cheese at edges (180-350kcal). 
+
+If unsure, it is a TORTILLA.
+If image is blurry, non-food, or unrecognizable, return: {"items":[{"n":"Unrecognized","q":"0","cal":0,"p":0,"c":0,"f":0}],"conf":0}
+DO NOT GUESS.
+Return JSON ONLY: {"items":[{"n":"name","q":"qty","cal":int,"p":int,"c":int,"f":int}],"conf":int}
 Empty items if no food. Return "n" and "q" in $language ONLY.
 ''');
   }
@@ -73,7 +79,15 @@ Empty items if no food. Return "n" and "q" in $language ONLY.
   Future<FoodAnalysis> analyzeFood(File image) async {
     final sw = Stopwatch()..start();
     final imageBytes = await image.readAsBytes();
+    if (imageBytes.length < 100000) {
+      debugPrint(
+        '⚠️ Image size (${(imageBytes.length / 1024).toStringAsFixed(1)}KB) is very low. Accuracy may suffer.',
+      );
+    }
     debugPrint('⏱️ Image read and ready: ${sw.elapsedMilliseconds}ms');
+    debugPrint(
+      '📸 Final Payload Size: ${(imageBytes.length / 1024).toStringAsFixed(1)}KB',
+    );
 
     // The prompt is simple because the System Instruction already does the heavy lifting.
     final content = [
@@ -145,6 +159,12 @@ Return JSON ONLY (minimized):
       apiKey: apiKey,
       systemInstruction: _getSystemInstruction(language),
       generationConfig: _generationConfig,
+      safetySettings: [
+        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.none),
+        SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.none),
+      ],
     );
     _cachedModelName = modelName;
     _cachedApiKey = apiKey;
@@ -160,7 +180,7 @@ Return JSON ONLY (minimized):
       final sw = Stopwatch()..start();
       final response = await _withTimeout(
         () => model.generateContent(content),
-        timeout: const Duration(seconds: 30),
+        timeout: const Duration(seconds: 45),
       );
       debugPrint('⏱️ AI Generation time: ${sw.elapsedMilliseconds}ms');
       final text = response.text;

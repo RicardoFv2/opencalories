@@ -165,15 +165,21 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
           ),
           onPressed: () => context.pop(),
         ),
-        title: Text(
-          widget.isViewOnly
-              ? AppLocalizations.of(context)!.mealDetails
-              : AppLocalizations.of(context)!.analysis,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            letterSpacing: 2,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title:
+            Text(
+                  widget.isViewOnly
+                      ? AppLocalizations.of(context)!.mealDetails
+                      : AppLocalizations.of(context)!.analysis,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+                .animate(onPlay: (controller) => controller.repeat())
+                .shimmer(
+                  duration: 2000.ms,
+                  color: AppTheme.primary.withValues(alpha: 0.3),
+                ),
         actions: [],
       ),
       body: SingleChildScrollView(
@@ -444,23 +450,32 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             _MacroCard(
-                              label: AppLocalizations.of(context)!.carbs,
-                              value: '${totalCarbs}g',
-                              color: DesignTokens.carbsColor,
-                              isPrimary: false,
-                            ),
+                                  label: AppLocalizations.of(context)!.carbs,
+                                  value: '${totalCarbs}g',
+                                  color: DesignTokens.carbsColor,
+                                  isPrimary: false,
+                                )
+                                .animate()
+                                .fadeIn(delay: 300.ms)
+                                .slideX(begin: 0.1, end: 0),
                             _MacroCard(
-                              label: AppLocalizations.of(context)!.protein,
-                              value: '${totalProtein}g',
-                              color: DesignTokens.proteinColor,
-                              isPrimary: true,
-                            ),
+                                  label: AppLocalizations.of(context)!.protein,
+                                  value: '${totalProtein}g',
+                                  color: DesignTokens.proteinColor,
+                                  isPrimary: true,
+                                )
+                                .animate()
+                                .fadeIn(delay: 450.ms)
+                                .slideX(begin: 0.1, end: 0),
                             _MacroCard(
-                              label: AppLocalizations.of(context)!.fat,
-                              value: '${totalFat}g',
-                              color: DesignTokens.fatColor,
-                              isPrimary: false,
-                            ),
+                                  label: AppLocalizations.of(context)!.fat,
+                                  value: '${totalFat}g',
+                                  color: DesignTokens.fatColor,
+                                  isPrimary: false,
+                                )
+                                .animate()
+                                .fadeIn(delay: 600.ms)
+                                .slideX(begin: 0.1, end: 0),
                           ],
                         ),
                       ],

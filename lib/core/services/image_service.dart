@@ -25,9 +25,9 @@ class ImageService extends _$ImageService {
     try {
       final pickedFile = await picker.pickImage(
         source: source,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 80,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
       );
       if (pickedFile == null) return null;
 
@@ -56,8 +56,8 @@ class ImageService extends _$ImageService {
         targetPath,
         format: CompressFormat.jpeg,
         quality: 85,
-        minWidth: 1024,
-        minHeight: 1024,
+        minWidth: 1920,
+        minHeight: 1920,
       );
 
       if (result == null) {
