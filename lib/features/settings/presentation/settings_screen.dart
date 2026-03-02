@@ -268,8 +268,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                     ),
                                     items: [
                                       DropdownMenuItem(
-                                        value:
-                                            'gemini-2.5-flash-preview-09-2025',
+                                        value: 'gemini-2.5-flash',
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -278,12 +277,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                           children: [
                                             Text(
                                               ModelPreferenceService.getFriendlyName(
-                                                'gemini-2.5-flash-preview-09-2025',
+                                                'gemini-2.5-flash',
                                               ),
                                             ),
                                             Text(
                                               ModelPreferenceService.getHint(
-                                                'gemini-2.5-flash-preview-09-2025',
+                                                'gemini-2.5-flash',
                                               ),
                                               style: TextStyle(
                                                 color: Colors.grey[400],
@@ -312,6 +311,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                               ),
                                               style: TextStyle(
                                                 color: Colors.orange,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: 'gemini-3.1-pro-preview',
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              ModelPreferenceService.getFriendlyName(
+                                                'gemini-3.1-pro-preview',
+                                              ),
+                                            ),
+                                            Text(
+                                              ModelPreferenceService.getHint(
+                                                'gemini-3.1-pro-preview',
+                                              ),
+                                              style: TextStyle(
+                                                color: Colors.redAccent,
                                                 fontSize: 12,
                                               ),
                                             ),

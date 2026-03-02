@@ -15,29 +15,22 @@ class ImageService extends _$ImageService {
     return;
   }
 
-  /// Picks an image from the specified [source] with native resizing applied.
-  ///
-  /// Uses ImagePicker's native resizing (maxWidth: 768, quality: 70) which is
-  /// faster than a separate compression step. This reduces API payload size
-  /// while maintaining quality for food recognition.
   Future<File?> pickImage(ImageSource source) async {
     final picker = ImagePicker();
     try {
       final pickedFile = await picker.pickImage(
         source: source,
-        maxWidth: 1920,
-        maxHeight: 1920,
+        maxWidth: 1024,
+        maxHeight: 1024,
         imageQuality: 85,
       );
       if (pickedFile == null) return null;
 
       final file = File(pickedFile.path);
-      // Even if image_picker resized it, we run it through our compressor
-      // to ensure it's a JPEG and meets our size/quality targets.
-      return await compressImage(file);
+      // ImagePicker native resizing is sufficient and faster.
+      // We no longer need to run it through compressImage().
+      return file;
     } catch (e) {
-      // In a real app, we might log this or show a snackbar via a notifier
-      // specifically handling the case where Camera is not available
       return null;
     }
   }
@@ -55,9 +48,9 @@ class ImageService extends _$ImageService {
         file.absolute.path,
         targetPath,
         format: CompressFormat.jpeg,
-        quality: 85,
-        minWidth: 1920,
-        minHeight: 1920,
+        quality: 70,
+        minWidth: 800,
+        minHeight: 800,
       );
 
       if (result == null) {

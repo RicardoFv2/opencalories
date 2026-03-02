@@ -146,15 +146,23 @@ class _ScannerContent extends HookConsumerWidget {
       if (controller.value.isTakingPicture) return;
 
       try {
-        processingStatus.value = l10n.compressingImage;
         await HapticFeedback.mediumImpact();
 
         final XFile image = await controller.takePicture();
         final file = File(image.path);
+
+        // Immediate visual feedback (150-300ms perceived response)
+        ref.read(scannerImageProvider.notifier).state = file;
+
+        // Compress without blocking UI
         final compressed = await ref
             .read(imageServiceProvider.notifier)
             .compressImage(file);
-        ref.read(scannerImageProvider.notifier).state = compressed;
+
+        // Update state behind the scenes if the user hasn't discarded the image
+        if (ref.read(scannerImageProvider) != null) {
+          ref.read(scannerImageProvider.notifier).state = compressed;
+        }
       } catch (e) {
         debugPrint('Error capturing image: $e');
         if (context.mounted) {
@@ -163,20 +171,25 @@ class _ScannerContent extends HookConsumerWidget {
             isError: true,
           );
         }
-      } finally {
-        processingStatus.value = null;
       }
     }
 
     Future<void> pickAndProcessImage(ImageSource source) async {
-      processingStatus.value = l10n.compressingImage;
       try {
         final picked = await imageService.pickImage(source);
         if (picked != null) {
           ref.read(scannerImageProvider.notifier).state = picked;
+
+          // Process immediately
+          ref.read(analysisControllerProvider.notifier).analyze(picked);
+
+          // Navigate immediately
+          if (context.mounted) {
+            context.push('/analysis', extra: {'image': picked});
+          }
         }
-      } finally {
-        processingStatus.value = null;
+      } catch (e) {
+        debugPrint('Error picking image: $e');
       }
     }
 
@@ -184,14 +197,21 @@ class _ScannerContent extends HookConsumerWidget {
       next.whenOrNull(
         data: (analysis) {
           if (analysis != null && selectedImage != null) {
-            // Check if no food was detected
             if (analysis.items.isEmpty) {
               // Show not-food alert
               context.showAppSnackBar(l10n.noFoodDetected, isError: true);
               ref.read(scannerImageProvider.notifier).state =
                   null; // Clear the invalid image
+
+              // If we are covered by AnalysisResultScreen (optimistic UI), pop it.
+              final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
+              if (!isCurrent && context.canPop()) {
+                context.pop();
+              }
               return;
             }
+            // Since we push immediately now, we don't need ScannerScreen to push again.
+            // But we keep this just in case we didn't push immediately for some reason.
             final isCurrent = ModalRoute.of(context)?.isCurrent ?? false;
             if (isCurrent) {
               context.push(
@@ -594,11 +614,20 @@ class _ScannerContent extends HookConsumerWidget {
                                     );
 
                                     try {
-                                      await ref
+                                      // Start analysis
+                                      ref
                                           .read(
                                             analysisControllerProvider.notifier,
                                           )
                                           .analyze(selectedImage);
+
+                                      // Push immediately for optimistic UI
+                                      if (context.mounted) {
+                                        context.push(
+                                          '/analysis',
+                                          extra: {'image': selectedImage},
+                                        );
+                                      }
                                     } finally {
                                       statusTimer.cancel();
                                       processingStatus.value = null;
@@ -784,20 +813,90 @@ class _ScannerContent extends HookConsumerWidget {
           ),
 
           if (processingStatus.value != null)
-            Container(
-              color: Colors.black54,
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.3),
+                child: Stack(
                   children: [
-                    const CircularProgressIndicator(color: AppTheme.primary),
-                    const SizedBox(height: 16),
-                    Text(
-                      processingStatus.value!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                    // Moving scan line with gradient
+                    Positioned.fill(
+                      child: Builder(
+                        builder: (context) {
+                          return Align(
+                                alignment: Alignment.topCenter,
+                                child: Container(
+                                  height: 150,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                      colors: [
+                                        AppTheme.primary.withValues(alpha: 0.4),
+                                        AppTheme.primary.withValues(alpha: 0.0),
+                                      ],
+                                    ),
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: AppTheme.primary.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .animate(
+                                onPlay: (controller) => controller.repeat(),
+                              )
+                              .slideY(
+                                begin: -1.0,
+                                end: 8.0,
+                                duration: 2.seconds,
+                                curve: Curves.linear,
+                              );
+                        },
+                      ),
+                    ),
+                    // Centered Text with Glass effect
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: AppTheme.primary.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                color: AppTheme.primary,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                                  processingStatus.value!,
+                                  style: const TextStyle(
+                                    color: AppTheme.primary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
+                                  ),
+                                )
+                                .animate(onPlay: (c) => c.repeat(reverse: true))
+                                .fade(begin: 0.5, end: 1, duration: 800.ms),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -948,14 +1047,20 @@ class _ModelSelectorSheet extends StatelessWidget {
       children: [
         _buildOption(
           context,
-          'gemini-2.5-flash-preview-09-2025',
-          isActive: currentModel == 'gemini-2.5-flash-preview-09-2025',
+          'gemini-2.5-flash',
+          isActive: currentModel == 'gemini-2.5-flash',
         ),
         const SizedBox(height: 12),
         _buildOption(
           context,
           'gemini-3-flash-preview',
           isActive: currentModel == 'gemini-3-flash-preview',
+        ),
+        const SizedBox(height: 12),
+        _buildOption(
+          context,
+          'gemini-3.1-pro-preview',
+          isActive: currentModel == 'gemini-3.1-pro-preview',
         ),
         const SizedBox(height: 32),
       ],

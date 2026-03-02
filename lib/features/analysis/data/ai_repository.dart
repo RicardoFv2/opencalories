@@ -64,9 +64,9 @@ TORTILLA: Thin, flat, dry corn disc, no leaks (70-90kcal).
 PUPUSA: Thick, moist, visible filling/cheese at edges (180-350kcal). 
 
 If unsure, it is a TORTILLA.
-If image is blurry, non-food, or unrecognizable, return: {"items":[{"n":"Unrecognized","q":"0","cal":0,"p":0,"c":0,"f":0}],"conf":0}
+If image is blurry, non-food, or unrecognizable, DO NOT throw errors. Instead, return a valid JSON format with generic values: {"items":[{"n":"Unrecognized Food","q":"1 portion","cal":100,"p":0,"c":0,"f":0}],"conf":0}
 DO NOT GUESS.
-Return JSON ONLY: {"items":[{"n":"name","q":"qty","cal":int,"p":int,"c":int,"f":int}],"conf":int}
+Return JSON ONLY exactly like this format: {"items":[{"n":"name","q":"qty","cal":int,"p":int,"c":int,"f":int}],"conf":int}
 Empty items if no food. Return "n" and "q" in $language ONLY.
 ''');
   }
@@ -178,14 +178,15 @@ Return JSON ONLY (minimized):
 
     try {
       final sw = Stopwatch()..start();
-      final response = await _withTimeout(
-        () => model.generateContent(content),
-        timeout: const Duration(seconds: 45),
-      );
+
+      // Use generateContent instead of stream because we parse the complete JSON at the end
+      // and streaming with JSON schema can cause Unhandled format exceptions in the Dart SDK.
+      final response = await model.generateContent(content);
+
       debugPrint('⏱️ AI Generation time: ${sw.elapsedMilliseconds}ms');
       final text = response.text;
 
-      if (text == null) {
+      if (text == null || text.isEmpty) {
         throw Exception('Failed to generate analysis. No response from AI.');
       }
 
@@ -224,28 +225,5 @@ Return JSON ONLY (minimized):
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
     }
-  }
-
-  Future<T> _withTimeout<T>(
-    Future<T> Function() operation, {
-    Duration timeout = const Duration(seconds: 30),
-    int maxRetries = 2,
-  }) async {
-    int attempt = 0;
-    while (attempt < maxRetries) {
-      try {
-        return await operation().timeout(timeout);
-      } on TimeoutException {
-        attempt++;
-        if (attempt >= maxRetries) {
-          throw Exception(
-            'Analysis timeout. Please check your connection and try again.',
-          );
-        }
-        // Exponential backoff
-        await Future.delayed(Duration(seconds: attempt * 2));
-      }
-    }
-    throw Exception('Max retries exceeded');
   }
 }

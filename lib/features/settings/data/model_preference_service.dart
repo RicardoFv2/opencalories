@@ -26,21 +26,25 @@ class ModelPreferenceService {
 
   static String getFriendlyName(String modelId) {
     switch (modelId) {
-      case 'gemini-2.5-flash-preview-09-2025':
+      case 'gemini-2.5-flash':
         return 'Gemini 2.5 Flash';
       case 'gemini-3-flash-preview':
-        return 'Gemini 3 Preview';
+        return 'Gemini 3.0 Flash';
+      case 'gemini-3.1-pro-preview':
+        return 'Gemini 3.1 Pro';
       default:
-        return 'Gemini 3 Preview';
+        return 'Gemini 3.0 Flash';
     }
   }
 
   static String getHint(String modelId) {
     switch (modelId) {
-      case 'gemini-2.5-flash-preview-09-2025':
+      case 'gemini-2.5-flash':
         return 'Stable (Food Optimized)';
       case 'gemini-3-flash-preview':
         return 'Experimental (Fastest)';
+      case 'gemini-3.1-pro-preview':
+        return 'Requires API key with funds';
       default:
         return '';
     }

@@ -18,13 +18,14 @@
 
 ## ✨ Features
 
-- **📸 AI Food Analysis** — Snap a photo or upload from gallery. The app identifies the food and breaks down its nutritional value using Generative AI.
+- **📸 AI Food Analysis** — Snap a photo or upload from gallery. The app identifies the food and breaks down its nutritional value using Generative AI (supports Gemini 1.5 Flash, 2.5 Flash, 3.0 Flash Preview, and 3.1 Pro Preview).
 - **🔒 Privacy First** — Your **Gemini API Key** is stored securely on your device using `flutter_secure_storage`. It is never sent to any third-party server other than Google's API directly.
 - **💾 Local Persistence** — Meal history is saved locally using **Drift (SQLite)**. No account creation or cloud sync required—your data stays yours.
 - **🌔 Modern UI** — Sleek dark/light mode adaptable design with glassmorphism elements, **haptic feedback**, and smooth animations.
 - **📊 Macro Tracking** — Visual breakdown of your daily macronutrient intake with a **Daily Calorie Goal** progress bar.
 - **📝 Manual Entry** — Log food manually with AI assistance for estimation, perfect for when you can't snap a photo.
 - **🎓 Interactive Tutorials** — Built-in guides to help you master the app's features in seconds.
+- **⚙️ Model Selection** — Choose between stable models for consistency or experimental/pro models for bleeding-edge performance directly within the app.
 - **🌐 Multi-Language** — Available in **English** and **Spanish**, with easy support for adding more languages.
 
 ---
