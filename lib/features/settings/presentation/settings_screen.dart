@@ -293,7 +293,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                         ),
                                       ),
                                       DropdownMenuItem(
-                                        value: 'gemini-3-flash-preview',
+                                        value: 'gemini-3.1-flash-lite-preview',
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -302,40 +302,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                           children: [
                                             Text(
                                               ModelPreferenceService.getFriendlyName(
-                                                'gemini-3-flash-preview',
+                                                'gemini-3.1-flash-lite-preview',
                                               ),
                                             ),
                                             Text(
                                               ModelPreferenceService.getHint(
-                                                'gemini-3-flash-preview',
+                                                'gemini-3.1-flash-lite-preview',
                                               ),
                                               style: TextStyle(
                                                 color: Colors.orange,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'gemini-3.1-pro-preview',
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              ModelPreferenceService.getFriendlyName(
-                                                'gemini-3.1-pro-preview',
-                                              ),
-                                            ),
-                                            Text(
-                                              ModelPreferenceService.getHint(
-                                                'gemini-3.1-pro-preview',
-                                              ),
-                                              style: TextStyle(
-                                                color: Colors.redAccent,
                                                 fontSize: 12,
                                               ),
                                             ),

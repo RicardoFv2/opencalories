@@ -12,12 +12,17 @@ ModelPreferenceService modelPreferenceService(Ref ref) {
 class ModelPreferenceService {
   final SharedPreferences _prefs;
   static const _keyModel = 'selected_ai_model';
-  static const defaultModel = 'gemini-3-flash-preview';
+  static const defaultModel = 'gemini-3.1-flash-lite-preview';
 
   ModelPreferenceService(this._prefs);
 
   String getSelectedModel() {
-    return _prefs.getString(_keyModel) ?? defaultModel;
+    final stored = _prefs.getString(_keyModel);
+    // Migration: If the stored model is the old preview or pro version, use the new default
+    if (stored == 'gemini-3-flash-preview' || stored == 'gemini-3.1-pro-preview') {
+      return defaultModel;
+    }
+    return stored ?? defaultModel;
   }
 
   Future<void> setSelectedModel(String model) async {
@@ -28,12 +33,10 @@ class ModelPreferenceService {
     switch (modelId) {
       case 'gemini-2.5-flash':
         return 'Gemini 2.5 Flash';
-      case 'gemini-3-flash-preview':
-        return 'Gemini 3.0 Flash';
-      case 'gemini-3.1-pro-preview':
-        return 'Gemini 3.1 Pro';
+      case 'gemini-3.1-flash-lite-preview':
+        return 'Gemini 3.1 Flash';
       default:
-        return 'Gemini 3.0 Flash';
+        return 'Gemini 3.1 Flash';
     }
   }
 
@@ -41,10 +44,8 @@ class ModelPreferenceService {
     switch (modelId) {
       case 'gemini-2.5-flash':
         return 'Stable (Food Optimized)';
-      case 'gemini-3-flash-preview':
-        return 'Experimental (Fastest)';
-      case 'gemini-3.1-pro-preview':
-        return 'Requires API key with funds';
+      case 'gemini-3.1-flash-lite-preview':
+        return 'Experimental (Lite & Fast)';
       default:
         return '';
     }

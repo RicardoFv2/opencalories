@@ -1053,14 +1053,8 @@ class _ModelSelectorSheet extends StatelessWidget {
         const SizedBox(height: 12),
         _buildOption(
           context,
-          'gemini-3-flash-preview',
-          isActive: currentModel == 'gemini-3-flash-preview',
-        ),
-        const SizedBox(height: 12),
-        _buildOption(
-          context,
-          'gemini-3.1-pro-preview',
-          isActive: currentModel == 'gemini-3.1-pro-preview',
+          'gemini-3.1-flash-lite-preview',
+          isActive: currentModel == 'gemini-3.1-flash-lite-preview',
         ),
         const SizedBox(height: 32),
       ],
