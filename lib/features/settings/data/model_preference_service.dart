@@ -19,7 +19,8 @@ class ModelPreferenceService {
   String getSelectedModel() {
     final stored = _prefs.getString(_keyModel);
     // Migration: If the stored model is the old preview or pro version, use the new default
-    if (stored == 'gemini-3-flash-preview' || stored == 'gemini-3.1-pro-preview') {
+    if (stored == 'gemini-3-flash-preview' ||
+        stored == 'gemini-3.1-pro-preview') {
       return defaultModel;
     }
     return stored ?? defaultModel;
