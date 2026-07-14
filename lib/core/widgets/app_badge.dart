@@ -11,7 +11,10 @@ class AppPill extends StatelessWidget {
     required this.label,
     this.color = DesignTokens.primary,
     this.glass = false,
-    this.padding = const EdgeInsets.symmetric(horizontal: DesignTokens.spaceM, vertical: DesignTokens.spaceS),
+    this.padding = const EdgeInsets.symmetric(
+      horizontal: DesignTokens.spaceM,
+      vertical: DesignTokens.spaceS,
+    ),
   });
 
   final Widget? leading;
@@ -29,7 +32,10 @@ class AppPill extends StatelessWidget {
     final content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (leading != null) ...[leading!, const SizedBox(width: DesignTokens.spaceXS)],
+        if (leading != null) ...[
+          leading!,
+          const SizedBox(width: DesignTokens.spaceXS),
+        ],
         Flexible(
           child: Text(
             label,
@@ -62,12 +68,18 @@ class AppPill extends StatelessWidget {
 
 /// Convenience alias for a floating glass badge (camera/photo overlays).
 class GlassBadge extends StatelessWidget {
-  const GlassBadge({super.key, this.leading, required this.label, this.color = DesignTokens.primary});
+  const GlassBadge({
+    super.key,
+    this.leading,
+    required this.label,
+    this.color = DesignTokens.primary,
+  });
 
   final Widget? leading;
   final String label;
   final Color color;
 
   @override
-  Widget build(BuildContext context) => AppPill(leading: leading, label: label, color: color, glass: true);
+  Widget build(BuildContext context) =>
+      AppPill(leading: leading, label: label, color: color, glass: true);
 }

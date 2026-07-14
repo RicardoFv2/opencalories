@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart' show GlassGlow;
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart'
+    show GlassGlow;
 import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/widgets/liquid_glass_surface.dart';
 
@@ -51,29 +52,42 @@ class AppButton extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[icon!, const SizedBox(width: DesignTokens.spaceS)],
+              if (icon != null) ...[
+                icon!,
+                const SizedBox(width: DesignTokens.spaceS),
+              ],
               Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
             ],
           );
 
     final button = switch (variant) {
-      AppButtonVariant.primary => FilledButton(onPressed: disabled ? null : onPressed, child: child),
+      AppButtonVariant.primary => FilledButton(
+        onPressed: disabled ? null : onPressed,
+        child: child,
+      ),
       AppButtonVariant.secondary => OutlinedButton(
         onPressed: disabled ? null : onPressed,
         style: (foregroundColor != null || borderColor != null)
             ? OutlinedButton.styleFrom(
                 foregroundColor: foregroundColor,
-                side: borderColor != null ? BorderSide(color: borderColor!) : null,
+                side: borderColor != null
+                    ? BorderSide(color: borderColor!)
+                    : null,
               )
             : null,
         child: child,
       ),
       AppButtonVariant.ghost => TextButton(
         onPressed: disabled ? null : onPressed,
-        style: foregroundColor != null ? TextButton.styleFrom(foregroundColor: foregroundColor) : null,
+        style: foregroundColor != null
+            ? TextButton.styleFrom(foregroundColor: foregroundColor)
+            : null,
         child: child,
       ),
-      AppButtonVariant.glass => _GlassButtonShell(onPressed: disabled ? null : onPressed, child: child),
+      AppButtonVariant.glass => _GlassButtonShell(
+        onPressed: disabled ? null : onPressed,
+        child: child,
+      ),
     };
 
     return expand ? SizedBox(width: double.infinity, child: button) : button;
@@ -87,7 +101,12 @@ class AppButton extends StatelessWidget {
     double size = 48,
     String? tooltip,
   }) {
-    final btn = _GlassIconButton(icon: icon, onPressed: onPressed, variant: variant, size: size);
+    final btn = _GlassIconButton(
+      icon: icon,
+      onPressed: onPressed,
+      variant: variant,
+      size: size,
+    );
     return tooltip != null ? Tooltip(message: tooltip, child: btn) : btn;
   }
 }
@@ -106,14 +125,20 @@ class _GlassButtonShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return LiquidGlassSurface(
       shapeKind: GlassShapeKind.pill,
-      padding: const EdgeInsets.symmetric(horizontal: DesignTokens.spaceL, vertical: DesignTokens.spaceM),
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.spaceL,
+        vertical: DesignTokens.spaceM,
+      ),
       child: GlassGlow(
         child: GestureDetector(
           onTap: onPressed == null ? null : () => _tap(onPressed),
           child: Opacity(
             opacity: onPressed == null ? DesignTokens.opacityDisabled : 1,
             child: DefaultTextStyle.merge(
-              style: const TextStyle(color: DesignTokens.textPrimary, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: DesignTokens.textPrimary,
+                fontWeight: FontWeight.bold,
+              ),
               child: IconTheme.merge(
                 data: const IconThemeData(color: DesignTokens.textPrimary),
                 child: child,
@@ -147,7 +172,11 @@ class _GlassIconButton extends StatelessWidget {
         child: Opacity(
           opacity: onPressed == null ? DesignTokens.opacityDisabled : 1,
           child: Center(
-            child: Icon(icon, color: DesignTokens.textPrimary, size: size * 0.45),
+            child: Icon(
+              icon,
+              color: DesignTokens.textPrimary,
+              size: size * 0.45,
+            ),
           ),
         ),
       ),
@@ -171,7 +200,11 @@ class _GlassIconButton extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: LiquidGlassSurface(shapeKind: GlassShapeKind.circle, padding: EdgeInsets.zero, child: tappable),
+      child: LiquidGlassSurface(
+        shapeKind: GlassShapeKind.circle,
+        padding: EdgeInsets.zero,
+        child: tappable,
+      ),
     );
   }
 }

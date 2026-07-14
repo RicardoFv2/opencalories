@@ -25,7 +25,9 @@ class LiquidGlassBottomNav extends ConsumerWidget {
       // Pre-auth, `/settings` is reached as a one-off push from Welcome, not
       // a real tab destination yet — hide the bar so the other two tabs
       // don't look available before there's an API key.
-      bottomNavigationBar: hasKey ? _NavBar(navigationShell: navigationShell) : null,
+      bottomNavigationBar: hasKey
+          ? _NavBar(navigationShell: navigationShell)
+          : null,
     );
   }
 }
@@ -37,7 +39,10 @@ class _NavBar extends StatelessWidget {
 
   void _select(BuildContext context, int index) {
     HapticFeedback.selectionClick();
-    navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
+    navigationShell.goBranch(
+      index,
+      initialLocation: index == navigationShell.currentIndex,
+    );
   }
 
   @override
@@ -112,7 +117,12 @@ class _NavBar extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  const _NavItem({required this.icon, required this.label, required this.selected, required this.onTap});
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String label;
@@ -177,7 +187,11 @@ class _ScanButton extends StatelessWidget {
             color: DesignTokens.primary,
             boxShadow: DesignTokens.glowPrimary(opacity: 0.5, blur: 20),
           ),
-          child: const Icon(Icons.camera_alt_rounded, color: Colors.black, size: 26),
+          child: const Icon(
+            Icons.camera_alt_rounded,
+            color: Colors.black,
+            size: 26,
+          ),
         ),
       ),
     );

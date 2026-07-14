@@ -111,12 +111,18 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
         if (context.mounted) {
           context.go('/');
           context.showAppSnackBar(
-            l10n.loggedFood(estimatedEntry.value!.name, estimatedEntry.value!.calories ?? 0),
+            l10n.loggedFood(
+              estimatedEntry.value!.name,
+              estimatedEntry.value!.calories ?? 0,
+            ),
           );
         }
       } catch (e) {
         if (context.mounted) {
-          context.showAppSnackBar(l10n.errorWithMessage(e.toString()), isError: true);
+          context.showAppSnackBar(
+            l10n.errorWithMessage(e.toString()),
+            isError: true,
+          );
         }
       } finally {
         isSaving.value = false;
@@ -128,7 +134,10 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
       appBar: AppBar(
         title: Text(
           l10n.assistedSearchTitle,
-          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
         ),
         backgroundColor: Colors.transparent,
       ),
@@ -192,7 +201,9 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
                     fontSize: 14,
                   ),
                   child: AppButton(
-                    label: isEstimating.value ? l10n.estimatingEllipsis : l10n.estimateWithAiAction,
+                    label: isEstimating.value
+                        ? l10n.estimatingEllipsis
+                        : l10n.estimateWithAiAction,
                     icon: const Icon(Icons.auto_awesome, size: 20),
                     variant: AppButtonVariant.primary,
                     expand: true,
@@ -251,7 +262,11 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
               const SizedBox(height: 4),
               Text(
                 '${entry.calories ?? 0} ${l10n.kcal}',
-                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

@@ -30,12 +30,18 @@ extension ResponsiveContext on BuildContext {
   /// System text scale, clamped so HUD labels and hero numbers can't blow
   /// past their containers at extreme accessibility settings while still
   /// respecting the user's preference.
-  double get clampedTextScale => MediaQuery.textScalerOf(this).scale(1.0).clamp(0.85, 1.3);
+  double get clampedTextScale =>
+      MediaQuery.textScalerOf(this).scale(1.0).clamp(0.85, 1.3);
 }
 
 /// Picks a value for the current breakpoint, falling back to the next
 /// smallest tier that was supplied.
-T responsiveValue<T>(BuildContext context, {required T compact, T? medium, T? expanded}) {
+T responsiveValue<T>(
+  BuildContext context, {
+  required T compact,
+  T? medium,
+  T? expanded,
+}) {
   switch (context.breakpoint) {
     case Breakpoint.expanded:
       return expanded ?? medium ?? compact;
@@ -79,7 +85,9 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = safeArea ? SafeArea(top: !extendBodyBehindAppBar, child: body) : body;
+    final content = safeArea
+        ? SafeArea(top: !extendBodyBehindAppBar, child: body)
+        : body;
 
     return Scaffold(
       backgroundColor: backgroundColor ?? DesignTokens.background,

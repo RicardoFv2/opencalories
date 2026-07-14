@@ -231,7 +231,8 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
                           child: _DayGridItem(
                             dayData: dayData,
                             onSelect: (date) {
-                              ref.read(selectedDateProvider.notifier).state = date;
+                              ref.read(selectedDateProvider.notifier).state =
+                                  date;
                               context.go('/');
                             },
                           ),
@@ -292,7 +293,12 @@ class _DayGridItem extends StatelessWidget {
     return GestureDetector(
       onTap: () => onSelect(date),
       child: Container(
-        height: responsiveValue(context, compact: 220.0, medium: 200.0, expanded: 240.0),
+        height: responsiveValue(
+          context,
+          compact: 220.0,
+          medium: 200.0,
+          expanded: 240.0,
+        ),
         decoration: BoxDecoration(
           color: DesignTokens.surface,
           borderRadius: BorderRadius.circular(DesignTokens.radiusXL),

@@ -79,7 +79,12 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
   Widget build(BuildContext context) {
     final isSmallScreen = context.isShortHeight;
     final l10n = AppLocalizations.of(context)!;
-    final heroHeight = responsiveValue(context, compact: 260.0, medium: 320.0, expanded: 380.0);
+    final heroHeight = responsiveValue(
+      context,
+      compact: 260.0,
+      medium: 320.0,
+      expanded: 380.0,
+    );
 
     return Scaffold(
       body: Stack(
@@ -111,7 +116,9 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                 return SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -129,7 +136,9 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppTheme.primary.withValues(alpha: 0.2),
+                                          color: AppTheme.primary.withValues(
+                                            alpha: 0.2,
+                                          ),
                                           blurRadius: 20,
                                           offset: const Offset(0, 10),
                                         ),
@@ -142,7 +151,10 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                                     ),
                                   )
                                   .animate()
-                                  .scale(duration: 600.ms, curve: Curves.easeOutBack)
+                                  .scale(
+                                    duration: 600.ms,
+                                    curve: Curves.easeOutBack,
+                                  )
                                   .fadeIn(duration: 600.ms),
                         ),
 
@@ -150,30 +162,43 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
 
                         // Welcome Text
                         Text(
-                          l10n.openCalories,
-                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          textAlign: TextAlign.center,
-                        ).animate().fadeIn(delay: 200.ms).moveY(begin: 20, end: 0),
+                              l10n.openCalories,
+                              style: Theme.of(context).textTheme.displaySmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                              textAlign: TextAlign.center,
+                            )
+                            .animate()
+                            .fadeIn(delay: 200.ms)
+                            .moveY(begin: 20, end: 0),
 
                         const SizedBox(height: 16),
 
                         Text(
-                          l10n.welcomeDescription,
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodyLarge?.copyWith(color: DesignTokens.textSecondary, height: 1.5),
-                          textAlign: TextAlign.center,
-                        ).animate().fadeIn(delay: 400.ms).moveY(begin: 20, end: 0),
+                              l10n.welcomeDescription,
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    color: DesignTokens.textSecondary,
+                                    height: 1.5,
+                                  ),
+                              textAlign: TextAlign.center,
+                            )
+                            .animate()
+                            .fadeIn(delay: 400.ms)
+                            .moveY(begin: 20, end: 0),
 
                         SizedBox(height: isSmallScreen ? 24 : 32),
 
                         // Hero Area — local decorative composition (no network
                         // dependency; previously an Image.network placeholder
                         // that broke offline with no loading state).
-                        if (!isSmallScreen) SizedBox(height: heroHeight, child: const _ScanHero()),
+                        if (!isSmallScreen)
+                          SizedBox(
+                            height: heroHeight,
+                            child: const _ScanHero(),
+                          ),
 
                         SizedBox(height: isSmallScreen ? 24 : 32),
 
@@ -191,7 +216,10 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
-                              descTextStyle: TextStyle(color: _tutorialText.withValues(alpha: 0.8), fontSize: 14),
+                              descTextStyle: TextStyle(
+                                color: _tutorialText.withValues(alpha: 0.8),
+                                fontSize: 14,
+                              ),
                               overlayColor: Colors.black.withValues(alpha: 0.7),
                               child: Semantics(
                                 label: l10n.startScanning,
@@ -202,7 +230,12 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                                   expand: true,
                                   onPressed: () {
                                     HapticFeedback.lightImpact();
-                                    final hasKey = ref.read(apiKeyProvider).valueOrNull?.isNotEmpty ?? false;
+                                    final hasKey =
+                                        ref
+                                            .read(apiKeyProvider)
+                                            .valueOrNull
+                                            ?.isNotEmpty ??
+                                        false;
                                     if (hasKey) {
                                       context.push('/scan');
                                     } else {
@@ -239,12 +272,19 @@ class _WelcomeContentState extends ConsumerState<_WelcomeContent> {
                                 label: l10n.connectDevice,
                                 variant: AppButtonVariant.secondary,
                                 expand: true,
-                                icon: const Icon(Icons.bluetooth_connected, size: 20),
+                                icon: const Icon(
+                                  Icons.bluetooth_connected,
+                                  size: 20,
+                                ),
                                 foregroundColor: Colors.white,
-                                borderColor: Colors.white.withValues(alpha: 0.1),
+                                borderColor: Colors.white.withValues(
+                                  alpha: 0.1,
+                                ),
                                 onPressed: () {
                                   HapticFeedback.lightImpact();
-                                  context.showAppSnackBar(l10n.deviceIntegrationComingSoon);
+                                  context.showAppSnackBar(
+                                    l10n.deviceIntegrationComingSoon,
+                                  );
                                 },
                               ),
                             ),
@@ -278,7 +318,13 @@ class _ScanHero extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white10),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 40, offset: const Offset(0, 20))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 40,
+            offset: const Offset(0, 20),
+          ),
+        ],
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -290,7 +336,11 @@ class _ScanHero extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           Center(
-            child: Icon(Icons.local_dining_rounded, size: 96, color: DesignTokens.primary.withValues(alpha: 0.12)),
+            child: Icon(
+              Icons.local_dining_rounded,
+              size: 96,
+              color: DesignTokens.primary.withValues(alpha: 0.12),
+            ),
           ),
 
           // Overlay Gradient
@@ -299,7 +349,10 @@ class _ScanHero extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [AppTheme.backgroundDark.withValues(alpha: 0.05), AppTheme.backgroundDark.withValues(alpha: 0.85)],
+                colors: [
+                  AppTheme.backgroundDark.withValues(alpha: 0.05),
+                  AppTheme.backgroundDark.withValues(alpha: 0.85),
+                ],
               ),
             ),
           ),
@@ -310,15 +363,34 @@ class _ScanHero extends StatelessWidget {
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3), width: 1),
+                border: Border.all(
+                  color: AppTheme.primary.withValues(alpha: 0.3),
+                  width: 1,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Stack(
                 children: [
-                  const Positioned(top: 0, left: 0, child: _CornerBracket(isTop: true, isLeft: true)),
-                  const Positioned(top: 0, right: 0, child: _CornerBracket(isTop: true, isLeft: false)),
-                  const Positioned(bottom: 0, left: 0, child: _CornerBracket(isTop: false, isLeft: true)),
-                  const Positioned(bottom: 0, right: 0, child: _CornerBracket(isTop: false, isLeft: false)),
+                  const Positioned(
+                    top: 0,
+                    left: 0,
+                    child: _CornerBracket(isTop: true, isLeft: true),
+                  ),
+                  const Positioned(
+                    top: 0,
+                    right: 0,
+                    child: _CornerBracket(isTop: true, isLeft: false),
+                  ),
+                  const Positioned(
+                    bottom: 0,
+                    left: 0,
+                    child: _CornerBracket(isTop: false, isLeft: true),
+                  ),
+                  const Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: _CornerBracket(isTop: false, isLeft: false),
+                  ),
 
                   // Scanning indicator — real liquid glass badge (static,
                   // non-animated geometry; only the dot inside pulses).
@@ -328,16 +400,26 @@ class _ScanHero extends StatelessWidget {
                     child: LiquidGlassSurface(
                       shapeKind: GlassShapeKind.pill,
                       settings: DesignTokens.glassSettingsAccent,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       child: Builder(
                         builder: (context) {
                           final dot = Container(
                             width: 6,
                             height: 6,
-                            decoration: const BoxDecoration(color: AppTheme.primary, shape: BoxShape.circle),
+                            decoration: const BoxDecoration(
+                              color: AppTheme.primary,
+                              shape: BoxShape.circle,
+                            ),
                           );
 
-                          final animatedDot = kIsTest ? dot : dot.animate(onPlay: (c) => c.repeat()).fade(duration: 1.seconds);
+                          final animatedDot = kIsTest
+                              ? dot
+                              : dot
+                                    .animate(onPlay: (c) => c.repeat())
+                                    .fade(duration: 1.seconds);
 
                           return Row(
                             mainAxisSize: MainAxisSize.min,
@@ -346,7 +428,11 @@ class _ScanHero extends StatelessWidget {
                               const SizedBox(width: 6),
                               Text(
                                 AppLocalizations.of(context)!.scanning,
-                                style: const TextStyle(color: AppTheme.primary, fontSize: 10, fontFamily: 'monospace'),
+                                style: const TextStyle(
+                                  color: AppTheme.primary,
+                                  fontSize: 10,
+                                  fontFamily: 'monospace',
+                                ),
                               ),
                             ],
                           );
@@ -377,16 +463,26 @@ class _CornerBracket extends StatelessWidget {
       height: 24,
       decoration: BoxDecoration(
         border: Border(
-          top: isTop ? const BorderSide(color: AppTheme.primary, width: 2) : BorderSide.none,
-          bottom: !isTop ? const BorderSide(color: AppTheme.primary, width: 2) : BorderSide.none,
-          left: isLeft ? const BorderSide(color: AppTheme.primary, width: 2) : BorderSide.none,
-          right: !isLeft ? const BorderSide(color: AppTheme.primary, width: 2) : BorderSide.none,
+          top: isTop
+              ? const BorderSide(color: AppTheme.primary, width: 2)
+              : BorderSide.none,
+          bottom: !isTop
+              ? const BorderSide(color: AppTheme.primary, width: 2)
+              : BorderSide.none,
+          left: isLeft
+              ? const BorderSide(color: AppTheme.primary, width: 2)
+              : BorderSide.none,
+          right: !isLeft
+              ? const BorderSide(color: AppTheme.primary, width: 2)
+              : BorderSide.none,
         ),
         borderRadius: BorderRadius.only(
           topLeft: isTop && isLeft ? const Radius.circular(8) : Radius.zero,
           topRight: isTop && !isLeft ? const Radius.circular(8) : Radius.zero,
           bottomLeft: !isTop && isLeft ? const Radius.circular(8) : Radius.zero,
-          bottomRight: !isTop && !isLeft ? const Radius.circular(8) : Radius.zero,
+          bottomRight: !isTop && !isLeft
+              ? const Radius.circular(8)
+              : Radius.zero,
         ),
       ),
     );

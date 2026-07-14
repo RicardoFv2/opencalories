@@ -141,7 +141,14 @@ class DesignTokens {
   // Reserve for 1-2 focal points per screen (see plan: "Cyberpunk tal cual"
   // keeps the neon glow language, but it shouldn't be on every surface).
   // ---------------------------------------------------------------------
-  static List<BoxShadow> glowPrimary({double opacity = 0.35, double blur = 24}) => [
-    BoxShadow(color: primary.withValues(alpha: opacity), blurRadius: blur, spreadRadius: 2),
+  static List<BoxShadow> glowPrimary({
+    double opacity = 0.35,
+    double blur = 24,
+  }) => [
+    BoxShadow(
+      color: primary.withValues(alpha: opacity),
+      blurRadius: blur,
+      spreadRadius: 2,
+    ),
   ];
 }

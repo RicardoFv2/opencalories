@@ -77,24 +77,39 @@ GoRouter appRouter(Ref ref) {
         branches: [
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/', builder: (context, state) => const HistoryScreen()),
+              GoRoute(
+                path: '/',
+                builder: (context, state) => const HistoryScreen(),
+              ),
             ],
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/weekly', builder: (context, state) => const WeeklySummaryScreen()),
+              GoRoute(
+                path: '/weekly',
+                builder: (context, state) => const WeeklySummaryScreen(),
+              ),
             ],
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: '/settings', builder: (context, state) => const SettingsScreen()),
+              GoRoute(
+                path: '/settings',
+                builder: (context, state) => const SettingsScreen(),
+              ),
             ],
           ),
         ],
       ),
       // Full-screen routes, outside the shell — no bottom nav.
-      GoRoute(path: '/scan', builder: (context, state) => const ScannerScreen()),
-      GoRoute(path: '/welcome', builder: (context, state) => const WelcomeScreen()),
+      GoRoute(
+        path: '/scan',
+        builder: (context, state) => const ScannerScreen(),
+      ),
+      GoRoute(
+        path: '/welcome',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
       GoRoute(
         path: '/analysis',
         builder: (context, state) {
@@ -123,7 +138,10 @@ GoRouter appRouter(Ref ref) {
           return FullScreenImageView(imageFile: imageFile!);
         },
       ),
-      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
     ],
   );
 }

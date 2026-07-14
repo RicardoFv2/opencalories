@@ -123,12 +123,18 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline_rounded, color: DesignTokens.error, size: 40),
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: DesignTokens.error,
+                        size: 40,
+                      ),
                       const SizedBox(height: DesignTokens.spaceM),
                       Text(
                         l10n.errorWithMessage(error.toString()),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: DesignTokens.textSecondary),
+                        style: const TextStyle(
+                          color: DesignTokens.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: DesignTokens.spaceL),
                       AppButton(
@@ -235,109 +241,117 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
               GestureDetector(
                 onTap: () =>
                     context.push('/image-view', extra: widget.imageFile),
-                child: Container(
-                  height: 220,
-                  width: double.infinity,
-                  margin: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 20,
-                      ),
-                    ],
-                    image: DecorationImage(
-                      image: FileImage(widget.imageFile!),
-                      fit: BoxFit.cover,
-                    ),
-                    border: Border.all(color: Colors.white10),
-                  ),
-                  child: Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.8),
-                              Colors.transparent,
+                child:
+                    Container(
+                          height: 220,
+                          width: double.infinity,
+                          margin: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 20,
+                              ),
+                            ],
+                            image: DecorationImage(
+                              image: FileImage(widget.imageFile!),
+                              fit: BoxFit.cover,
+                            ),
+                            border: Border.all(color: Colors.white10),
+                          ),
+                          child: Stack(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(24),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Colors.black.withValues(alpha: 0.8),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              if ((analysis?.confidence ?? 0) > 0 || isLoading)
+                                Positioned(
+                                  top: 16,
+                                  left: 16,
+                                  child:
+                                      LiquidGlassSurface(
+                                            shapeKind: GlassShapeKind.pill,
+                                            settings: DesignTokens
+                                                .glassSettingsAccent,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 6,
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.auto_awesome,
+                                                  color: AppTheme.primary,
+                                                  size: 14,
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  isLoading
+                                                      ? l10n.analyzingEllipsis
+                                                      : l10n.matchPercent(
+                                                          analysis?.confidence ??
+                                                              0,
+                                                        ),
+                                                  style:
+                                                      GoogleFonts.spaceGrotesk(
+                                                        color: AppTheme.primary,
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                          .animate(target: isLoading ? 1 : 0)
+                                          .shimmer(duration: 1.seconds),
+                                ),
+
+                              Positioned(
+                                bottom: 16,
+                                left: 16,
+                                right: 16,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      isLoading
+                                          ? l10n.identifyingFoodStatus
+                                          : (items.isNotEmpty
+                                                ? FoodTranslationHelper.getLocalizedFoodItemName(
+                                                    context,
+                                                    items.first,
+                                                  ).toUpperCase()
+                                                : l10n.detected),
+                                      style: GoogleFonts.spaceGrotesk(
+                                        color: AppTheme.primary,
+                                        fontSize: 12,
+                                        letterSpacing: 2.0,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    // Name overlay removed in favor of the summary bar below
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                      ),
-                      if ((analysis?.confidence ?? 0) > 0 || isLoading)
-                        Positioned(
-                          top: 16,
-                          left: 16,
-                          child:
-                              LiquidGlassSurface(
-                                    shapeKind: GlassShapeKind.pill,
-                                    settings: DesignTokens.glassSettingsAccent,
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(
-                                          Icons.auto_awesome,
-                                          color: AppTheme.primary,
-                                          size: 14,
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          isLoading
-                                              ? l10n.analyzingEllipsis
-                                              : l10n.matchPercent(
-                                                  analysis?.confidence ?? 0,
-                                                ),
-                                          style: GoogleFonts.spaceGrotesk(
-                                            color: AppTheme.primary,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                  .animate(target: isLoading ? 1 : 0)
-                                  .shimmer(duration: 1.seconds),
-                        ),
-
-                      Positioned(
-                        bottom: 16,
-                        left: 16,
-                        right: 16,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isLoading
-                                  ? l10n.identifyingFoodStatus
-                                  : (items.isNotEmpty
-                                        ? FoodTranslationHelper.getLocalizedFoodItemName(
-                                            context,
-                                            items.first,
-                                          ).toUpperCase()
-                                        : l10n.detected),
-                              style: GoogleFonts.spaceGrotesk(
-                                color: AppTheme.primary,
-                                fontSize: 12,
-                                letterSpacing: 2.0,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            // Name overlay removed in favor of the summary bar below
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
+                        )
+                        .animate()
+                        .fadeIn(duration: 600.ms)
+                        .slideY(begin: 0.1, end: 0, curve: Curves.easeOut),
               ),
 
             // 2. Ingredient Summary Bar (New explicit CTA)
@@ -556,55 +570,74 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                           children: [
                             if (isLoading) ...[
                               Expanded(
-                                child: MacroChip(type: MacroType.carbs, label: l10n.carbs, grams: 0)
-                                    .animate(onPlay: (c) => c.repeat())
-                                    .shimmer(duration: 1.5.seconds),
+                                child:
+                                    MacroChip(
+                                          type: MacroType.carbs,
+                                          label: l10n.carbs,
+                                          grams: 0,
+                                        )
+                                        .animate(onPlay: (c) => c.repeat())
+                                        .shimmer(duration: 1.5.seconds),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child:
                                     MacroChip(
-                                      type: MacroType.protein,
-                                      label: l10n.protein,
-                                      grams: 0,
-                                      isPrimary: true,
-                                    ).animate(onPlay: (c) => c.repeat()).shimmer(
-                                      duration: 1.5.seconds,
-                                    ),
+                                          type: MacroType.protein,
+                                          label: l10n.protein,
+                                          grams: 0,
+                                          isPrimary: true,
+                                        )
+                                        .animate(onPlay: (c) => c.repeat())
+                                        .shimmer(duration: 1.5.seconds),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: MacroChip(type: MacroType.fat, label: l10n.fat, grams: 0)
-                                    .animate(onPlay: (c) => c.repeat())
-                                    .shimmer(duration: 1.5.seconds),
+                                child:
+                                    MacroChip(
+                                          type: MacroType.fat,
+                                          label: l10n.fat,
+                                          grams: 0,
+                                        )
+                                        .animate(onPlay: (c) => c.repeat())
+                                        .shimmer(duration: 1.5.seconds),
                               ),
                             ] else ...[
                               Expanded(
                                 child:
                                     MacroChip(
-                                      type: MacroType.carbs,
-                                      label: l10n.carbs,
-                                      grams: totalCarbs.toDouble(),
-                                    ).animate().fadeIn(delay: 300.ms).slideX(begin: 0.1, end: 0),
+                                          type: MacroType.carbs,
+                                          label: l10n.carbs,
+                                          grams: totalCarbs.toDouble(),
+                                        )
+                                        .animate()
+                                        .fadeIn(delay: 300.ms)
+                                        .slideX(begin: 0.1, end: 0),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child:
                                     MacroChip(
-                                      type: MacroType.protein,
-                                      label: l10n.protein,
-                                      grams: totalProtein.toDouble(),
-                                      isPrimary: true,
-                                    ).animate().fadeIn(delay: 450.ms).slideX(begin: 0.1, end: 0),
+                                          type: MacroType.protein,
+                                          label: l10n.protein,
+                                          grams: totalProtein.toDouble(),
+                                          isPrimary: true,
+                                        )
+                                        .animate()
+                                        .fadeIn(delay: 450.ms)
+                                        .slideX(begin: 0.1, end: 0),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child:
                                     MacroChip(
-                                      type: MacroType.fat,
-                                      label: l10n.fat,
-                                      grams: totalFat.toDouble(),
-                                    ).animate().fadeIn(delay: 600.ms).slideX(begin: 0.1, end: 0),
+                                          type: MacroType.fat,
+                                          label: l10n.fat,
+                                          grams: totalFat.toDouble(),
+                                        )
+                                        .animate()
+                                        .fadeIn(delay: 600.ms)
+                                        .slideX(begin: 0.1, end: 0),
                               ),
                             ],
                           ],
@@ -653,9 +686,13 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                         onPressed: isLoading
                             ? null
                             : () async {
-                                if (analysis == null || analysis.items.isEmpty) {
+                                if (analysis == null ||
+                                    analysis.items.isEmpty) {
                                   if (context.mounted) {
-                                    context.showAppSnackBar(l10n.noItemsToSave, isError: true);
+                                    context.showAppSnackBar(
+                                      l10n.noItemsToSave,
+                                      isError: true,
+                                    );
                                   }
                                   return;
                                 }
@@ -663,9 +700,12 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                 await HapticFeedback.heavyImpact();
                                 setState(() => _isSaving = true);
                                 try {
-                                  if (widget.mealId != null || widget.isViewOnly) {
+                                  if (widget.mealId != null ||
+                                      widget.isViewOnly) {
                                     if (widget.mealId == null) {
-                                      throw Exception(l10n.errorRecordIdNotFound);
+                                      throw Exception(
+                                        l10n.errorRecordIdNotFound,
+                                      );
                                     }
                                     // Update existing record
                                     await ref
@@ -673,7 +713,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                         .updateMeal(widget.mealId!, analysis);
                                     if (context.mounted) {
                                       context.go('/');
-                                      context.showAppSnackBar(l10n.summaryUpdatedSuccess);
+                                      context.showAppSnackBar(
+                                        l10n.summaryUpdatedSuccess,
+                                      );
                                     }
                                   } else {
                                     // Save new record
@@ -683,7 +725,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                         .saveMeal(analysis, widget.imageFile!);
                                     if (context.mounted) {
                                       context.go('/');
-                                      context.showAppSnackBar(l10n.mealSavedToHistory);
+                                      context.showAppSnackBar(
+                                        l10n.mealSavedToHistory,
+                                      );
                                     }
                                   }
                                 } catch (e) {
@@ -826,7 +870,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                       ),
                                       IconButton(
                                         key: ValueKey('refine_item_$i'),
-                                        tooltip: AppLocalizations.of(context)!.refineWithAiTooltip,
+                                        tooltip: AppLocalizations.of(
+                                          context,
+                                        )!.refineWithAiTooltip,
                                         onPressed: () => _showEditItemDialog(
                                           context,
                                           items[i],
@@ -1060,7 +1106,11 @@ class _RefineDialogState extends State<_RefineDialog> {
           children: [
             Row(
               children: [
-                const Icon(Icons.auto_awesome, color: AppTheme.primary, size: 24),
+                const Icon(
+                  Icons.auto_awesome,
+                  color: AppTheme.primary,
+                  size: 24,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   l10n.refineFoodTitle,
@@ -1075,7 +1125,10 @@ class _RefineDialogState extends State<_RefineDialog> {
             const SizedBox(height: 8),
             Text(
               l10n.refineFoodSubtitle,
-              style: GoogleFonts.spaceGrotesk(color: Colors.white60, fontSize: 14),
+              style: GoogleFonts.spaceGrotesk(
+                color: Colors.white60,
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 24),
             SingleChildScrollView(
@@ -1105,7 +1158,9 @@ class _RefineDialogState extends State<_RefineDialog> {
                           label: l10n.portionOptionalLabel,
                           onChanged: (val) {
                             setState(() {
-                              _pendingItem = _pendingItem.copyWith(portionEstimate: val);
+                              _pendingItem = _pendingItem.copyWith(
+                                portionEstimate: val,
+                              );
                             });
                           },
                         ),
@@ -1114,7 +1169,9 @@ class _RefineDialogState extends State<_RefineDialog> {
                   ),
                   const SizedBox(height: 32),
                   AppButton(
-                    label: _isReanalyzing ? l10n.estimatingEllipsis : l10n.estimateWithAiAction,
+                    label: _isReanalyzing
+                        ? l10n.estimatingEllipsis
+                        : l10n.estimateWithAiAction,
                     icon: const Icon(Icons.auto_awesome, size: 20),
                     variant: AppButtonVariant.primary,
                     expand: true,

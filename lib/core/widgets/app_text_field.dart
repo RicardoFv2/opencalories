@@ -47,7 +47,11 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   Widget build(BuildContext context) {
     final baseStyle = widget.monospace
-        ? const TextStyle(fontFamily: 'monospace', color: DesignTokens.textPrimary, fontSize: 14)
+        ? const TextStyle(
+            fontFamily: 'monospace',
+            color: DesignTokens.textPrimary,
+            fontSize: 14,
+          )
         : const TextStyle(color: DesignTokens.textPrimary);
 
     return TextFormField(
@@ -69,7 +73,9 @@ class _AppTextFieldState extends State<AppTextField> {
         suffixIcon: widget.showObscureToggle
             ? IconButton(
                 icon: Icon(
-                  _obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                  _obscured
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
                   color: DesignTokens.textTertiary,
                 ),
                 onPressed: () => setState(() => _obscured = !_obscured),
@@ -77,7 +83,10 @@ class _AppTextFieldState extends State<AppTextField> {
             : widget.suffixIcon,
         filled: true,
         fillColor: DesignTokens.surface1,
-        contentPadding: const EdgeInsets.symmetric(horizontal: DesignTokens.spaceM, vertical: DesignTokens.spaceM),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: DesignTokens.spaceM,
+          vertical: DesignTokens.spaceM,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(DesignTokens.radiusM),
           borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),

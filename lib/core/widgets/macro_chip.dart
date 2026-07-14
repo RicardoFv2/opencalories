@@ -36,21 +36,35 @@ class MacroChip extends StatelessWidget {
     return AppCard(
       glass: isPrimary,
       borderColor: isPrimary ? color.withValues(alpha: 0.4) : null,
-      padding: const EdgeInsets.symmetric(vertical: DesignTokens.spaceM, horizontal: DesignTokens.spaceS),
+      padding: const EdgeInsets.symmetric(
+        vertical: DesignTokens.spaceM,
+        horizontal: DesignTokens.spaceS,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
           const SizedBox(height: DesignTokens.spaceXS),
           Text(
             '${grams.toStringAsFixed(0)}g',
-            style: GoogleFonts.spaceGrotesk(fontSize: 20, fontWeight: FontWeight.w800, color: DesignTokens.textPrimary),
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: DesignTokens.textPrimary,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
             label,
-            style: const TextStyle(color: DesignTokens.textTertiary, fontSize: 11),
+            style: const TextStyle(
+              color: DesignTokens.textTertiary,
+              fontSize: 11,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -72,12 +86,19 @@ class MacroMiniTag extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 6, height: 6, decoration: BoxDecoration(color: type.color, shape: BoxShape.circle)),
+        Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(color: type.color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: DesignTokens.spaceXS),
         Flexible(
           child: Text(
             text,
-            style: const TextStyle(color: DesignTokens.textSecondary, fontSize: 12),
+            style: const TextStyle(
+              color: DesignTokens.textSecondary,
+              fontSize: 12,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -88,7 +109,13 @@ class MacroMiniTag extends StatelessWidget {
 
 /// Horizontal protein/carbs/fat proportion bar.
 class MacroBar extends StatelessWidget {
-  const MacroBar({super.key, required this.protein, required this.carbs, required this.fat, this.height = 8});
+  const MacroBar({
+    super.key,
+    required this.protein,
+    required this.carbs,
+    required this.fat,
+    this.height = 8,
+  });
 
   final double protein;
   final double carbs;
@@ -103,12 +130,16 @@ class MacroBar extends StatelessWidget {
     if (total <= 0) {
       return ClipRRect(
         borderRadius: radius,
-        child: Container(height: height, color: Colors.white.withValues(alpha: 0.08)),
+        child: Container(
+          height: height,
+          color: Colors.white.withValues(alpha: 0.08),
+        ),
       );
     }
 
     // At least one segment is guaranteed > 0 here, so total flex is never 0.
-    int flexFor(double grams) => grams <= 0 ? 0 : (grams / total * 1000).round().clamp(1, 1000);
+    int flexFor(double grams) =>
+        grams <= 0 ? 0 : (grams / total * 1000).round().clamp(1, 1000);
 
     return ClipRRect(
       borderRadius: radius,
@@ -116,9 +147,18 @@ class MacroBar extends StatelessWidget {
         height: height,
         child: Row(
           children: [
-            Expanded(flex: flexFor(protein), child: Container(color: DesignTokens.proteinColor)),
-            Expanded(flex: flexFor(carbs), child: Container(color: DesignTokens.carbsColor)),
-            Expanded(flex: flexFor(fat), child: Container(color: DesignTokens.fatColor)),
+            Expanded(
+              flex: flexFor(protein),
+              child: Container(color: DesignTokens.proteinColor),
+            ),
+            Expanded(
+              flex: flexFor(carbs),
+              child: Container(color: DesignTokens.carbsColor),
+            ),
+            Expanded(
+              flex: flexFor(fat),
+              child: Container(color: DesignTokens.fatColor),
+            ),
           ],
         ),
       ),

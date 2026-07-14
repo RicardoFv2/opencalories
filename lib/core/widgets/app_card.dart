@@ -33,16 +33,24 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedPadding = padding ?? const EdgeInsets.all(DesignTokens.spaceM);
+    final resolvedPadding =
+        padding ?? const EdgeInsets.all(DesignTokens.spaceM);
     final inner = Padding(padding: resolvedPadding, child: child);
 
     Widget card = glass
-        ? LiquidGlassSurface(borderRadius: borderRadius, animated: animated, padding: resolvedPadding, child: child)
+        ? LiquidGlassSurface(
+            borderRadius: borderRadius,
+            animated: animated,
+            padding: resolvedPadding,
+            child: child,
+          )
         : DecoratedBox(
             decoration: BoxDecoration(
               color: color ?? Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(borderRadius),
-              border: Border.all(color: borderColor ?? Colors.white.withValues(alpha: 0.1)),
+              border: Border.all(
+                color: borderColor ?? Colors.white.withValues(alpha: 0.1),
+              ),
             ),
             child: inner,
           );

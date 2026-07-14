@@ -152,7 +152,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             gradient: LinearGradient(
                               begin: Alignment.bottomCenter,
                               end: Alignment.topCenter,
-                              colors: [AppTheme.backgroundDark, Colors.transparent],
+                              colors: [
+                                AppTheme.backgroundDark,
+                                Colors.transparent,
+                              ],
                             ),
                           ),
                         ),
@@ -251,11 +254,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   children: [
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
-                                            ModelPreferenceService.getFriendlyName(currentModel),
+                                            ModelPreferenceService.getFriendlyName(
+                                              currentModel,
+                                            ),
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
@@ -264,21 +270,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            ModelPreferenceService.getHint(currentModel),
+                                            ModelPreferenceService.getHint(
+                                              currentModel,
+                                            ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                                            style: TextStyle(
+                                              color: Colors.grey[400],
+                                              fontSize: 12,
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    const Icon(Icons.unfold_more, color: AppTheme.primary),
+                                    const Icon(
+                                      Icons.unfold_more,
+                                      color: AppTheme.primary,
+                                    ),
                                   ],
                                 ),
                               );
                             },
-                            loading: () => const Center(child: CircularProgressIndicator()),
-                            error: (err, stack) => Text(l10n.errorWithMessage(err.toString())),
+                            loading: () => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            error: (err, stack) =>
+                                Text(l10n.errorWithMessage(err.toString())),
                           );
                         },
                       ),
@@ -435,7 +452,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              key.isEmpty ? l10n.pleaseEnterApiKey : l10n.invalidKeyFormat,
+                              key.isEmpty
+                                  ? l10n.pleaseEnterApiKey
+                                  : l10n.invalidKeyFormat,
                             ),
                             backgroundColor: Colors.red,
                           ),
@@ -474,7 +493,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     borderColor: Colors.grey[700],
                     onPressed: () async {
                       await ref.read(tutorialServiceProvider.future);
-                      await ref.read(tutorialServiceProvider.notifier).resetTutorials();
+                      await ref
+                          .read(tutorialServiceProvider.notifier)
+                          .resetTutorials();
                       if (context.mounted) {
                         context.showAppSnackBar(l10n.hintsReset);
                       }
@@ -545,20 +566,27 @@ class _ModelOptionList extends StatelessWidget {
               children: [
                 Text(
                   ModelPreferenceService.getFriendlyName(modelId),
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   ModelPreferenceService.getHint(modelId),
                   style: TextStyle(
                     fontSize: 12,
-                    color: modelId.contains('preview') ? Colors.orange : Colors.grey[400],
+                    color: modelId.contains('preview')
+                        ? Colors.orange
+                        : Colors.grey[400],
                   ),
                 ),
               ],
             ),
           ),
-          if (isActive) const Icon(Icons.bolt, color: AppTheme.primary, size: 20),
+          if (isActive)
+            const Icon(Icons.bolt, color: AppTheme.primary, size: 20),
         ],
       ),
     );

@@ -19,7 +19,9 @@ LiquidShape _shapeFor(GlassShapeKind kind, double borderRadius) {
     case GlassShapeKind.circle:
       return const LiquidOval();
     case GlassShapeKind.pill:
-      return const LiquidRoundedSuperellipse(borderRadius: DesignTokens.radiusPill);
+      return const LiquidRoundedSuperellipse(
+        borderRadius: DesignTokens.radiusPill,
+      );
     case GlassShapeKind.rounded:
       return LiquidRoundedSuperellipse(borderRadius: borderRadius);
   }
@@ -66,7 +68,9 @@ class LiquidGlassSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = padding != null ? Padding(padding: padding!, child: child) : child;
+    final content = padding != null
+        ? Padding(padding: padding!, child: child)
+        : child;
 
     final glass = LiquidGlass.withOwnLayer(
       shape: _shapeFor(shapeKind, borderRadius),
@@ -137,7 +141,9 @@ class LiquidGlassBlob extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = padding != null ? Padding(padding: padding!, child: child) : child;
+    final content = padding != null
+        ? Padding(padding: padding!, child: child)
+        : child;
 
     return LiquidGlass.grouped(
       shape: _shapeFor(shapeKind, borderRadius),

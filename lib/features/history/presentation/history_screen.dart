@@ -301,7 +301,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                         Text(
                           '$dailyCalories',
                           style: TextStyle(
-                            fontSize: responsiveValue(context, compact: 48.0, medium: 56.0, expanded: 64.0),
+                            fontSize: responsiveValue(
+                              context,
+                              compact: 48.0,
+                              medium: 56.0,
+                              expanded: 64.0,
+                            ),
                             fontWeight: FontWeight.w900,
                             height: 1.0,
                             color: Colors.white,

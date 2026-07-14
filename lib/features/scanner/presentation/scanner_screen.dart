@@ -91,7 +91,10 @@ class _ScannerContent extends HookConsumerWidget {
     final cameraPermissionDenied = useState(false);
 
     final viewportSize = MediaQuery.sizeOf(context);
-    final frameSize = math.min(300.0, math.min(viewportSize.width * 0.78, viewportSize.height * 0.34));
+    final frameSize = math.min(
+      300.0,
+      math.min(viewportSize.width * 0.78, viewportSize.height * 0.34),
+    );
 
     // Initialize camera and reset state
     useEffect(() {
@@ -123,7 +126,9 @@ class _ScannerContent extends HookConsumerWidget {
         } catch (e) {
           debugPrint('Error initializing camera: $e');
           final status = await Permission.camera.status;
-          if ((status.isDenied || status.isPermanentlyDenied || status.isRestricted) &&
+          if ((status.isDenied ||
+                  status.isPermanentlyDenied ||
+                  status.isRestricted) &&
               context.mounted) {
             cameraPermissionDenied.value = true;
           }
@@ -322,9 +327,7 @@ class _ScannerContent extends HookConsumerWidget {
                       icon: selectedImage != null
                           ? Icons.close
                           : Icons.arrow_back,
-                      tooltip: selectedImage != null
-                          ? l10n.close
-                          : l10n.back,
+                      tooltip: selectedImage != null ? l10n.close : l10n.back,
                       onPressed: () {
                         if (selectedImage != null) {
                           ref.read(scannerImageProvider.notifier).state = null;
@@ -347,219 +350,231 @@ class _ScannerContent extends HookConsumerWidget {
               builder: (context, constraints) {
                 return SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
                     child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Daily Calories Badge (New Overlay)
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 24.0),
-                    child: const _DailyCaloriesBadge(),
-                  ),
-                ),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Daily Calories Badge (New Overlay)
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 24.0),
+                            child: const _DailyCaloriesBadge(),
+                          ),
+                        ),
 
-                // Active Badge
-                Showcase(
-                  key: modelBadgeKey,
-                  title: l10n.tutorialModelTitle,
-                  description: l10n.tutorialModelDesc,
-                  tooltipBackgroundColor: _tutorialBg,
-                  titleTextStyle: const TextStyle(
-                    color: _tutorialText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  descTextStyle: TextStyle(
-                    color: _tutorialText.withValues(alpha: 0.8),
-                    fontSize: 14,
-                  ),
-                  child: Consumer(
-                    builder: (context, ref, child) {
-                      final asyncModel = ref.watch(
-                        modelPreferenceServiceInitializedProvider,
-                      );
-                      return asyncModel.when(
-                        data: (service) {
-                          final currentModel = service.getSelectedModel();
-                          final friendlyName =
-                              ModelPreferenceService.getFriendlyName(
-                                currentModel,
+                        // Active Badge
+                        Showcase(
+                          key: modelBadgeKey,
+                          title: l10n.tutorialModelTitle,
+                          description: l10n.tutorialModelDesc,
+                          tooltipBackgroundColor: _tutorialBg,
+                          titleTextStyle: const TextStyle(
+                            color: _tutorialText,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          descTextStyle: TextStyle(
+                            color: _tutorialText.withValues(alpha: 0.8),
+                            fontSize: 14,
+                          ),
+                          child: Consumer(
+                            builder: (context, ref, child) {
+                              final asyncModel = ref.watch(
+                                modelPreferenceServiceInitializedProvider,
                               );
+                              return asyncModel.when(
+                                data: (service) {
+                                  final currentModel = service
+                                      .getSelectedModel();
+                                  final friendlyName =
+                                      ModelPreferenceService.getFriendlyName(
+                                        currentModel,
+                                      );
 
-                          return GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              GlassModal.show(
-                                context: context,
-                                title: l10n.selectAiModelTitle,
-                                child: _ModelSelectorSheet(
-                                  service: service,
-                                  currentModel: currentModel,
-                                  onModelSelected: () {
-                                    rebuildTrigger.value++; // Refresh badge
-                                  },
-                                ),
+                                  return GestureDetector(
+                                    onTap: () {
+                                      HapticFeedback.lightImpact();
+                                      GlassModal.show(
+                                        context: context,
+                                        title: l10n.selectAiModelTitle,
+                                        child: _ModelSelectorSheet(
+                                          service: service,
+                                          currentModel: currentModel,
+                                          onModelSelected: () {
+                                            rebuildTrigger
+                                                .value++; // Refresh badge
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    child: Builder(
+                                      builder: (context) {
+                                        return LiquidGlassSurface(
+                                          shapeKind: GlassShapeKind.pill,
+                                          settings:
+                                              DesignTokens.glassSettingsAccent,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 8,
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              if (kIsTest)
+                                                const Icon(
+                                                  Icons.bolt,
+                                                  color: AppTheme.primary,
+                                                  size: 16,
+                                                )
+                                              else
+                                                const Icon(
+                                                      Icons.bolt,
+                                                      color: AppTheme.primary,
+                                                      size: 16,
+                                                    )
+                                                    .animate(
+                                                      onPlay: (c) => c.repeat(
+                                                        reverse: true,
+                                                      ),
+                                                    )
+                                                    .scale(
+                                                      begin: const Offset(1, 1),
+                                                      end: const Offset(
+                                                        1.05,
+                                                        1.05,
+                                                      ),
+                                                      duration: 2.seconds,
+                                                    ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                friendlyName.toUpperCase(),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelSmall
+                                                    ?.copyWith(
+                                                      color: AppTheme.primary,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      letterSpacing: 1,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                loading: () => const SizedBox.shrink(),
+                                error: (error, stack) =>
+                                    const SizedBox.shrink(),
                               );
                             },
-                            child: Builder(
-                              builder: (context) {
-                                return LiquidGlassSurface(
-                                  shapeKind: GlassShapeKind.pill,
-                                  settings: DesignTokens.glassSettingsAccent,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (kIsTest)
-                                        const Icon(
-                                          Icons.bolt,
-                                          color: AppTheme.primary,
-                                          size: 16,
-                                        )
-                                      else
-                                        const Icon(
-                                              Icons.bolt,
-                                              color: AppTheme.primary,
-                                              size: 16,
-                                            )
-                                            .animate(
-                                              onPlay: (c) =>
-                                                  c.repeat(reverse: true),
-                                            )
-                                            .scale(
-                                              begin: const Offset(1, 1),
-                                              end: const Offset(1.05, 1.05),
-                                              duration: 2.seconds,
-                                            ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        friendlyName.toUpperCase(),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall
-                                            ?.copyWith(
-                                              color: AppTheme.primary,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 1,
-                                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // Framing Overlay
+                        SizedBox(
+                          width: frameSize,
+                          height: frameSize,
+                          child: Stack(
+                            children: [
+                              CustomPaint(
+                                painter: _ScannerOverlayPainter(),
+                                child: Container(),
+                              ),
+
+                              // Center Reticle
+                              Center(
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primary,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppTheme.primary.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        blurRadius: 10,
                                       ),
                                     ],
                                   ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        loading: () => const SizedBox.shrink(),
-                        error: (error, stack) => const SizedBox.shrink(),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Framing Overlay
-                SizedBox(
-                  width: frameSize,
-                  height: frameSize,
-                  child: Stack(
-                    children: [
-                      CustomPaint(
-                        painter: _ScannerOverlayPainter(),
-                        child: Container(),
-                      ),
-
-                      // Center Reticle
-                      Center(
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: AppTheme.primary,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppTheme.primary.withValues(alpha: 0.8),
-                                blurRadius: 10,
+                                ),
                               ),
+
+                              // Scan Line
+                              Positioned(
+                                    left: -20,
+                                    right: -20,
+                                    top: 0,
+                                    child: Builder(
+                                      builder: (context) {
+                                        return Column(
+                                          children: [
+                                            Container(
+                                              height: 2,
+                                              decoration: BoxDecoration(
+                                                color: AppTheme.primary,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: AppTheme.primary
+                                                        .withValues(alpha: 0.8),
+                                                    blurRadius: 15,
+                                                    spreadRadius: 2,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                  colors: [
+                                                    AppTheme.primary.withValues(
+                                                      alpha: 0.2,
+                                                    ),
+                                                    AppTheme.primary.withValues(
+                                                      alpha: 0,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  )
+                                  .animate(onPlay: (c) => c.repeat())
+                                  .moveY(
+                                    begin: 0,
+                                    end: frameSize,
+                                    duration: 2.5.seconds,
+                                    curve: Curves.easeInOut,
+                                  ),
                             ],
                           ),
                         ),
-                      ),
 
-                      // Scan Line
-                      Positioned(
-                            left: -20,
-                            right: -20,
-                            top: 0,
-                            child: Builder(
-                              builder: (context) {
-                                return Column(
-                                  children: [
-                                    Container(
-                                      height: 2,
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.primary,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: AppTheme.primary.withValues(
-                                              alpha: 0.8,
-                                            ),
-                                            blurRadius: 15,
-                                            spreadRadius: 2,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            AppTheme.primary.withValues(
-                                              alpha: 0.2,
-                                            ),
-                                            AppTheme.primary.withValues(
-                                              alpha: 0,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          )
-                          .animate(onPlay: (c) => c.repeat())
-                          .moveY(
-                            begin: 0,
-                            end: frameSize,
-                            duration: 2.5.seconds,
-                            curve: Curves.easeInOut,
+                        const SizedBox(height: 24),
+
+                        Text(
+                          l10n.alignFoodWithinFrame,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 14,
                           ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                Text(
-                  l10n.alignFoodWithinFrame,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 14,
-                  ),
-                ),
-              ],
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -734,7 +749,8 @@ class _ScannerContent extends HookConsumerWidget {
                         child: AppButton.iconOnly(
                           icon: Icons.photo_library,
                           tooltip: l10n.gallery,
-                          onPressed: () => pickAndProcessImage(ImageSource.gallery),
+                          onPressed: () =>
+                              pickAndProcessImage(ImageSource.gallery),
                         ),
                       ),
 
