@@ -95,11 +95,12 @@ void main() {
 
     // Allow time for async value and router
     // SplashScreen has a 2s delay.
+    // Authenticated users now land on Home (History, inside the tabbed
+    // shell) instead of the old camera-first Scanner route.
     bool found = false;
     for (int i = 0; i < 30; i++) {
       await tester.pump(const Duration(milliseconds: 100));
-      // Look for Scanner Screen title "Scan Meal" or similar unique element
-      if (find.text('Scan Meal').evaluate().isNotEmpty) {
+      if (find.text('HISTORY').evaluate().isNotEmpty) {
         found = true;
         break;
       }
@@ -107,11 +108,11 @@ void main() {
     expect(
       found,
       isTrue,
-      reason: 'Should have navigated to Scanner Screen (Camera First)',
+      reason: 'Should have navigated to the Home (History) tab',
     );
 
-    // Verify we are on Scanner Screen
-    expect(find.text('Scan Meal'), findsOneWidget);
+    // Verify we are on the Home tab
+    expect(find.text('HISTORY'), findsOneWidget);
 
     // Explicitly dispose to clean up infinite animations or pending timers
     await tester.pumpWidget(Container());

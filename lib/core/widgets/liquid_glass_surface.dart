@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:opencalories/core/theme/design_tokens.dart';
+import 'package:opencalories/core/utils/platform_utils.dart';
 
 /// The outline family a glass surface should take.
 enum GlassShapeKind {
@@ -75,7 +76,9 @@ class LiquidGlassSurface extends StatelessWidget {
     final glass = LiquidGlass.withOwnLayer(
       shape: _shapeFor(shapeKind, borderRadius),
       settings: settings ?? DesignTokens.glassSettingsNeutral,
-      fake: animated,
+      // Force the fake fallback under `flutter test` — liquid_glass_renderer's
+      // shaders don't compile against the SkSL target the test harness uses.
+      fake: animated || kIsTest,
       glassContainsChild: glassContainsChild,
       clipBehavior: clipBehavior,
       child: content,
@@ -113,7 +116,7 @@ class LiquidGlassScope extends StatelessWidget {
   Widget build(BuildContext context) {
     return LiquidGlassLayer(
       settings: settings ?? DesignTokens.glassSettingsAccent,
-      fake: fake,
+      fake: fake || kIsTest,
       child: LiquidGlassBlendGroup(blend: blend, child: child),
     );
   }
