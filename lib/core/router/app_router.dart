@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:opencalories/core/widgets/liquid_glass_bottom_nav.dart';
 import 'package:opencalories/features/analysis/domain/food_analysis.dart';
 import 'package:opencalories/features/settings/data/api_key_repository.dart';
 import 'package:opencalories/features/settings/presentation/settings_screen.dart';
@@ -48,7 +49,7 @@ GoRouter appRouter(Ref ref) {
       if (hasKey) {
         // No debería poder ver splash ni welcome
         if (isWelcome || isSplash) {
-          return '/scan';
+          return '/';
         }
         return null; // Dejarlo pasar a donde iba (ej. settings, scan, history)
       }
@@ -67,19 +68,33 @@ GoRouter appRouter(Ref ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const HistoryScreen()),
-      GoRoute(
-        path: '/scan',
-        builder: (context, state) => const ScannerScreen(),
+      // Persistent-tab shell: Home / Insights / Settings share one liquid
+      // glass bottom nav bar (lib/core/widgets/liquid_glass_bottom_nav.dart).
+      // Each branch keeps its own navigation stack.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            LiquidGlassBottomNav(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/', builder: (context, state) => const HistoryScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/weekly', builder: (context, state) => const WeeklySummaryScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/settings', builder: (context, state) => const SettingsScreen()),
+            ],
+          ),
+        ],
       ),
-      GoRoute(
-        path: '/welcome',
-        builder: (context, state) => const WelcomeScreen(),
-      ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
-      ),
+      // Full-screen routes, outside the shell — no bottom nav.
+      GoRoute(path: '/scan', builder: (context, state) => const ScannerScreen()),
+      GoRoute(path: '/welcome', builder: (context, state) => const WelcomeScreen()),
       GoRoute(
         path: '/analysis',
         builder: (context, state) {
@@ -108,14 +123,7 @@ GoRouter appRouter(Ref ref) {
           return FullScreenImageView(imageFile: imageFile!);
         },
       ),
-      GoRoute(
-        path: '/weekly',
-        builder: (context, state) => const WeeklySummaryScreen(),
-      ),
-      GoRoute(
-        path: '/splash',
-        builder: (context, state) => const SplashScreen(),
-      ),
+      GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     ],
   );
 }

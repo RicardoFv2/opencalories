@@ -15,6 +15,9 @@ import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/services/calorie_goal_service.dart';
 import 'package:opencalories/core/widgets/shimmer_loading.dart';
 import 'package:opencalories/features/history/presentation/widgets/history_skeletons.dart';
+import 'package:opencalories/core/providers/selected_date_provider.dart';
+import 'package:opencalories/core/utils/responsive.dart';
+import 'package:opencalories/core/widgets/app_card.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 import 'package:opencalories/core/widgets/language_selector.dart';
 import 'package:opencalories/features/history/data/app_database.dart';
@@ -91,6 +94,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
 
   @override
   Widget build(BuildContext context) {
+    // WeeklySummaryScreen is a sibling shell tab now, not a pushed route, so
+    // it can't return a value via pop(). It writes here instead.
+    ref.listen<DateTime?>(selectedDateProvider, (previous, next) {
+      if (next != null) {
+        setState(() => _currentDate = _getDateOnly(next));
+        ref.read(selectedDateProvider.notifier).state = null;
+      }
+    });
+
     final mealsStream = ref
         .watch(mealsDaoProvider)
         .watchMealsForDate(_currentDate);
@@ -214,16 +226,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Center(
                       child: GestureDetector(
-                        onTap: () async {
-                          final selectedDate = await context.push<DateTime>(
-                            '/weekly',
-                          );
-                          if (selectedDate != null) {
-                            setState(() {
-                              _currentDate = _getDateOnly(selectedDate);
-                            });
-                          }
-                        },
+                        onTap: () => context.go('/weekly'),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -297,8 +300,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen>
                         const SizedBox(height: 8),
                         Text(
                           '$dailyCalories',
-                          style: const TextStyle(
-                            fontSize: 48,
+                          style: TextStyle(
+                            fontSize: responsiveValue(context, compact: 48.0, medium: 56.0, expanded: 64.0),
                             fontWeight: FontWeight.w900,
                             height: 1.0,
                             color: Colors.white,
@@ -692,13 +695,9 @@ class _MealCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
+      padding: EdgeInsets.zero,
       child: ListTile(
         onTap: () {
           final analysis = FoodAnalysis(

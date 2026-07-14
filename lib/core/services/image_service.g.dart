@@ -6,7 +6,7 @@ part of 'image_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$imageServiceHash() => r'eeeeb68cd1c9e9a2224b3cb7c5c075892e90d7c2';
+String _$imageServiceHash() => r'bfb969311897a89087c061edce9995ef8d200f99';
 
 /// See also [ImageService].
 @ProviderFor(ImageService)

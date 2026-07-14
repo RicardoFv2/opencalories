@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,6 +13,10 @@ import 'package:opencalories/core/services/calorie_goal_service.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 import 'package:opencalories/core/widgets/language_selector.dart';
+import 'package:opencalories/core/widgets/app_button.dart';
+import 'package:opencalories/core/widgets/app_card.dart';
+import 'package:opencalories/core/widgets/app_text_field.dart';
+import 'package:opencalories/core/widgets/glass_modal.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = DesignTokens.surface;
@@ -26,7 +31,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _apiKeyController = TextEditingController();
-  bool _obscureApiKey = true;
 
   final _apiKeyFieldKey = GlobalKey();
   final _getApiKeyButtonKey = GlobalKey();
@@ -87,13 +91,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios_new,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              onPressed: () => context.pop(),
-            ),
+            // Settings is reachable both as a pushed route (pre-auth, from
+            // Welcome) and as a shell tab root (post-auth) — only show a
+            // back arrow when there's actually somewhere to pop to.
+            leading: context.canPop()
+                ? IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    onPressed: () => context.pop(),
+                  )
+                : null,
             title: Text(
               AppLocalizations.of(context)!.connectIntelligence,
               style: Theme.of(
@@ -107,7 +116,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Column(
                 children: [
-                  // 1. Hero Graphic
+                  // 1. Hero Graphic — local composition (no network image,
+                  // so it can never show broken/blank when offline).
                   Container(
                     height: 180,
                     decoration: BoxDecoration(
@@ -121,22 +131,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           blurRadius: 15,
                         ),
                       ],
-                      image: const DecorationImage(
-                        image: NetworkImage(
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuCyQpXAOclKcePKfVsBD87ITisJezg4kpOcFKaLUM_H_vvnnE99DxDbPTEcK3MVzatJapxNntZ80lDpS7buLyig3_IG79Z83mgyxzWbpeXrApUCO5Gizpphnq76RNfjDBklQabqMe-xlyUO72jL0ulyJ5jvHCcsMOTBh1JEHhNxb6lGUGDsRPRvaf92xrwGgl5TS8Q3-5JJyqhKJOu1TiljSEyYvLFvXsEphXlomRVR9hum5hdHt0mITzByvPwiMCedmlj5YIcBuVM',
-                        ),
-                        fit: BoxFit.cover,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [DesignTokens.surface2, DesignTokens.surface0],
                       ),
                     ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(24),
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [AppTheme.backgroundDark, Colors.transparent],
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(
+                          Icons.auto_awesome,
+                          size: 96,
+                          color: AppTheme.primary.withValues(alpha: 0.12),
                         ),
-                      ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [AppTheme.backgroundDark, Colors.transparent],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -178,44 +198,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       Showcase(
                         key: _apiKeyFieldKey,
-                        description:
-                            'Ingresa tu API Key de Google AI Studio aquí',
+                        description: l10n.apiKeyTutorialDesc,
                         tooltipBackgroundColor: _tutorialBg,
                         textColor: _tutorialText,
-                        child: TextField(
+                        child: AppTextField(
                           controller: _apiKeyController,
-                          obscureText: _obscureApiKey,
-                          style: const TextStyle(fontFamily: 'monospace'),
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppTheme.surfaceDark,
-                            hintText: 'AIzaSy...',
-                            hintStyle: TextStyle(color: Colors.grey[600]),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppTheme.primary,
-                                width: 2,
-                              ),
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureApiKey
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                color: Colors.grey,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureApiKey = !_obscureApiKey;
-                                });
-                              },
-                            ),
-                          ),
+                          monospace: true,
+                          obscureText: true,
+                          showObscureToggle: true,
+                          hint: 'AIzaSy...',
                         ),
                       ),
                     ],
@@ -234,107 +225,62 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceDark,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white10),
-                        ),
-                        child: Consumer(
-                          builder: (context, ref, child) {
-                            final asyncModel = ref.watch(
-                              modelPreferenceServiceInitializedProvider,
-                            );
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final asyncModel = ref.watch(
+                            modelPreferenceServiceInitializedProvider,
+                          );
 
-                            return asyncModel.when(
-                              data: (service) {
-                                final currentModel = service.getSelectedModel();
-                                return DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    value: currentModel,
-                                    isExpanded: true,
-                                    dropdownColor: AppTheme.surfaceDark,
-                                    icon: const Icon(
-                                      Icons.arrow_drop_down,
-                                      color: AppTheme.primary,
+                          return asyncModel.when(
+                            data: (service) {
+                              final currentModel = service.getSelectedModel();
+                              return AppCard(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  GlassModal.show(
+                                    context: context,
+                                    title: l10n.selectAiModelTitle,
+                                    child: _ModelOptionList(
+                                      service: service,
+                                      currentModel: currentModel,
+                                      onModelSelected: () => setState(() {}),
                                     ),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            ModelPreferenceService.getFriendlyName(currentModel),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            ModelPreferenceService.getHint(currentModel),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: 'gemini-2.5-flash',
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              ModelPreferenceService.getFriendlyName(
-                                                'gemini-2.5-flash',
-                                              ),
-                                            ),
-                                            Text(
-                                              ModelPreferenceService.getHint(
-                                                'gemini-2.5-flash',
-                                              ),
-                                              style: TextStyle(
-                                                color: Colors.grey[400],
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'gemini-3.1-flash-lite-preview',
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              ModelPreferenceService.getFriendlyName(
-                                                'gemini-3.1-flash-lite-preview',
-                                              ),
-                                            ),
-                                            Text(
-                                              ModelPreferenceService.getHint(
-                                                'gemini-3.1-flash-lite-preview',
-                                              ),
-                                              style: TextStyle(
-                                                color: Colors.orange,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (value) {
-                                      if (value != null) {
-                                        service.setSelectedModel(value);
-                                        setState(() {}); // Refresh UI
-                                      }
-                                    },
-                                  ),
-                                );
-                              },
-                              loading: () => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              error: (err, stack) =>
-                                  Text(l10n.errorWithMessage(err.toString())),
-                            );
-                          },
-                        ),
+                                    const Icon(Icons.unfold_more, color: AppTheme.primary),
+                                  ],
+                                ),
+                              );
+                            },
+                            loading: () => const Center(child: CircularProgressIndicator()),
+                            error: (err, stack) => Text(l10n.errorWithMessage(err.toString())),
+                          );
+                        },
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 4, top: 8),
@@ -353,7 +299,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                   Showcase(
                     key: _getApiKeyButtonKey,
-                    description: 'Toca aquí para obtener una llave gratis',
+                    description: l10n.getKeyTutorialDesc,
                     tooltipBackgroundColor: _tutorialBg,
                     textColor: _tutorialText,
                     child: TextButton.icon(
@@ -403,17 +349,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ),
                       Showcase(
                         key: _calorieGoalKey,
-                        description:
-                            'Ajusta tu meta diaria para el seguimiento',
+                        description: l10n.calorieGoalTutorialDesc,
                         tooltipBackgroundColor: _tutorialBg,
                         textColor: _tutorialText,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppTheme.surfaceDark,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.white10),
-                          ),
+                        child: AppCard(
                           child: Consumer(
                             builder: (context, ref, child) {
                               final calorieGoal = ref.watch(
@@ -475,56 +414,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 48),
 
                   // 5. Connect Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: FilledButton(
-                      onPressed: () async {
-                        final key = _apiKeyController.text.trim();
-                        // Validate basic Gemini format: starts with AIza, 39 chars, alphanumeric+dashes
-                        final isValidFormat = RegExp(
-                          r'^AIza[0-9A-Za-z\-_]{35}$',
-                        ).hasMatch(key);
+                  AppButton(
+                    label: l10n.connectAndContinue,
+                    variant: AppButtonVariant.primary,
+                    expand: true,
+                    onPressed: () async {
+                      final key = _apiKeyController.text.trim();
+                      // Validate basic Gemini format: starts with AIza, 39 chars, alphanumeric+dashes
+                      final isValidFormat = RegExp(
+                        r'^AIza[0-9A-Za-z\-_]{35}$',
+                      ).hasMatch(key);
 
-                        if (isValidFormat) {
-                          await ref
-                              .read(apiKeyRepositoryProvider)
-                              .setApiKey(key);
-                          ref.invalidate(apiKeyProvider);
-                          if (context.mounted) {
-                            context.go('/'); // Go to scanner
-                          }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                key.isEmpty
-                                    ? AppLocalizations.of(
-                                        context,
-                                      )!.pleaseEnterApiKey
-                                    : AppLocalizations.of(
-                                        context,
-                                      )!.invalidKeyFormat,
-                              ),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
+                      if (isValidFormat) {
+                        await ref.read(apiKeyRepositoryProvider).setApiKey(key);
+                        ref.invalidate(apiKeyProvider);
+                        if (context.mounted) {
+                          context.go('/'); // Go to scanner
                         }
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
-                        foregroundColor: AppTheme.backgroundDark,
-                        textStyle: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        shadowColor: AppTheme.primary.withValues(alpha: 0.5),
-                        elevation: 8,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context)!.connectAndContinue,
-                      ),
-                    ),
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              key.isEmpty ? l10n.pleaseEnterApiKey : l10n.invalidKeyFormat,
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
                   ),
 
                   const SizedBox(height: 16),
@@ -549,28 +466,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 48),
 
                   // 6. Reset Hints Button
-                  OutlinedButton.icon(
+                  AppButton(
+                    label: l10n.resetHints,
+                    icon: const Icon(Icons.help_outline, size: 18),
+                    variant: AppButtonVariant.secondary,
+                    foregroundColor: Colors.grey[400],
+                    borderColor: Colors.grey[700],
                     onPressed: () async {
                       await ref.read(tutorialServiceProvider.future);
-                      await ref
-                          .read(tutorialServiceProvider.notifier)
-                          .resetTutorials();
+                      await ref.read(tutorialServiceProvider.notifier).resetTutorials();
                       if (context.mounted) {
-                        context.showAppSnackBar(
-                          AppLocalizations.of(context)!.hintsReset,
-                        );
+                        context.showAppSnackBar(l10n.hintsReset);
                       }
                     },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.grey[400],
-                      side: BorderSide(color: Colors.grey[700]!),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 24,
-                      ),
-                    ),
-                    icon: const Icon(Icons.help_outline, size: 18),
-                    label: Text(AppLocalizations.of(context)!.resetHints),
                   ),
                   const SizedBox(height: 48),
                 ],
@@ -579,6 +487,80 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+/// Model picker list shown inside a [GlassModal] — replaces the old native
+/// `DropdownButton`, whose 2-line items risked an internal overflow at the
+/// dropdown menu's fixed item height.
+class _ModelOptionList extends StatelessWidget {
+  final ModelPreferenceService service;
+  final String currentModel;
+  final VoidCallback onModelSelected;
+
+  const _ModelOptionList({
+    required this.service,
+    required this.currentModel,
+    required this.onModelSelected,
+  });
+
+  static const _models = ['gemini-3.5-flash'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final modelId in _models) ...[
+          _buildOption(context, modelId),
+          if (modelId != _models.last) const SizedBox(height: 12),
+        ],
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _buildOption(BuildContext context, String modelId) {
+    final isActive = modelId == currentModel;
+    return AppCard(
+      color: isActive ? AppTheme.primary.withValues(alpha: 0.1) : null,
+      borderColor: isActive ? AppTheme.primary : null,
+      onTap: () {
+        service.setSelectedModel(modelId);
+        onModelSelected();
+        Navigator.pop(context);
+      },
+      child: Row(
+        children: [
+          Icon(
+            isActive ? Icons.radio_button_checked : Icons.radio_button_off,
+            color: isActive ? AppTheme.primary : Colors.grey,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  ModelPreferenceService.getFriendlyName(modelId),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  ModelPreferenceService.getHint(modelId),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: modelId.contains('preview') ? Colors.orange : Colors.grey[400],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isActive) const Icon(Icons.bolt, color: AppTheme.primary, size: 20),
+        ],
+      ),
     );
   }
 }

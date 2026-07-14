@@ -434,4 +434,110 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get saveWithoutReestimating => 'Guardar sin reestimar';
+
+  @override
+  String get navHome => 'Inicio';
+
+  @override
+  String get navInsights => 'Resumen';
+
+  @override
+  String get navSettings => 'Ajustes';
+
+  @override
+  String get navScan => 'Escanear';
+
+  @override
+  String get identifyingIngredientsStatus =>
+      'IDENTIFICANDO INGREDIENTES LOCALES...';
+
+  @override
+  String get finalizingReportStatus => 'FINALIZANDO INFORME...';
+
+  @override
+  String get analyzingEllipsis => 'Analizando...';
+
+  @override
+  String get identifyingFoodStatus => 'Identificando alimentos...';
+
+  @override
+  String get errorRecordIdNotFound =>
+      'Error: No se encontró el ID del registro para actualizar.';
+
+  @override
+  String get analyzingIngredientsStatus => 'Analizando ingredientes...';
+
+  @override
+  String get refineFoodTitle => 'Refinar Alimento';
+
+  @override
+  String get portionOptionalLabel => 'Porción (Opcional)';
+
+  @override
+  String get estimatingEllipsis => 'ESTIMANDO...';
+
+  @override
+  String get updateAction => 'ACTUALIZAR';
+
+  @override
+  String get summaryUpdatedSuccess => 'Resumen actualizado correctamente';
+
+  @override
+  String get assistedSearchTitle => 'Búsqueda Asistida';
+
+  @override
+  String get cameraPermissionDenied =>
+      'Acceso a la cámara denegado. Actívalo en Ajustes para escanear comidas.';
+
+  @override
+  String get openSettingsAction => 'Abrir Ajustes';
+
+  @override
+  String get weeklyEmptyState => 'Aún no hay comidas registradas esta semana';
+
+  @override
+  String get selectAiModelTitle => 'Seleccionar Modelo IA';
+
+  @override
+  String get refineWithAiTooltip => 'Refinar con IA';
+
+  @override
+  String get refineFoodSubtitle =>
+      'Corrige el nombre y deja que la IA recalcule los macros automáticamente.';
+
+  @override
+  String get estimationCompleted => '¡Estimación completada!';
+
+  @override
+  String get estimateFirstError => 'Por favor, estima primero con IA.';
+
+  @override
+  String get manualEntryDescription =>
+      'Describe lo que comiste y la IA hará el resto.';
+
+  @override
+  String get foodDetailsSection => 'DETALLES DEL ALIMENTO';
+
+  @override
+  String get foodNameExampleHint => 'Ej: 2 arepas, 1 hamburguesa, etc.';
+
+  @override
+  String get aiMagicTitle => 'Magia de IA';
+
+  @override
+  String get aiMagicDesc => 'Pulsa aquí para que la IA estime los macros.';
+
+  @override
+  String get estimationResultSection => 'ESTIMACIÓN RESULTANTE';
+
+  @override
+  String get apiKeyTutorialDesc =>
+      'Ingresa tu API Key de Google AI Studio aquí';
+
+  @override
+  String get getKeyTutorialDesc => 'Toca aquí para obtener una llave gratis';
+
+  @override
+  String get calorieGoalTutorialDesc =>
+      'Ajusta tu meta diaria para el seguimiento';
 }

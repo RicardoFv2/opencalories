@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -9,18 +10,21 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:camera/camera.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:opencalories/core/theme/design_tokens.dart';
 import 'package:opencalories/core/services/image_service.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/core/theme/app_theme.dart';
 import 'package:opencalories/core/utils/platform_utils.dart';
+import 'package:opencalories/core/widgets/app_button.dart';
+import 'package:opencalories/core/widgets/glass_modal.dart';
+import 'package:opencalories/core/widgets/liquid_glass_surface.dart';
 import '../../settings/data/api_key_repository.dart';
 import '../../settings/data/model_preference_service.dart';
 import '../../analysis/presentation/analysis_controller.dart';
 import 'package:opencalories/core/utils/snackbar_utils.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
-import 'package:opencalories/core/widgets/glass_modal.dart';
 import '../../history/data/daily_calories_provider.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
@@ -84,6 +88,10 @@ class _ScannerContent extends HookConsumerWidget {
     // Camera state
     final cameraController = useState<CameraController?>(null);
     final isCameraInitialized = useState(false);
+    final cameraPermissionDenied = useState(false);
+
+    final viewportSize = MediaQuery.sizeOf(context);
+    final frameSize = math.min(300.0, math.min(viewportSize.width * 0.78, viewportSize.height * 0.34));
 
     // Initialize camera and reset state
     useEffect(() {
@@ -114,6 +122,11 @@ class _ScannerContent extends HookConsumerWidget {
           }
         } catch (e) {
           debugPrint('Error initializing camera: $e');
+          final status = await Permission.camera.status;
+          if ((status.isDenied || status.isPermanentlyDenied || status.isRestricted) &&
+              context.mounted) {
+            cameraPermissionDenied.value = true;
+          }
         }
       }
 
@@ -284,31 +297,35 @@ class _ScannerContent extends HookConsumerWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _CircleButton(
+                    AppButton.iconOnly(
                       icon: Icons.logout,
-                      semanticLabel: l10n.logout,
-                      onTap: () async {
+                      tooltip: l10n.logout,
+                      onPressed: () async {
                         // Clear API key to reset app state (Back to Welcome)
                         await ref.read(apiKeyRepositoryProvider).deleteApiKey();
                         ref.invalidate(apiKeyProvider);
                       },
                     ),
-                    Text(
-                      l10n.scanMeal,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Text(
+                        l10n.scanMeal,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    _CircleButton(
+                    AppButton.iconOnly(
                       icon: selectedImage != null
                           ? Icons.close
                           : Icons.arrow_back,
-                      semanticLabel: selectedImage != null
+                      tooltip: selectedImage != null
                           ? l10n.close
                           : l10n.back,
-                      onTap: () {
+                      onPressed: () {
                         if (selectedImage != null) {
                           ref.read(scannerImageProvider.notifier).state = null;
                         } else {
@@ -323,8 +340,15 @@ class _ScannerContent extends HookConsumerWidget {
           ),
 
           // 4. Main Content (Scanner Frame)
-          Center(
-            child: Column(
+          if (cameraPermissionDenied.value)
+            Center(child: _CameraPermissionDeniedView(l10n: l10n))
+          else
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Daily Calories Badge (New Overlay)
@@ -369,7 +393,7 @@ class _ScannerContent extends HookConsumerWidget {
                               HapticFeedback.lightImpact();
                               GlassModal.show(
                                 context: context,
-                                title: 'Select AI Model',
+                                title: l10n.selectAiModelTitle,
                                 child: _ModelSelectorSheet(
                                   service: service,
                                   currentModel: currentModel,
@@ -381,19 +405,12 @@ class _ScannerContent extends HookConsumerWidget {
                             },
                             child: Builder(
                               builder: (context) {
-                                final badge = Container(
+                                return LiquidGlassSurface(
+                                  shapeKind: GlassShapeKind.pill,
+                                  settings: DesignTokens.glassSettingsAccent,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black54,
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: AppTheme.primary.withValues(
-                                        alpha: 0.3,
-                                      ),
-                                    ),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -434,10 +451,6 @@ class _ScannerContent extends HookConsumerWidget {
                                     ],
                                   ),
                                 );
-
-                                if (kIsTest) return badge;
-
-                                return badge;
                               },
                             ),
                           );
@@ -453,8 +466,8 @@ class _ScannerContent extends HookConsumerWidget {
 
                 // Framing Overlay
                 SizedBox(
-                  width: 300,
-                  height: 300,
+                  width: frameSize,
+                  height: frameSize,
                   child: Stack(
                     children: [
                       CustomPaint(
@@ -529,7 +542,7 @@ class _ScannerContent extends HookConsumerWidget {
                           .animate(onPlay: (c) => c.repeat())
                           .moveY(
                             begin: 0,
-                            end: 300,
+                            end: frameSize,
                             duration: 2.5.seconds,
                             curve: Curves.easeInOut,
                           ),
@@ -547,8 +560,11 @@ class _ScannerContent extends HookConsumerWidget {
                   ),
                 ),
               ],
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
 
           // 5. Bottom Controls
           Positioned(
@@ -562,10 +578,10 @@ class _ScannerContent extends HookConsumerWidget {
                         Row(
                           children: [
                             // Retake Button
-                            _GlassButton(
+                            AppButton.iconOnly(
                               icon: Icons.refresh,
-                              semanticLabel: l10n.retake,
-                              onTap: () async {
+                              tooltip: l10n.retake,
+                              onPressed: () async {
                                 await HapticFeedback.mediumImpact();
                                 ref.read(scannerImageProvider.notifier).state =
                                     null;
@@ -594,8 +610,8 @@ class _ScannerContent extends HookConsumerWidget {
                                       l10n.analyzingProteins,
                                       l10n.calculatingMacros,
                                       l10n.estimatingPortions,
-                                      'IDENTIFYING LOCAL INGREDIENTS...',
-                                      'FINALIZING REPORT...',
+                                      l10n.identifyingIngredientsStatus,
+                                      l10n.finalizingReportStatus,
                                     ];
 
                                     processingStatus.value = statuses[0];
@@ -715,10 +731,10 @@ class _ScannerContent extends HookConsumerWidget {
                           color: _tutorialText.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
-                        child: _GlassButton(
+                        child: AppButton.iconOnly(
                           icon: Icons.photo_library,
-                          semanticLabel: l10n.gallery,
-                          onTap: () => pickAndProcessImage(ImageSource.gallery),
+                          tooltip: l10n.gallery,
+                          onPressed: () => pickAndProcessImage(ImageSource.gallery),
                         ),
                       ),
 
@@ -802,10 +818,10 @@ class _ScannerContent extends HookConsumerWidget {
                           color: _tutorialText.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
-                        child: _GlassButton(
+                        child: AppButton.iconOnly(
                           icon: Icons.history,
-                          semanticLabel: l10n.history,
-                          onTap: () => context.go('/'),
+                          tooltip: l10n.history,
+                          onPressed: () => context.go('/'),
                         ),
                       ),
                     ],
@@ -909,73 +925,36 @@ class _ScannerContent extends HookConsumerWidget {
   }
 }
 
-class _CircleButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final String? semanticLabel;
+class _CameraPermissionDeniedView extends StatelessWidget {
+  const _CameraPermissionDeniedView({required this.l10n});
 
-  const _CircleButton({
-    required this.icon,
-    required this.onTap,
-    this.semanticLabel,
-  });
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: semanticLabel,
-      child: GestureDetector(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          onTap();
-        },
-        child: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.black26,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white10),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.no_photography_rounded,
+            size: 56,
+            color: Colors.white.withValues(alpha: 0.4),
           ),
-          child: Icon(icon, color: Colors.white, size: 24),
-        ),
-      ),
-    );
-  }
-}
-
-class _GlassButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final String? semanticLabel;
-
-  const _GlassButton({
-    required this.icon,
-    required this.onTap,
-    this.semanticLabel,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: semanticLabel,
-      child: GestureDetector(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          onTap();
-        },
-        child: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white24),
+          const SizedBox(height: DesignTokens.spaceM),
+          Text(
+            l10n.cameraPermissionDenied,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
-          child: Icon(icon, color: Colors.white, size: 24),
-        ),
+          const SizedBox(height: DesignTokens.spaceL),
+          AppButton(
+            label: l10n.openSettingsAction,
+            variant: AppButtonVariant.primary,
+            onPressed: openAppSettings,
+          ),
+        ],
       ),
     );
   }
@@ -1047,14 +1026,8 @@ class _ModelSelectorSheet extends StatelessWidget {
       children: [
         _buildOption(
           context,
-          'gemini-2.5-flash',
-          isActive: currentModel == 'gemini-2.5-flash',
-        ),
-        const SizedBox(height: 12),
-        _buildOption(
-          context,
-          'gemini-3.1-flash-lite-preview',
-          isActive: currentModel == 'gemini-3.1-flash-lite-preview',
+          'gemini-3.5-flash',
+          isActive: currentModel == 'gemini-3.5-flash',
         ),
         const SizedBox(height: 32),
       ],
@@ -1139,25 +1112,12 @@ class _DailyCaloriesBadge extends ConsumerWidget {
         return GestureDetector(
           onTap: () => context.go('/'), // Quick access to history
           child:
-              Container(
+              LiquidGlassSurface(
+                    shapeKind: GlassShapeKind.pill,
+                    settings: DesignTokens.glassSettingsAccent,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: AppTheme.primary.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

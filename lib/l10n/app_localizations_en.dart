@@ -431,4 +431,106 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveWithoutReestimating => 'Save without reestimating';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navInsights => 'Insights';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
+  String get navScan => 'Scan';
+
+  @override
+  String get identifyingIngredientsStatus => 'IDENTIFYING LOCAL INGREDIENTS...';
+
+  @override
+  String get finalizingReportStatus => 'FINALIZING REPORT...';
+
+  @override
+  String get analyzingEllipsis => 'Analyzing...';
+
+  @override
+  String get identifyingFoodStatus => 'Identifying food...';
+
+  @override
+  String get errorRecordIdNotFound => 'Error: record ID not found for update.';
+
+  @override
+  String get analyzingIngredientsStatus => 'Analyzing ingredients...';
+
+  @override
+  String get refineFoodTitle => 'Refine Food';
+
+  @override
+  String get portionOptionalLabel => 'Portion (Optional)';
+
+  @override
+  String get estimatingEllipsis => 'ESTIMATING...';
+
+  @override
+  String get updateAction => 'UPDATE';
+
+  @override
+  String get summaryUpdatedSuccess => 'Summary updated successfully';
+
+  @override
+  String get assistedSearchTitle => 'Assisted Search';
+
+  @override
+  String get cameraPermissionDenied =>
+      'Camera access denied. Enable it in Settings to scan meals.';
+
+  @override
+  String get openSettingsAction => 'Open Settings';
+
+  @override
+  String get weeklyEmptyState => 'No meals logged this week yet';
+
+  @override
+  String get selectAiModelTitle => 'Select AI Model';
+
+  @override
+  String get refineWithAiTooltip => 'Refine with AI';
+
+  @override
+  String get refineFoodSubtitle =>
+      'Fix the name and let AI recalculate the macros automatically.';
+
+  @override
+  String get estimationCompleted => 'Estimation complete!';
+
+  @override
+  String get estimateFirstError => 'Please estimate with AI first.';
+
+  @override
+  String get manualEntryDescription =>
+      'Describe what you ate and AI will do the rest.';
+
+  @override
+  String get foodDetailsSection => 'FOOD DETAILS';
+
+  @override
+  String get foodNameExampleHint => 'E.g.: 2 arepas, 1 burger, etc.';
+
+  @override
+  String get aiMagicTitle => 'AI Magic';
+
+  @override
+  String get aiMagicDesc => 'Tap here to have AI estimate the macros.';
+
+  @override
+  String get estimationResultSection => 'RESULTING ESTIMATE';
+
+  @override
+  String get apiKeyTutorialDesc => 'Enter your Google AI Studio API Key here';
+
+  @override
+  String get getKeyTutorialDesc => 'Tap here to get a free key';
+
+  @override
+  String get calorieGoalTutorialDesc => 'Adjust your daily goal for tracking';
 }

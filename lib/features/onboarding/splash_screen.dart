@@ -63,8 +63,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   void _navigateBasedOnKey(String? apiKey) {
     if (apiKey != null && apiKey.isNotEmpty) {
-      // Tiene Key -> Ir directo a Scanner (Camera First UX)
-      context.go('/scan');
+      // Tiene Key -> Ir a Home (la barra de navegación reemplaza el flujo camera-first)
+      context.go('/');
     } else {
       // No tiene Key -> Ir a Welcome
       context.go('/welcome');
@@ -80,7 +80,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       backgroundColor: nativeSplashColor,
       body: Container(
         color: nativeSplashColor,
-        child: Center(
+        child: SafeArea(
+          child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -181,6 +182,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               ).animate().fadeIn(delay: 800.ms),
             ],
           ),
+        ),
         ),
       ),
     );

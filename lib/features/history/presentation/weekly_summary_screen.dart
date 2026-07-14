@@ -11,6 +11,8 @@ import 'package:opencalories/core/theme/app_theme.dart';
 import '../data/app_database.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
+import 'package:opencalories/core/providers/selected_date_provider.dart';
+import 'package:opencalories/core/utils/responsive.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = DesignTokens.surface;
@@ -80,10 +82,7 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
           ),
         ),
         backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
+        automaticallyImplyLeading: false,
       ),
       body: ShowCaseWidget(
         onFinish: () {
@@ -185,6 +184,32 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
 
                     final data = snapshot.data ?? [];
 
+                    if (data.isEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(DesignTokens.spaceL),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.calendar_month_outlined,
+                                size: 64,
+                                color: Colors.grey.withValues(alpha: 0.3),
+                              ),
+                              const SizedBox(height: DesignTokens.spaceM),
+                              Text(
+                                AppLocalizations.of(context)!.weeklyEmptyState,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    final columns = responsiveColumns(context);
+
                     return MasonryGridView.count(
                       padding: const EdgeInsets.only(
                         left: 16,
@@ -193,7 +218,7 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
                         bottom:
                             100, // Extra padding to ensure the last item is not cut off
                       ),
-                      crossAxisCount: 2,
+                      crossAxisCount: columns,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
                       itemCount: data.length,
@@ -201,9 +226,15 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
                         final dayData = data[index];
                         final widget = Padding(
                           padding: EdgeInsets.only(
-                            top: index == 1 ? 40.0 : 0.0,
+                            top: (index % columns) == 1 ? 40.0 : 0.0,
                           ),
-                          child: _DayGridItem(dayData: dayData),
+                          child: _DayGridItem(
+                            dayData: dayData,
+                            onSelect: (date) {
+                              ref.read(selectedDateProvider.notifier).state = date;
+                              context.go('/');
+                            },
+                          ),
                         );
 
                         if (index == 0) {
@@ -244,8 +275,9 @@ class _WeeklySummaryScreenState extends ConsumerState<WeeklySummaryScreen> {
 
 class _DayGridItem extends StatelessWidget {
   final Map<String, dynamic> dayData;
+  final ValueChanged<DateTime> onSelect;
 
-  const _DayGridItem({required this.dayData});
+  const _DayGridItem({required this.dayData, required this.onSelect});
 
   @override
   Widget build(BuildContext context) {
@@ -258,11 +290,9 @@ class _DayGridItem extends StatelessWidget {
         DateTime.now().day == date.day;
 
     return GestureDetector(
-      onTap: () {
-        context.pop(date);
-      },
+      onTap: () => onSelect(date),
       child: Container(
-        height: 220, // Fixed height for consistent stepped look
+        height: responsiveValue(context, compact: 220.0, medium: 200.0, expanded: 240.0),
         decoration: BoxDecoration(
           color: DesignTokens.surface,
           borderRadius: BorderRadius.circular(DesignTokens.radiusXL),

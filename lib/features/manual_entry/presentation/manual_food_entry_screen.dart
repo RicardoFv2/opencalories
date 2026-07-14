@@ -13,6 +13,10 @@ import '../domain/manual_food_entry.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:opencalories/core/services/tutorial_service.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
+import 'package:opencalories/core/widgets/app_button.dart';
+import 'package:opencalories/core/widgets/app_card.dart';
+import 'package:opencalories/core/widgets/app_text_field.dart';
+import 'package:opencalories/core/widgets/macro_chip.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = DesignTokens.surface;
@@ -23,6 +27,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final nameKey = useMemoized(() => GlobalKey());
     final aiKey = useMemoized(() => GlobalKey());
 
@@ -54,10 +59,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
       final portion = portionController.text.trim();
 
       if (name.isEmpty || portion.isEmpty) {
-        context.showAppSnackBar(
-          AppLocalizations.of(context)!.enterNameAndPortionError,
-          isError: true,
-        );
+        context.showAppSnackBar(l10n.enterNameAndPortionError, isError: true);
         return;
       }
 
@@ -79,13 +81,13 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
           );
 
           if (context.mounted) {
-            context.showAppSnackBar('¡Estimación completada!');
+            context.showAppSnackBar(l10n.estimationCompleted);
           }
         }
       } catch (e) {
         if (context.mounted) {
           context.showAppSnackBar(
-            AppLocalizations.of(context)!.aiEstimationFailed(e.toString()),
+            l10n.aiEstimationFailed(e.toString()),
             isError: true,
           );
         }
@@ -96,10 +98,7 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
 
     Future<void> saveEntry() async {
       if (estimatedEntry.value == null) {
-        context.showAppSnackBar(
-          'Por favor, estima primero con IA.',
-          isError: true,
-        );
+        context.showAppSnackBar(l10n.estimateFirstError, isError: true);
         return;
       }
 
@@ -112,18 +111,12 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
         if (context.mounted) {
           context.go('/');
           context.showAppSnackBar(
-            AppLocalizations.of(context)!.loggedFood(
-              estimatedEntry.value!.name,
-              estimatedEntry.value!.calories ?? 0,
-            ),
+            l10n.loggedFood(estimatedEntry.value!.name, estimatedEntry.value!.calories ?? 0),
           );
         }
       } catch (e) {
         if (context.mounted) {
-          context.showAppSnackBar(
-            AppLocalizations.of(context)!.errorWithMessage(e.toString()),
-            isError: true,
-          );
+          context.showAppSnackBar(l10n.errorWithMessage(e.toString()), isError: true);
         }
       } finally {
         isSaving.value = false;
@@ -133,9 +126,9 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(
-          'Búsqueda Asistida',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
+        title: Text(
+          l10n.assistedSearchTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
         ),
         backgroundColor: Colors.transparent,
       ),
@@ -150,17 +143,17 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Describe lo que comiste y la IA hará el resto.',
-                  style: TextStyle(color: Colors.white60, fontSize: 14),
+                Text(
+                  l10n.manualEntryDescription,
+                  style: const TextStyle(color: Colors.white60, fontSize: 14),
                 ),
                 const SizedBox(height: 32),
-                _buildSectionTitle('DETALLES DEL ALIMENTO'),
+                _buildSectionTitle(l10n.foodDetailsSection),
                 const SizedBox(height: 16),
                 Showcase(
                   key: nameKey,
-                  title: 'Nombre del Alimento',
-                  description: 'Ej: 2 arepas, 1 hamburguesa, etc.',
+                  title: l10n.foodName,
+                  description: l10n.foodNameExampleHint,
                   tooltipBackgroundColor: _tutorialBg,
                   titleTextStyle: const TextStyle(
                     color: _tutorialText,
@@ -171,107 +164,63 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
                     color: _tutorialText.withValues(alpha: 0.8),
                     fontSize: 14,
                   ),
-                  child: _buildTextField(
+                  child: AppTextField(
                     controller: nameController,
-                    label: AppLocalizations.of(context)!.foodNameLabel,
-                    hint: AppLocalizations.of(context)!.foodNameHint,
+                    label: l10n.foodNameLabel,
+                    hint: l10n.foodNameHint,
                   ),
                 ),
                 const SizedBox(height: 20),
-                _buildTextField(
+                AppTextField(
                   controller: portionController,
-                  label: AppLocalizations.of(context)!.portionLabel,
-                  hint: AppLocalizations.of(context)!.portionHint,
+                  label: l10n.portionLabel,
+                  hint: l10n.portionHint,
                 ),
                 const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: Showcase(
-                    key: aiKey,
-                    title: 'Magia de IA',
-                    description: 'Pulsa aquí para que la IA estime los macros.',
-                    tooltipBackgroundColor: _tutorialBg,
-                    titleTextStyle: const TextStyle(
-                      color: _tutorialText,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    descTextStyle: TextStyle(
-                      color: _tutorialText.withValues(alpha: 0.8),
-                      fontSize: 14,
-                    ),
-                    child: ElevatedButton.icon(
-                      onPressed: isEstimating.value
-                          ? null
-                          : () async {
-                              await HapticFeedback.lightImpact();
-                              estimateWithAi();
-                            },
-                      icon: isEstimating.value
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.black,
-                              ),
-                            )
-                          : const Icon(Icons.auto_awesome, size: 20),
-                      label: Text(
-                        isEstimating.value ? 'ESTIMANDO...' : 'ESTIMAR CON IA',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
+                Showcase(
+                  key: aiKey,
+                  title: l10n.aiMagicTitle,
+                  description: l10n.aiMagicDesc,
+                  tooltipBackgroundColor: _tutorialBg,
+                  titleTextStyle: const TextStyle(
+                    color: _tutorialText,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  descTextStyle: TextStyle(
+                    color: _tutorialText.withValues(alpha: 0.8),
+                    fontSize: 14,
+                  ),
+                  child: AppButton(
+                    label: isEstimating.value ? l10n.estimatingEllipsis : l10n.estimateWithAiAction,
+                    icon: const Icon(Icons.auto_awesome, size: 20),
+                    variant: AppButtonVariant.primary,
+                    expand: true,
+                    loading: isEstimating.value,
+                    onPressed: () async {
+                      await HapticFeedback.lightImpact();
+                      estimateWithAi();
+                    },
                   ),
                 ),
                 const SizedBox(height: 48),
                 if (estimatedEntry.value != null) ...[
-                  _buildSectionTitle('ESTIMACIÓN RESULTANTE'),
+                  _buildSectionTitle(l10n.estimationResultSection),
                   const SizedBox(height: 16),
-                  _buildMacroPreview(estimatedEntry.value!),
+                  _buildMacroPreview(context, estimatedEntry.value!),
                   const SizedBox(height: 48),
                 ],
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: (isSaving.value || estimatedEntry.value == null)
-                        ? null
-                        : () async {
-                            await HapticFeedback.heavyImpact();
-                            saveEntry();
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: estimatedEntry.value == null
-                          ? Colors.white12
-                          : AppTheme.primary,
-                      foregroundColor: estimatedEntry.value == null
-                          ? Colors.white24
-                          : Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: isSaving.value
-                        ? const CircularProgressIndicator(color: Colors.black)
-                        : const Text(
-                            'REGISTRAR ALIMENTO',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                  ),
+                AppButton(
+                  label: l10n.logFood.toUpperCase(),
+                  variant: AppButtonVariant.primary,
+                  expand: true,
+                  loading: isSaving.value,
+                  onPressed: estimatedEntry.value == null
+                      ? null
+                      : () async {
+                          await HapticFeedback.heavyImpact();
+                          saveEntry();
+                        },
                 ),
               ],
             ),
@@ -281,39 +230,56 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildMacroPreview(ManualFoodEntry entry) {
+  Widget _buildMacroPreview(BuildContext context, ManualFoodEntry entry) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
-        _MacroBox(
-          label: 'Calorías',
-          value: '${entry.calories} kcal',
-          color: AppTheme.primary,
-          isMain: true,
+        AppCard(
+          glass: true,
+          borderColor: AppTheme.primary.withValues(alpha: 0.3),
+          child: Column(
+            children: [
+              Text(
+                l10n.caloriesLabel.toUpperCase(),
+                style: TextStyle(
+                  color: AppTheme.primary.withValues(alpha: 0.7),
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${entry.calories ?? 0} ${l10n.kcal}',
+                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: _MacroBox(
-                label: 'Prot',
-                value: '${entry.protein}g',
-                color: DesignTokens.proteinColor,
+              child: MacroChip(
+                type: MacroType.protein,
+                label: l10n.protein,
+                grams: (entry.protein ?? 0).toDouble(),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _MacroBox(
-                label: 'Carb',
-                value: '${entry.carbs}g',
-                color: DesignTokens.carbsColor,
+              child: MacroChip(
+                type: MacroType.carbs,
+                label: l10n.carbs,
+                grams: (entry.carbs ?? 0).toDouble(),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _MacroBox(
-                label: 'Grasa',
-                value: '${entry.fat}g',
-                color: DesignTokens.fatColor,
+              child: MacroChip(
+                type: MacroType.fat,
+                label: l10n.fat,
+                grams: (entry.fat ?? 0).toDouble(),
               ),
             ),
           ],
@@ -330,115 +296,6 @@ class ManualFoodEntryScreen extends HookConsumerWidget {
         fontSize: 12,
         fontWeight: FontWeight.bold,
         letterSpacing: 1.2,
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    TextInputType? keyboardType,
-    String? suffix,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          validator: validator,
-          keyboardType: keyboardType,
-          style: const TextStyle(color: Colors.white, fontSize: 16),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: Colors.white.withValues(alpha: 0.2),
-              fontSize: 16,
-            ),
-            filled: true,
-            fillColor: Colors.white.withValues(alpha: 0.05),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppTheme.primary, width: 1),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.red, width: 1),
-            ),
-            suffixText: suffix,
-            suffixStyle: const TextStyle(color: Colors.grey),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MacroBox extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color color;
-  final bool isMain;
-
-  const _MacroBox({
-    required this.label,
-    required this.value,
-    required this.color,
-    this.isMain = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(isMain ? 20 : 16),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: TextStyle(
-              color: color.withValues(alpha: 0.7),
-              fontSize: isMain ? 14 : 12,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: isMain ? 28 : 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ),
     );
   }

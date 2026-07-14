@@ -877,6 +877,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save without reestimating'**
   String get saveWithoutReestimating;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights'**
+  String get navInsights;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// No description provided for @navScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get navScan;
+
+  /// No description provided for @identifyingIngredientsStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'IDENTIFYING LOCAL INGREDIENTS...'**
+  String get identifyingIngredientsStatus;
+
+  /// No description provided for @finalizingReportStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'FINALIZING REPORT...'**
+  String get finalizingReportStatus;
+
+  /// No description provided for @analyzingEllipsis.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing...'**
+  String get analyzingEllipsis;
+
+  /// No description provided for @identifyingFoodStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Identifying food...'**
+  String get identifyingFoodStatus;
+
+  /// No description provided for @errorRecordIdNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: record ID not found for update.'**
+  String get errorRecordIdNotFound;
+
+  /// No description provided for @analyzingIngredientsStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing ingredients...'**
+  String get analyzingIngredientsStatus;
+
+  /// No description provided for @refineFoodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Refine Food'**
+  String get refineFoodTitle;
+
+  /// No description provided for @portionOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Portion (Optional)'**
+  String get portionOptionalLabel;
+
+  /// No description provided for @estimatingEllipsis.
+  ///
+  /// In en, this message translates to:
+  /// **'ESTIMATING...'**
+  String get estimatingEllipsis;
+
+  /// No description provided for @updateAction.
+  ///
+  /// In en, this message translates to:
+  /// **'UPDATE'**
+  String get updateAction;
+
+  /// No description provided for @summaryUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary updated successfully'**
+  String get summaryUpdatedSuccess;
+
+  /// No description provided for @assistedSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Assisted Search'**
+  String get assistedSearchTitle;
+
+  /// No description provided for @cameraPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access denied. Enable it in Settings to scan meals.'**
+  String get cameraPermissionDenied;
+
+  /// No description provided for @openSettingsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get openSettingsAction;
+
+  /// No description provided for @weeklyEmptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No meals logged this week yet'**
+  String get weeklyEmptyState;
+
+  /// No description provided for @selectAiModelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select AI Model'**
+  String get selectAiModelTitle;
+
+  /// No description provided for @refineWithAiTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Refine with AI'**
+  String get refineWithAiTooltip;
+
+  /// No description provided for @refineFoodSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix the name and let AI recalculate the macros automatically.'**
+  String get refineFoodSubtitle;
+
+  /// No description provided for @estimationCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimation complete!'**
+  String get estimationCompleted;
+
+  /// No description provided for @estimateFirstError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please estimate with AI first.'**
+  String get estimateFirstError;
+
+  /// No description provided for @manualEntryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe what you ate and AI will do the rest.'**
+  String get manualEntryDescription;
+
+  /// No description provided for @foodDetailsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'FOOD DETAILS'**
+  String get foodDetailsSection;
+
+  /// No description provided for @foodNameExampleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g.: 2 arepas, 1 burger, etc.'**
+  String get foodNameExampleHint;
+
+  /// No description provided for @aiMagicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Magic'**
+  String get aiMagicTitle;
+
+  /// No description provided for @aiMagicDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to have AI estimate the macros.'**
+  String get aiMagicDesc;
+
+  /// No description provided for @estimationResultSection.
+  ///
+  /// In en, this message translates to:
+  /// **'RESULTING ESTIMATE'**
+  String get estimationResultSection;
+
+  /// No description provided for @apiKeyTutorialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Google AI Studio API Key here'**
+  String get apiKeyTutorialDesc;
+
+  /// No description provided for @getKeyTutorialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to get a free key'**
+  String get getKeyTutorialDesc;
+
+  /// No description provided for @calorieGoalTutorialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust your daily goal for tracking'**
+  String get calorieGoalTutorialDesc;
 }
 
 class _AppLocalizationsDelegate

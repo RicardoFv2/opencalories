@@ -75,6 +75,10 @@ dependencies:
   shimmer: ^3.0.0
   confetti: ^0.8.0
 
+  # Liquid Glass (Impeller-only: Android/iOS/macOS). Wrapped behind
+  # LiquidGlassSurface with a BackdropFilter fallback — see lib/core/widgets/liquid_glass_surface.dart
+  liquid_glass_renderer: ^0.2.0-dev.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

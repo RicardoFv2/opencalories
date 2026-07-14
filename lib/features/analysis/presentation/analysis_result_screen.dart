@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +17,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:opencalories/features/history/data/meal_repository.dart';
 import 'package:opencalories/l10n/app_localizations.dart';
 import 'package:opencalories/core/utils/food_translation_helper.dart';
+import 'package:opencalories/core/widgets/app_button.dart';
+import 'package:opencalories/core/widgets/app_card.dart';
+import 'package:opencalories/core/widgets/app_text_field.dart';
+import 'package:opencalories/core/widgets/liquid_glass_surface.dart';
+import 'package:opencalories/core/widgets/macro_chip.dart';
 
 /// Tutorial colors (Cyberpunk Theme)
 const _tutorialBg = DesignTokens.surface;
@@ -111,7 +115,32 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
             );
           },
           error: (error, stack) => Scaffold(
-            body: Center(child: Text(l10n.errorWithMessage(error.toString()))),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(DesignTokens.spaceL),
+                child: AppCard(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.error_outline_rounded, color: DesignTokens.error, size: 40),
+                      const SizedBox(height: DesignTokens.spaceM),
+                      Text(
+                        l10n.errorWithMessage(error.toString()),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: DesignTokens.textSecondary),
+                      ),
+                      const SizedBox(height: DesignTokens.spaceL),
+                      AppButton(
+                        label: l10n.retake,
+                        variant: AppButtonVariant.primary,
+                        onPressed: () => context.pop(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
           data: (analysis) {
             final items = analysis?.items ?? [];
@@ -169,6 +198,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
     int totalFat, {
     bool isLoading = false,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -243,54 +273,35 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                           top: 16,
                           left: 16,
                           child:
-                              ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: BackdropFilter(
-                                      filter: ui.ImageFilter.blur(
-                                        sigmaX: 10,
-                                        sigmaY: 10,
-                                      ),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 6,
+                              LiquidGlassSurface(
+                                    shapeKind: GlassShapeKind.pill,
+                                    settings: DesignTokens.glassSettingsAccent,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.auto_awesome,
+                                          color: AppTheme.primary,
+                                          size: 14,
                                         ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          borderRadius: BorderRadius.circular(
-                                            20,
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          isLoading
+                                              ? l10n.analyzingEllipsis
+                                              : l10n.matchPercent(
+                                                  analysis?.confidence ?? 0,
+                                                ),
+                                          style: GoogleFonts.spaceGrotesk(
+                                            color: AppTheme.primary,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          border: Border.all(
-                                            color: AppTheme.primary.withValues(
-                                              alpha: 0.3,
-                                            ),
-                                          ),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.auto_awesome,
-                                              color: AppTheme.primary,
-                                              size: 14,
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              isLoading
-                                                  ? 'Analizando...'
-                                                  : AppLocalizations.of(
-                                                      context,
-                                                    )!.matchPercent(
-                                                      analysis?.confidence ?? 0,
-                                                    ),
-                                              style: GoogleFonts.spaceGrotesk(
-                                                color: AppTheme.primary,
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      ],
                                     ),
                                   )
                                   .animate(target: isLoading ? 1 : 0)
@@ -306,15 +317,13 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                           children: [
                             Text(
                               isLoading
-                                  ? 'Identificando alimentos...'
+                                  ? l10n.identifyingFoodStatus
                                   : (items.isNotEmpty
                                         ? FoodTranslationHelper.getLocalizedFoodItemName(
                                             context,
                                             items.first,
                                           ).toUpperCase()
-                                        : AppLocalizations.of(
-                                            context,
-                                          )!.detected),
+                                        : l10n.detected),
                               style: GoogleFonts.spaceGrotesk(
                                 color: AppTheme.primary,
                                 fontSize: 12,
@@ -544,65 +553,59 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                         ),
                         const SizedBox(height: 20),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             if (isLoading) ...[
-                              _MacroCard(
-                                    label: AppLocalizations.of(context)!.carbs,
-                                    value: '-',
-                                    color: DesignTokens.carbsColor,
-                                    isPrimary: false,
-                                  )
-                                  .animate(onPlay: (c) => c.repeat())
-                                  .shimmer(duration: 1.5.seconds),
-                              _MacroCard(
-                                    label: AppLocalizations.of(
-                                      context,
-                                    )!.protein,
-                                    value: '-',
-                                    color: DesignTokens.proteinColor,
-                                    isPrimary: true,
-                                  )
-                                  .animate(onPlay: (c) => c.repeat())
-                                  .shimmer(duration: 1.5.seconds),
-                              _MacroCard(
-                                    label: AppLocalizations.of(context)!.fat,
-                                    value: '-',
-                                    color: DesignTokens.fatColor,
-                                    isPrimary: false,
-                                  )
-                                  .animate(onPlay: (c) => c.repeat())
-                                  .shimmer(duration: 1.5.seconds),
+                              Expanded(
+                                child: MacroChip(type: MacroType.carbs, label: l10n.carbs, grams: 0)
+                                    .animate(onPlay: (c) => c.repeat())
+                                    .shimmer(duration: 1.5.seconds),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child:
+                                    MacroChip(
+                                      type: MacroType.protein,
+                                      label: l10n.protein,
+                                      grams: 0,
+                                      isPrimary: true,
+                                    ).animate(onPlay: (c) => c.repeat()).shimmer(
+                                      duration: 1.5.seconds,
+                                    ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: MacroChip(type: MacroType.fat, label: l10n.fat, grams: 0)
+                                    .animate(onPlay: (c) => c.repeat())
+                                    .shimmer(duration: 1.5.seconds),
+                              ),
                             ] else ...[
-                              _MacroCard(
-                                    label: AppLocalizations.of(context)!.carbs,
-                                    value: '${totalCarbs}g',
-                                    color: DesignTokens.carbsColor,
-                                    isPrimary: false,
-                                  )
-                                  .animate()
-                                  .fadeIn(delay: 300.ms)
-                                  .slideX(begin: 0.1, end: 0),
-                              _MacroCard(
-                                    label: AppLocalizations.of(
-                                      context,
-                                    )!.protein,
-                                    value: '${totalProtein}g',
-                                    color: DesignTokens.proteinColor,
-                                    isPrimary: true,
-                                  )
-                                  .animate()
-                                  .fadeIn(delay: 450.ms)
-                                  .slideX(begin: 0.1, end: 0),
-                              _MacroCard(
-                                    label: AppLocalizations.of(context)!.fat,
-                                    value: '${totalFat}g',
-                                    color: DesignTokens.fatColor,
-                                    isPrimary: false,
-                                  )
-                                  .animate()
-                                  .fadeIn(delay: 600.ms)
-                                  .slideX(begin: 0.1, end: 0),
+                              Expanded(
+                                child:
+                                    MacroChip(
+                                      type: MacroType.carbs,
+                                      label: l10n.carbs,
+                                      grams: totalCarbs.toDouble(),
+                                    ).animate().fadeIn(delay: 300.ms).slideX(begin: 0.1, end: 0),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child:
+                                    MacroChip(
+                                      type: MacroType.protein,
+                                      label: l10n.protein,
+                                      grams: totalProtein.toDouble(),
+                                      isPrimary: true,
+                                    ).animate().fadeIn(delay: 450.ms).slideX(begin: 0.1, end: 0),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child:
+                                    MacroChip(
+                                      type: MacroType.fat,
+                                      label: l10n.fat,
+                                      grams: totalFat.toDouble(),
+                                    ).animate().fadeIn(delay: 600.ms).slideX(begin: 0.1, end: 0),
+                              ),
                             ],
                           ],
                         ),
@@ -624,17 +627,11 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
           children: [
             if (!widget.isViewOnly) ...[
               Expanded(
-                child: FilledButton.icon(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Colors.white10,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
+                child: AppButton(
+                  label: l10n.retake,
                   icon: const Icon(Icons.replay),
-                  label: Text(AppLocalizations.of(context)!.retake),
+                  variant: AppButtonVariant.glass,
+                  onPressed: () => context.pop(),
                 ),
               ),
               const SizedBox(width: 16),
@@ -642,19 +639,23 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
             Expanded(
               flex: 2,
               child:
-                  ElevatedButton.icon(
-                        onPressed: (_isSaving || isLoading)
+                  AppButton(
+                        label: (widget.mealId != null || widget.isViewOnly)
+                            ? l10n.updateAction
+                            : l10n.logFood,
+                        icon: Icon(
+                          (widget.mealId != null || widget.isViewOnly)
+                              ? Icons.update
+                              : Icons.check_circle,
+                        ),
+                        variant: AppButtonVariant.primary,
+                        loading: _isSaving,
+                        onPressed: isLoading
                             ? null
                             : () async {
-                                if (analysis == null ||
-                                    analysis.items.isEmpty) {
+                                if (analysis == null || analysis.items.isEmpty) {
                                   if (context.mounted) {
-                                    context.showAppSnackBar(
-                                      AppLocalizations.of(
-                                        context,
-                                      )!.noItemsToSave,
-                                      isError: true,
-                                    );
+                                    context.showAppSnackBar(l10n.noItemsToSave, isError: true);
                                   }
                                   return;
                                 }
@@ -662,12 +663,9 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                 await HapticFeedback.heavyImpact();
                                 setState(() => _isSaving = true);
                                 try {
-                                  if (widget.mealId != null ||
-                                      widget.isViewOnly) {
+                                  if (widget.mealId != null || widget.isViewOnly) {
                                     if (widget.mealId == null) {
-                                      throw Exception(
-                                        'Error: No se encontró el ID del registro para actualizar.',
-                                      );
+                                      throw Exception(l10n.errorRecordIdNotFound);
                                     }
                                     // Update existing record
                                     await ref
@@ -675,9 +673,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                         .updateMeal(widget.mealId!, analysis);
                                     if (context.mounted) {
                                       context.go('/');
-                                      context.showAppSnackBar(
-                                        'Resumen actualizado correctamente',
-                                      );
+                                      context.showAppSnackBar(l10n.summaryUpdatedSuccess);
                                     }
                                   } else {
                                     // Save new record
@@ -687,19 +683,13 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                         .saveMeal(analysis, widget.imageFile!);
                                     if (context.mounted) {
                                       context.go('/');
-                                      context.showAppSnackBar(
-                                        AppLocalizations.of(
-                                          context,
-                                        )!.mealSavedToHistory,
-                                      );
+                                      context.showAppSnackBar(l10n.mealSavedToHistory);
                                     }
                                   }
                                 } catch (e) {
                                   if (context.mounted) {
                                     context.showAppSnackBar(
-                                      AppLocalizations.of(
-                                        context,
-                                      )!.errorSavingMeal(e.toString()),
+                                      l10n.errorSavingMeal(e.toString()),
                                       isError: true,
                                     );
                                   }
@@ -709,21 +699,6 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                   }
                                 }
                               },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primary,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        icon: Icon(
-                          (widget.mealId != null || widget.isViewOnly)
-                              ? Icons.update
-                              : Icons.check_circle,
-                        ),
-                        label: Text(
-                          (widget.mealId != null || widget.isViewOnly)
-                              ? 'ACTUALIZAR'
-                              : AppLocalizations.of(context)!.logFood,
-                        ),
                       )
                       .animate(target: _hasChanges(analysis) ? 1 : 0)
                       .fadeIn()
@@ -851,7 +826,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
                                       ),
                                       IconButton(
                                         key: ValueKey('refine_item_$i'),
-                                        tooltip: 'Refinar con IA',
+                                        tooltip: AppLocalizations.of(context)!.refineWithAiTooltip,
                                         onPressed: () => _showEditItemDialog(
                                           context,
                                           items[i],
@@ -962,7 +937,7 @@ class _AnalysisResultScreenState extends ConsumerState<AnalysisResultScreen> {
               Expanded(
                 child: Text(
                   isLoading
-                      ? 'Analizando ingredientes...'
+                      ? l10n.analyzingIngredientsStatus
                       : l10n.foodsDetectedCount(items.length),
                   style: GoogleFonts.spaceGrotesk(
                     color: Colors.white,
@@ -1076,284 +1051,139 @@ class _RefineDialogState extends State<_RefineDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1A1A).withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: LiquidGlassSurface(
+        borderRadius: 28,
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.auto_awesome,
-                      color: AppTheme.primary,
-                      size: 24,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Refinar Alimento',
-                      style: GoogleFonts.spaceGrotesk(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
+                const Icon(Icons.auto_awesome, color: AppTheme.primary, size: 24),
+                const SizedBox(width: 12),
                 Text(
-                  'Corrige el nombre y deja que la IA recalcule los macros automáticamente.',
+                  l10n.refineFoodTitle,
                   style: GoogleFonts.spaceGrotesk(
-                    color: Colors.white60,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: TextField(
-                              controller: _nameController,
-                              decoration: InputDecoration(
-                                labelText: l10n.foodName,
-                                labelStyle: const TextStyle(
-                                  color: AppTheme.primary,
-                                ),
-                                enabledBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white24),
-                                ),
-                                focusedBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppTheme.primary,
-                                  ),
-                                ),
-                              ),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                              onChanged: (val) {
-                                setState(() {
-                                  _pendingItem = _pendingItem.copyWith(
-                                    name: val,
-                                  );
-                                });
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            flex: 2,
-                            child: TextField(
-                              controller: _portionController,
-                              decoration: InputDecoration(
-                                labelText: 'Porción (Opcional)',
-                                labelStyle: const TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 12,
-                                ),
-                                enabledBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white24),
-                                ),
-                                focusedBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: AppTheme.primary,
-                                  ),
-                                ),
-                              ),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                              onChanged: (val) {
-                                setState(() {
-                                  _pendingItem = _pendingItem.copyWith(
-                                    portionEstimate: val,
-                                  );
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 54,
-                        child: ElevatedButton.icon(
-                          onPressed: _isReanalyzing
-                              ? null
-                              : () async {
-                                  final name = _nameController.text.trim();
-                                  if (name.isEmpty) return;
-
-                                  setState(() => _isReanalyzing = true);
-
-                                  try {
-                                    final result = await widget.reanalyzeItem(
-                                      name,
-                                      _portionController.text.trim(),
-                                    );
-
-                                    if (result != null && context.mounted) {
-                                      widget.onSave(result);
-                                      Navigator.pop(context);
-                                    } else if (mounted) {
-                                      setState(() => _isReanalyzing = false);
-                                    }
-                                  } catch (e) {
-                                    if (context.mounted) {
-                                      setState(() => _isReanalyzing = false);
-                                      context.showAppSnackBar(
-                                        'Error: $e',
-                                        isError: true,
-                                      );
-                                    }
-                                  }
-                                },
-                          icon: _isReanalyzing
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.black,
-                                  ),
-                                )
-                              : const Icon(Icons.auto_awesome, size: 20),
-                          label: Text(
-                            _isReanalyzing ? 'ESTIMANDO...' : 'ESTIMAR CON IA',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: DesignTokens.primary,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: TextButton(
-                          onPressed: _isReanalyzing
-                              ? null
-                              : () {
-                                  final name = _nameController.text.trim();
-                                  if (name.isEmpty) return;
-
-                                  widget.onSave(
-                                    _pendingItem.copyWith(
-                                      name: name,
-                                      portionEstimate: _portionController.text
-                                          .trim(),
-                                    ),
-                                  );
-                                  Navigator.pop(context);
-                                },
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white70,
-                          ),
-                          child: Text(
-                            l10n.saveWithoutReestimating.toUpperCase(),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          l10n.cancel,
-                          style: const TextStyle(color: Colors.white54),
-                        ),
-                      ),
-                    ],
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.refineFoodSubtitle,
+              style: GoogleFonts.spaceGrotesk(color: Colors.white60, fontSize: 14),
+            ),
+            const SizedBox(height: 24),
+            SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: AppTextField(
+                          controller: _nameController,
+                          label: l10n.foodName,
+                          onChanged: (val) {
+                            setState(() {
+                              _pendingItem = _pendingItem.copyWith(name: val);
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        flex: 2,
+                        child: AppTextField(
+                          controller: _portionController,
+                          label: l10n.portionOptionalLabel,
+                          onChanged: (val) {
+                            setState(() {
+                              _pendingItem = _pendingItem.copyWith(portionEstimate: val);
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  AppButton(
+                    label: _isReanalyzing ? l10n.estimatingEllipsis : l10n.estimateWithAiAction,
+                    icon: const Icon(Icons.auto_awesome, size: 20),
+                    variant: AppButtonVariant.primary,
+                    expand: true,
+                    loading: _isReanalyzing,
+                    onPressed: () async {
+                      final name = _nameController.text.trim();
+                      if (name.isEmpty) return;
+
+                      setState(() => _isReanalyzing = true);
+
+                      try {
+                        final result = await widget.reanalyzeItem(
+                          name,
+                          _portionController.text.trim(),
+                        );
+
+                        if (result != null && context.mounted) {
+                          widget.onSave(result);
+                          Navigator.pop(context);
+                        } else if (mounted) {
+                          setState(() => _isReanalyzing = false);
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          setState(() => _isReanalyzing = false);
+                          context.showAppSnackBar(
+                            l10n.errorWithMessage(e.toString()),
+                            isError: true,
+                          );
+                        }
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  AppButton(
+                    label: l10n.saveWithoutReestimating.toUpperCase(),
+                    variant: AppButtonVariant.ghost,
+                    expand: true,
+                    foregroundColor: Colors.white70,
+                    onPressed: _isReanalyzing
+                        ? null
+                        : () {
+                            final name = _nameController.text.trim();
+                            if (name.isEmpty) return;
+
+                            widget.onSave(
+                              _pendingItem.copyWith(
+                                name: name,
+                                portionEstimate: _portionController.text.trim(),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                  ),
+                  const SizedBox(height: 8),
+                  AppButton(
+                    label: l10n.cancel,
+                    variant: AppButtonVariant.ghost,
+                    expand: true,
+                    foregroundColor: Colors.white54,
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     ).animate().scale(duration: 200.ms, curve: Curves.easeOut);
-  }
-}
-
-class _MacroCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color color;
-  final bool isPrimary;
-
-  const _MacroCard({
-    required this.label,
-    required this.value,
-    required this.color,
-    required this.isPrimary,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isPrimary
-            ? AppTheme.primary.withValues(alpha: 0.1)
-            : Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: isPrimary
-            ? Border.all(color: AppTheme.primary.withValues(alpha: 0.3))
-            : null,
-      ),
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: isPrimary ? AppTheme.primary : Colors.grey,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              color: isPrimary ? AppTheme.primary : Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Container(
-            width: 4,
-            height: 4,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-        ],
-      ),
-    );
   }
 }
 
